@@ -1,5 +1,5 @@
 enum ChartEvent {
   init,
   onPlaceData,
-  onChatData,
+  onChatData, onTapNId, onTapToggle, onTapPci, onTapNPci,
 }

@@ -90,8 +90,8 @@ class MeasureDataCard extends StatelessWidget {
                       children: [
                         SvgPicture.asset(
                             measureData.wirelessType == WirelessType.wLte
-                                ? 'icons/ic_lte.svg'
-                                : 'icons/ic_5g.svg'),
+                                ? 'assets/icons/ic_lte.svg'
+                                : 'assets/icons/ic_5g.svg'),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -141,7 +141,7 @@ class MeasureDataCard extends StatelessWidget {
               InkWell(
                 onTap: onTapAll,
                 child: SvgPicture.asset(
-                  'icons/ic_list_all.svg',
+                  'assets/icons/ic_list_all.svg',
                   width: 46,
                   height: 46,
                 ),
@@ -150,7 +150,7 @@ class MeasureDataCard extends StatelessWidget {
               InkWell(
                 onTap: onTapRemove,
                 child: SvgPicture.asset(
-                  'icons/ic_list_remove.svg',
+                  'assets/icons/ic_list_remove.svg',
                   width: 46,
                   height: 46,
                 ),

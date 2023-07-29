@@ -23,8 +23,8 @@ TableData _$TableDataFromJson(Map<String, dynamic> json) => TableData(
       nDst: json['nDst'] as String,
       nRnm: json['nRnm'] as String,
       nId: json['nId'] as String,
-      checked: json['checked'] as String,
-      hasColor: json['hasColor'] as String,
+      checked: Convert.stringToBool(json['checked'] as String),
+      hasColor: Convert.stringToBool(json['hasColor'] as String),
     );
 
 Map<String, dynamic> _$TableDataToJson(TableData instance) => <String, dynamic>{
@@ -44,6 +44,6 @@ Map<String, dynamic> _$TableDataToJson(TableData instance) => <String, dynamic>{
       'nDst': instance.nDst,
       'nRnm': instance.nRnm,
       'nId': instance.nId,
-      'checked': instance.checked,
-      'hasColor': instance.hasColor,
+      'checked': Convert.boolToString(instance.checked),
+      'hasColor': Convert.boolToString(instance.hasColor),
     };

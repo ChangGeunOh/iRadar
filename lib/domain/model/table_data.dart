@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../common/utils/convert.dart';
+
 part 'table_data.g.dart';
 
 @JsonSerializable()
@@ -20,8 +22,16 @@ class TableData {
   final String nDst;
   final String nRnm;
   final String nId;
-  final String checked;
-  final String hasColor;
+  @JsonKey(
+    fromJson: Convert.stringToBool,
+    toJson: Convert.boolToString,
+  )
+  late bool checked;
+  @JsonKey(
+    fromJson: Convert.stringToBool,
+    toJson: Convert.boolToString,
+  )
+  final bool hasColor;
 
   TableData({
     required this.pci,
@@ -43,6 +53,40 @@ class TableData {
     required this.checked,
     required this.hasColor,
   });
+
+  TableData copyWith({
+    bool? checked,
+  }) {
+    return TableData(
+      pci: pci,
+      nPci: nPci,
+      nTime: nTime,
+      nRsrp: nRsrp,
+      index: index,
+      sTime: sTime,
+      rp: rp,
+      cqi: cqi,
+      ri: ri,
+      dlMcs: dlMcs,
+      dlLayer: dlLayer,
+      dlRb: dlRb,
+      dlTb: dlTb,
+      nDst: nDst,
+      nRnm: nRnm,
+      nId: nId,
+      checked: checked ?? this.checked,
+      hasColor: hasColor,
+    );
+  }
+
+
+  void toggle() {
+    checked = !checked;
+  }
+
+  void isCheck(bool isCheck) {
+    checked = isCheck;
+  }
 
   Map<String, dynamic> toJson() => _$TableDataToJson(this);
 

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
@@ -19,12 +21,52 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       case ChartEvent.init:
         break;
       case ChartEvent.onPlaceData:
+        emit(state.copyWith(placeData: event.extra));
         final chartTableData = await repository.loadChartTableData(event.extra);
         if (chartTableData != null) {
           emit(state.copyWith(chartTableData: chartTableData));
         }
         break;
       case ChartEvent.onChatData:
+        break;
+      case ChartEvent.onTapNId:
+        print("onTapNid>");
+        var tableData = event.extra as TableData;
+        tableData.toggle();
+        final index = state.chartTableData!.tableList
+            .indexWhere((element) => element.pci == tableData.pci);
+        state.chartTableData!.tableList[index] = tableData;
+        emit(
+          state.copyWith(
+            chartTableData: state.chartTableData,
+            isCheck: false,
+          ),
+        );
+        break;
+      case ChartEvent.onTapToggle:
+        print("ChartEvent.onTapToogle");
+        final isCheck = !state.isCheck;
+        final tableList = state.chartTableData!.tableList.map(
+          (e) {
+            e.isCheck(isCheck);
+            return e;
+          },
+        ).toList();
+        emit(
+          state.copyWith(
+            chartTableData: ChartTableData(
+              chartList: state.chartTableData!.chartList,
+              tableList: tableList,
+            ),
+            isCheck: isCheck,
+          ),
+        );
+        break;
+      case ChartEvent.onTapPci:
+        print("ChartEvent.onTapPci");
+        break;
+      case ChartEvent.onTapNPci:
+        print("ChartEvent.onTapNPci");
         break;
     }
   }

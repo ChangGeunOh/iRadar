@@ -18,6 +18,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   List<BitmapDescriptor>? mapPins;
   BitmapDescriptor? basePin;
 
+
   CameraPosition initCameraPosition() {
     return repository.getCameraPosition();
   }
@@ -33,14 +34,14 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
   Future<void> _init() async {
     final filenames = List.generate(
-        11, (index) => 'icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
+        11, (index) => 'assets/icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
     mapPins = await Future.wait(filenames.map((e) async {
       final image = await rootBundle.load(e);
       final bytes = image.buffer.asUint8List();
       return BitmapDescriptor.fromBytes(bytes);
     }).toList());
 
-    final image = await rootBundle.load('icons/pin_base.png');
+    final image = await rootBundle.load('assets/icons/pin_base.png');
     final bytes = image.buffer.asUint8List();
     basePin = BitmapDescriptor.fromBytes(bytes);
   }

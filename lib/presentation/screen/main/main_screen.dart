@@ -42,12 +42,12 @@ class MainScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     controller: bloc.pageController,
                     children: [
+                      ChartScreen(
+                        placeData: state.placeData,
+                      ),
                       MapScreen(
                         placeData: state.placeData,
                         isRemove: state.isRemove,
-                      ),
-                      ChartScreen(
-                        placeData: state.placeData,
                       ),
                     ],
                   ),
@@ -176,8 +176,8 @@ class MainScreen extends StatelessWidget {
                   child: InkWell(
                     onTap: () => bloc.add(BlocEvent(MainEvent.onTapDrawer)),
                     child: SvgPicture.asset(state.isShowSide
-                        ? 'icons/ic_drawer_close.svg'
-                        : 'icons/ic_drawer_open.svg'),
+                        ? 'assets/icons/ic_drawer_close.svg'
+                        : 'assets/icons/ic_drawer_open.svg'),
                   ),
                 ),
                 if (state.isLoading)
