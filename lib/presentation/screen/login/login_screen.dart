@@ -138,6 +138,14 @@ class LoginScreen extends StatelessWidget {
                         controller: bloc.passwordController,
                         style: Theme.of(context).textTheme.bodySmall,
                         obscureText: state.isHide,
+                        onSubmitted: (value) {
+                          bloc.add(
+                            BlocEvent(
+                              LoginEvent.onTap,
+                              extra: LoginTapType.login,
+                            ),
+                          );
+                        },
                         onChanged: (value) {
                           bloc.add(
                               BlocEvent(LoginEvent.onPassword, extra: value));
