@@ -42,14 +42,14 @@ class ChartScreen extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapWeb)),
                       icon: const Icon(
                         Icons.web,
                         color: Colors.black87,
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: ()=> bloc.add(BlocEvent(ChartEvent.onTapExcel)),
                       icon: const Icon(
                         Icons.file_download,
                         color: Colors.black87,

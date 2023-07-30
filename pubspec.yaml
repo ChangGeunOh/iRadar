@@ -61,6 +61,7 @@ dependencies:
   dio_cookie_manager:
   cookie_jar:
   fl_chart: ^0.63.0
+  excel: 2.1.0
 
 dev_dependencies:
   flutter_test:

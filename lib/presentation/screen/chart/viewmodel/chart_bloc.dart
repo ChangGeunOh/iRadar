@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
@@ -67,6 +68,24 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         break;
       case ChartEvent.onTapNPci:
         print("ChartEvent.onTapNPci");
+        break;
+      case ChartEvent.onTapWeb:
+        print('ChartEvent.onTapWeb');
+        break;
+      case ChartEvent.onTapExcel:
+        print('ChartEvent.onTapExcel');
+        var excel = Excel.createExcel();
+        Sheet sheetObject = excel['Sheet1'];
+        CellStyle cellStyle = CellStyle(backgroundColorHex: '#1AFF1A', fontFamily : getFontFamily(FontFamily.Calibri));
+        cellStyle.underline = Underline.Single; // or Underline.Double
+
+        var cell = sheetObject.cell(CellIndex.indexByString('A1'));
+        cell.value = 8; // dynamic values support provided;
+        cell.cellStyle = cellStyle;
+        cell = sheetObject.cell(CellIndex.indexByString('A2'));
+        cell.value = "THIS IS EXCEL TEST...";
+        excel.save(fileName: 'EXCEl_TEST.xlsx');
+
         break;
     }
   }
