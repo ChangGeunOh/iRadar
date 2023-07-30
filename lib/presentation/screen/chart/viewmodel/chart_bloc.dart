@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
+import '../../web/web_screen.dart';
 import 'chart_state.dart';
 
 class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
@@ -71,12 +73,18 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         break;
       case ChartEvent.onTapWeb:
         print('ChartEvent.onTapWeb');
+        context.pushNamed(
+          WebScreen.routeName,
+          extra: state.placeData,
+        );
         break;
       case ChartEvent.onTapExcel:
         print('ChartEvent.onTapExcel');
         var excel = Excel.createExcel();
         Sheet sheetObject = excel['Sheet1'];
-        CellStyle cellStyle = CellStyle(backgroundColorHex: '#1AFF1A', fontFamily : getFontFamily(FontFamily.Calibri));
+        CellStyle cellStyle = CellStyle(
+            backgroundColorHex: '#1AFF1A',
+            fontFamily: getFontFamily(FontFamily.Calibri));
         cellStyle.underline = Underline.Single; // or Underline.Double
 
         var cell = sheetObject.cell(CellIndex.indexByString('A1'));

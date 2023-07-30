@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
+import 'package:googlemap/presentation/screen/web/web_screen.dart';
 
 import '../../presentation/screen/login/login_screen.dart';
 
@@ -15,6 +17,15 @@ final routerConfig = GoRouter(
       path: '/main',
       name: MainScreen.routeName,
       builder: (_, __) => const MainScreen(),
+      routes: [
+        GoRoute(
+          path: 'web',
+          name: WebScreen.routeName,
+          builder: (context, state) => WebScreen(
+            placeData: state.extra as PlaceData,
+          ),
+        ),
+      ],
     ),
   ],
 );
