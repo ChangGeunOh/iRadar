@@ -1,4 +1,8 @@
 class Convert {
+  static dynamic boolToDynamic(bool value) {
+    return value;
+  }
+
   static String listToString(List<String> values) {
    return values.join("|");
   }
@@ -32,5 +36,21 @@ class Convert {
 
   static int dynamicToInt(dynamic value) {
     return value.runtimeType == int ? value as int : int.parse(value);
+  }
+
+  static bool dynamicToBool(dynamic value) {
+    var convertedValue = false;
+    switch(value.runtimeType) {
+      case int:
+        convertedValue = (value as int) == 1;
+        break;
+      case String:
+        convertedValue = (value as String) == "1";
+        break;
+      case bool:
+        convertedValue = value as bool;
+        break;
+    }
+    return convertedValue;
   }
 }

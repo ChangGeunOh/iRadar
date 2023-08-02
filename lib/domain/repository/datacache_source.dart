@@ -4,9 +4,6 @@ import 'package:googlemap/domain/model/chart_table_data.dart';
 import '../model/map_data.dart';
 
 abstract class DataCacheSource {
-  void setMarkers(String link, List<Marker> markers);
-
-  List<Marker>? getMarkers(String link);
 
   void setGoogleMapController(GoogleMapController controller);
 
@@ -21,5 +18,11 @@ abstract class DataCacheSource {
 
   ChartTableData? getChartTableData(String link);
   void setChartTableData(String link, ChartTableData chartTableData);
+
+  void setBaseMarkers(String link, List<Marker> markers);
+  List<Marker>? getBaseMarkers(String link);
+
+  void setMeasureMarkers(String link, List<Marker> markers);
+  List<Marker>? getMeasureMarkers(String link);
 
 }

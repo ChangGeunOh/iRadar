@@ -14,16 +14,6 @@ class DataCacheSourceImpl extends DataCacheSource {
   }) : _dataCache = dataCache;
 
   @override
-  void setMarkers(String link, List<Marker> markers) {
-    _dataCache.cacheMarkers[link] = markers;
-  }
-
-  @override
-  List<Marker>? getMarkers(String link) {
-    return _dataCache.cacheMarkers[link];
-  }
-
-  @override
   CameraPosition? getCameraPosition() {
     return _dataCache.cameraPosition;
   }
@@ -61,6 +51,25 @@ class DataCacheSourceImpl extends DataCacheSource {
   @override
   ChartTableData? getChartTableData(String link) {
     return _dataCache.cacheChartTableData[link];
+  }
+
+  @override
+  void setBaseMarkers(String link, List<Marker> markers) {
+    _dataCache.cacheBaseMarkers[link] = markers;
+  }
+
+  @override
+  List<Marker>? getBaseMarkers(String link) {
+    return _dataCache.cacheBaseMarkers[link];
+  }
+  @override
+  void setMeasureMarkers(String link, List<Marker> markers) {
+    _dataCache.cacheMeasureMarkers[link] = markers;
+  }
+
+  @override
+  List<Marker>? getMeasureMarkers(String link) {
+    return _dataCache.cacheMeasureMarkers[link];
   }
 
 

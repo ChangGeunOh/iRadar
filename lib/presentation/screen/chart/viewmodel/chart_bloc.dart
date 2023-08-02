@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
@@ -72,10 +73,13 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         print("ChartEvent.onTapNPci");
         break;
       case ChartEvent.onTapWeb:
-        print('ChartEvent.onTapWeb');
+        final excelRequestData = ExcelRequestData(
+          placeData: state.placeData!,
+          tableList: state.chartTableData!.tableList,
+        );
         context.pushNamed(
           WebScreen.routeName,
-          extra: state.placeData,
+          extra: excelRequestData,
         );
         break;
       case ChartEvent.onTapExcel:

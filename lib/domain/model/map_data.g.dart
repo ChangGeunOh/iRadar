@@ -18,4 +18,5 @@ MapData _$MapDataFromJson(Map<String, dynamic> json) => MapData(
 Map<String, dynamic> _$MapDataToJson(MapData instance) => <String, dynamic>{
       'measure_list': instance.measureList,
       'base_list': instance.baseList,
+      'isSelected': instance.isSelected,
     };

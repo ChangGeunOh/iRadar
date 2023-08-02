@@ -12,7 +12,12 @@ class WebBloc extends BlocBloc<BlocEvent<WebEvent>, WebState> {
 
   @override
   FutureOr<void> onBlocEvent(event, Emitter<WebState> emit) {
-    throw UnimplementedError();
+    switch(event) {
+      case WebEvent.onInit:
+        final excelRequestData = event.extra;
+        repository.loadExcelResponseData(excelRequestData);
+        break;
+    }
   }
 
 }

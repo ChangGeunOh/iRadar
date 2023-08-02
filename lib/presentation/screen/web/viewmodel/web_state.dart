@@ -1,15 +1,17 @@
+import 'package:googlemap/domain/model/excel_request_data.dart';
+
 class WebState {
-  final String? value;
+  final ExcelRequestData? excelRequestData;
 
   WebState({
-    this.value,
+    this.excelRequestData,
   });
 
   WebState copyWith({
-    String? value,
+    ExcelRequestData? excelRequestData,
   }) {
     return WebState(
-      value: value ?? this.value,
+      excelRequestData: excelRequestData ?? this.excelRequestData,
     );
   }
 }

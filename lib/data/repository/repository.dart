@@ -5,6 +5,7 @@ import 'package:googlemap/domain/model/map_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
+import '../../domain/model/excel_response_data.dart';
 import '../../domain/repository/database_source.dart';
 import '../../domain/repository/datacache_source.dart';
 import '../../domain/repository/datastore_source.dart';
@@ -85,14 +86,6 @@ class Repository {
     return _dataCacheSource.getCameraPosition() ?? initCameraPosition;
   }
 
-  void setMarkers(PlaceData placeData, List<Marker> markers) {
-    _dataCacheSource.setMarkers(placeData.link, markers);
-  }
-
-  List<Marker>? getMakers(PlaceData placeData) {
-    return _dataCacheSource.getMarkers(placeData.link);
-  }
-
   Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
 
     if (_dataCacheSource.getChartTableData(placeData.link) == null) {
@@ -104,5 +97,24 @@ class Repository {
     return _dataCacheSource.getChartTableData(placeData.link);
   }
 
+  Future<ExcelResponseData?> loadExcelResponseData(excelRequestData) async {
+    return null;
+  }
+
+  void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {
+    _dataCacheSource.setMeasureMarkers(placeData.link, markers);
+  }
+
+  List<Marker>? getMeasureMarkers(PlaceData placeData) {
+    return _dataCacheSource.getMeasureMarkers(placeData.link);
+  }
+
+  void setBaseMarkers(PlaceData placeData, List<Marker> markers) {
+    _dataCacheSource.setBaseMarkers(placeData.link, markers);
+  }
+
+  List<Marker>? getBaseMarkers(PlaceData placeData) {
+    return _dataCacheSource.getBaseMarkers(placeData.link);
+  }
 
 }

@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/map_cursor_state.dart';
+import 'package:googlemap/domain/model/measure_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
+import '../../../../domain/model/base_data.dart';
 import '../../../../domain/model/map_data.dart';
 import 'map_state.dart';
 
@@ -17,7 +21,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   GoogleMapController? controller;
   List<BitmapDescriptor>? mapPins;
   BitmapDescriptor? basePin;
-
+  final Set<Circle> circleSet = HashSet<Circle>();
 
   CameraPosition initCameraPosition() {
     return repository.getCameraPosition();
@@ -34,7 +38,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
   Future<void> _init() async {
     final filenames = List.generate(
-        11, (index) => 'assets/icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
+        12, (index) => 'assets/icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
     mapPins = await Future.wait(filenames.map((e) async {
       final image = await rootBundle.load(e);
       final bytes = image.buffer.asUint8List();
@@ -44,6 +48,16 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     final image = await rootBundle.load('assets/icons/pin_base.png');
     final bytes = image.buffer.asUint8List();
     basePin = BitmapDescriptor.fromBytes(bytes);
+
+    circleSet.add(
+      Circle(
+        visible: false,
+        circleId: const CircleId('mouse_point'),
+        radius: state.radius,
+        strokeWidth: 0,
+        fillColor: const Color(0x80ff0000),
+      ),
+    );
   }
 
   @override
@@ -78,8 +92,16 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
             ),
           );
 
-          final markers = _getMarkers(event.extra, mapData);
-          emit(state.copyWith(markers: markers));
+          final baseMarkers = _getBaseMarkers(event.extra, mapData.baseList);
+          final measureMarkers =
+              _getMeasureMarkers(event.extra, mapData.measureList);
+
+          emit(
+            state.copyWith(
+              baseMarkers: baseMarkers,
+              measureMarkers: measureMarkers,
+            ),
+          );
         }
         break;
       case MapEvent.onTapRectangle:
@@ -124,6 +146,68 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           emit(state.copyWith(polygonSet: polygon));
         }
         break;
+      case MapEvent.onMoveCursor:
+        if (state.cursorState != MapCursorState.none) {
+          final latLng = event.extra as LatLng;
+          final circle = circleSet.first.copyWith(
+            centerParam: latLng,
+          );
+          circleSet.clear();
+          circleSet.add(circle);
+
+          final markerList = state.measureMarkers.map((e) {
+            if (e.position.distanceTo(latLng) <= state.radius / 1000.0) {
+              if ((state.cursorState == MapCursorState.remove) &&
+                  e.icon != mapPins![11]) {
+                return e.copyWith(iconParam: mapPins![11]);
+              }
+              if ((state.cursorState == MapCursorState.add) &&
+                  e.icon == mapPins![11]) {
+                return e.copyWith(
+                    iconParam: getRsrp5Marker(
+                        double.parse(e.infoWindow.snippet!.split("/").last)));
+              }
+            }
+            return e;
+          });
+
+          emit(
+            state.copyWith(
+              circleSet: circleSet,
+              measureMarkers: markerList.toList(),
+            ),
+          );
+        }
+        break;
+      case MapEvent.onChangeRadius:
+        final circle = circleSet.first.copyWith(
+          radiusParam: event.extra,
+        );
+        circleSet.clear();
+        circleSet.add(circle);
+
+        emit(
+          state.copyWith(
+            radius: event.extra,
+            circleSet: circleSet,
+          ),
+        );
+
+        break;
+      case MapEvent.onChangeCursorState:
+        final fillColor = event.extra == MapCursorState.remove
+            ? Colors.red.withOpacity(0.5)
+            : Colors.blue.withOpacity(0.5);
+
+        final circle = circleSet.first.copyWith(
+          fillColorParam: fillColor,
+          visibleParam: event.extra != MapCursorState.none,
+        );
+        circleSet.clear();
+        circleSet.add(circle);
+
+        emit(state.copyWith(cursorState: event.extra, circleSet: circleSet));
+        break;
     }
   }
 
@@ -152,11 +236,14 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     repository.setCameraPosition(value);
   }
 
-  List<Marker> _getMarkers(PlaceData placeData, MapData mapData) {
-    var markers = repository.getMakers(placeData);
+  List<Marker> _getMeasureMarkers(
+    PlaceData placeData,
+    List<MeasureData> measureList,
+  ) {
+    var markers = repository.getMeasureMarkers(placeData);
     if (markers == null) {
       markers = List<Marker>.empty(growable: true);
-      markers += mapData.measureList
+      markers += measureList
           .map(
             (e) => Marker(
               markerId: MarkerId('M${e.idx}'),
@@ -167,7 +254,19 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           )
           .toList();
 
-      markers += mapData.baseList
+      repository.setMeasureMarkers(placeData, markers);
+    }
+    return markers;
+  }
+
+  List<Marker> _getBaseMarkers(
+    PlaceData placeData,
+    List<BaseData> baseList,
+  ) {
+    var markers = repository.getBaseMarkers(placeData);
+    if (markers == null) {
+      markers = List<Marker>.empty(growable: true);
+      markers += baseList
           .map(
             (e) => Marker(
               markerId: MarkerId('B${e.idx}'),
@@ -177,30 +276,9 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
             ),
           )
           .toList();
-      repository.setMarkers(placeData, markers);
+
+      repository.setBaseMarkers(placeData, markers);
     }
     return markers;
   }
 }
-
-/*
-
-if(-120 > $RD[rp5]) {
-	$imgD = "../img/p120.png";
-} elseif(-120 <= $RD[rp5] && -110 > $RD[rp5]) {
-	$imgD = "../img/p110.png";
-} elseif(-110 <= $RD[rp5] && -100 > $RD[rp5]) {
-	$imgD = "../img/sp1.jpg";
-} elseif(-100 <= $RD[rp5] && -90 > $RD[rp5]) {
-	$imgD = "../img/sp3.jpg";
-} elseif(-90 <= $RD[rp5] && -80 > $RD[rp5]) {
-	$imgD = "../img/sp6.jpg";
-} elseif(-80 <= $RD[rp5] && -70 > $RD[rp5]) {
-	$imgD = "../img/sp7.jpg";
-} else {
-	$imgD = "../img/sp9.jpg";
-}
-
-
-
- */

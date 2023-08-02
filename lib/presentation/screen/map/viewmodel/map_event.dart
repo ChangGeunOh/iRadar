@@ -3,4 +3,7 @@ enum MapEvent {
   onPlaceData,
   onTapRectangle,
   onTapMap,
+  onMoveCursor,
+  onChangeRadius,
+  onChangeCursorState,
 }
