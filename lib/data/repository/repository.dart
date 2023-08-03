@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/map_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
@@ -68,7 +69,6 @@ class Repository {
     return _dataCacheSource.getMapData(placeData.link);
   }
 
-
   void setGoogleMapController(GoogleMapController controller) {
     _dataCacheSource.setGoogleMapController(controller);
   }
@@ -76,7 +76,6 @@ class Repository {
   GoogleMapController? getGoogleMapController() {
     return _dataCacheSource.getGoogleMapController();
   }
-
 
   void setCameraPosition(CameraPosition cameraPosition) {
     _dataCacheSource.setCameraPosition(cameraPosition);
@@ -87,9 +86,9 @@ class Repository {
   }
 
   Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
-
     if (_dataCacheSource.getChartTableData(placeData.link) == null) {
-      final responseData  = await _networkSource.loadChartTableData(placeData.link);
+      final responseData =
+          await _networkSource.loadChartTableData(placeData.link);
       if (responseData.data != null) {
         _dataCacheSource.setChartTableData(placeData.link, responseData.data!);
       }
@@ -97,8 +96,22 @@ class Repository {
     return _dataCacheSource.getChartTableData(placeData.link);
   }
 
-  Future<ExcelResponseData?> loadExcelResponseData(excelRequestData) async {
-    return null;
+  Future<List<ExcelResponseData>?> loadExcelResponseData(
+    ExcelRequestData excelRequestData,
+  ) async {
+    final List<String> bts = excelRequestData.tableList
+        .where((element) => element.checked)
+        .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
+        .toList();
+
+    final response = await _networkSource.loadExcelResponseData(
+      excelRequestData.placeData.wirelessType.name,
+      excelRequestData.placeData.link,
+      bts,
+      '',
+    );
+
+    return response.data;
   }
 
   void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {
@@ -116,5 +129,4 @@ class Repository {
   List<Marker>? getBaseMarkers(PlaceData placeData) {
     return _dataCacheSource.getBaseMarkers(placeData.link);
   }
-
 }

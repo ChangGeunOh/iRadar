@@ -203,6 +203,52 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     return value;
   }
 
+  @override
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
+    String tbl,
+    String area,
+    List<String> bts,
+    String cmd,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'tbl': tbl,
+      'area': area,
+      'bts[]': bts,
+      'cmd': cmd,
+    };
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<List<ExcelResponseData>>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              'bts_ex.php',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<List<ExcelResponseData>>.fromJson(
+      _result.data!,
+      (json) => json is List<dynamic>
+          ? json
+              .map<ExcelResponseData>(
+                  (i) => ExcelResponseData.fromJson(i as Map<String, dynamic>))
+              .toList()
+          : List.empty(),
+    );
+    return value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

@@ -8,6 +8,7 @@ import 'package:googlemap/domain/model/response_data.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../../domain/model/base_data.dart';
+import '../../domain/model/excel_response_data.dart';
 import '../../domain/repository/network_source.dart';
 
 part 'network_source_impl.g.dart';
@@ -27,9 +28,10 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @POST('login.php')
   @FormUrlEncoded()
-  Future<ResponseData<LoginData>> login(
-      {@Field('area') required String area,
-      @Field('userid') required String password});
+  Future<ResponseData<LoginData>> login({
+    @Field('area') required String area,
+    @Field('userid') required String password,
+  });
 
   @override
   @GET('5gtl.php')
@@ -42,5 +44,17 @@ abstract class NetworkSourceImpl extends NetworkSource {
 
   @override
   @GET('dtl.php')
-  Future<ResponseData<ChartTableData>> loadChartTableData(@Query('area') String area);
+  Future<ResponseData<ChartTableData>> loadChartTableData(
+    @Query('area') String area,
+  );
+
+  @override
+  @POST('bts_ex.php')
+  @FormUrlEncoded()
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
+    @Field('tbl') String tbl,
+    @Field('area') String area,
+    @Field('bts[]') List<String> bts,
+    @Field('cmd') String cmd,
+  );
 }

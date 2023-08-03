@@ -2,6 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 const List<String> tabTitles = ['차트', '지도'];
+const kWebHeaders = [
+  '구분',
+  '시도',
+  '시군구',
+  '행정동/인빌딩/테마 국소명',
+  '팀',
+  '조',
+  '년도',
+  '장비구분',
+  'ID',
+  'NAME',
+  '적용내용',
+  'Atten',
+  'Cell Lock',
+  'RU Lock',
+  '중계기 Lock',
+  'PCI',
+  '시나리오 기준',
+  'I-Radar\n기준일자',
+];
 const initCameraPosition = CameraPosition(
   target: LatLng(35.16861, 129.05091),
   zoom: 14.4746,

@@ -1,4 +1,9 @@
 class Convert {
+  static String dynamicToString(dynamic value) {
+    return value.toString();
+  }
+
+
   static dynamic boolToDynamic(bool value) {
     return value;
   }

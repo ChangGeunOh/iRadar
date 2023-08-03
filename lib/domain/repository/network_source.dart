@@ -1,5 +1,7 @@
 import 'package:googlemap/domain/model/area_data.dart';
 import 'package:googlemap/domain/model/base_data.dart';
+import 'package:googlemap/domain/model/excel_request_data.dart';
+import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/measure_data.dart';
 import 'package:googlemap/domain/model/response_data.dart';
@@ -19,5 +21,7 @@ abstract class NetworkSource {
   Future<ResponseData<MapData>> loadMapData(String area);
 
   Future<ResponseData<ChartTableData>> loadChartTableData(String link);
+
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(String tbl, String area, List<String> bts, String cmd);
 
 }

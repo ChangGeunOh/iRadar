@@ -1,17 +1,17 @@
-import 'package:googlemap/domain/model/excel_request_data.dart';
+import '../../../../domain/model/excel_response_data.dart';
 
 class WebState {
-  final ExcelRequestData? excelRequestData;
+  final List<ExcelResponseData>? excelResponseList;
 
   WebState({
-    this.excelRequestData,
+    this.excelResponseList,
   });
 
   WebState copyWith({
-    ExcelRequestData? excelRequestData,
+    List<ExcelResponseData>? excelResponseList,
   }) {
     return WebState(
-      excelRequestData: excelRequestData ?? this.excelRequestData,
+      excelResponseList: excelResponseList ?? this.excelResponseList,
     );
   }
 }

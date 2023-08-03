@@ -9,6 +9,7 @@ class ExcelResponseData {
   final String sido;
   final String sigungu;
   final String area;
+  final String type;
   final String team;
   final String jo;
   final String year;
@@ -22,6 +23,9 @@ class ExcelResponseData {
   final String ruLock;
   @JsonKey(name: 'relay_lock')
   final String relayLock;
+  @JsonKey(
+    fromJson: Convert.dynamicToString,
+  )
   final String pci;
   final String scenario;
   @JsonKey(name: 'reg_date')
@@ -40,6 +44,7 @@ class ExcelResponseData {
     required this.team,
     required this.jo,
     required this.year,
+    required this.type,
     required this.id,
     required this.rnm,
     required this.memo,
