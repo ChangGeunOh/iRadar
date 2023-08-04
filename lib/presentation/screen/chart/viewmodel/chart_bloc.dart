@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
+import 'package:googlemap/presentation/screen/chart/components/excel_maker.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
@@ -83,21 +83,18 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         );
         break;
       case ChartEvent.onTapExcel:
-        print('ChartEvent.onTapExcel');
-        var excel = Excel.createExcel();
-        Sheet sheetObject = excel['Sheet1'];
-        CellStyle cellStyle = CellStyle(
-            backgroundColorHex: '#1AFF1A',
-            fontFamily: getFontFamily(FontFamily.Calibri));
-        cellStyle.underline = Underline.Single; // or Underline.Double
-
-        var cell = sheetObject.cell(CellIndex.indexByString('A1'));
-        cell.value = 8; // dynamic values support provided;
-        cell.cellStyle = cellStyle;
-        cell = sheetObject.cell(CellIndex.indexByString('A2'));
-        cell.value = "THIS IS EXCEL TEST...";
-        excel.save(fileName: 'EXCEl_TEST.xlsx');
-
+        final excelRequestData = ExcelRequestData(
+          placeData: state.placeData!,
+          tableList: state.chartTableData!.tableList,
+        );
+        final excelResponseData =
+            await repository.loadExcelResponseData(excelRequestData);
+        if (excelResponseData != null) {
+          ExcelMaker(
+            placeData: state.placeData!,
+            excelResponseList: excelResponseData,
+          ).makeExcel();
+        }
         break;
     }
   }

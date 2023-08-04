@@ -70,21 +70,3 @@ class ChartView extends StatelessWidget {
     );
   }
 }
-
-/*
-
-[
-          BarChartGroupData(
-            x: 1,
-            barRods: [
-              BarChartRodData(
-                toY: 10.toDouble(),
-                borderRadius: BorderRadius.zero,
-                color: Colors.red,
-                width: 50,
-              ),
-            ],
-            showingTooltipIndicators: [0],
-          ),
-        ]
- */
