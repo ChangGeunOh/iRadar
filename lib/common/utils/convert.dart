@@ -40,6 +40,7 @@ class Convert {
   }
 
   static int dynamicToInt(dynamic value) {
+    value = value ?? 0;
     return value.runtimeType == int ? value as int : int.parse(value);
   }
 

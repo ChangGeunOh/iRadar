@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
+import 'package:googlemap/domain/model/place_table_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/presentation/screen/chart/components/excel_maker.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
+import '../../npci/npci_screen.dart';
 import '../../web/web_screen.dart';
 import 'chart_state.dart';
 
@@ -70,7 +72,14 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         print("ChartEvent.onTapPci");
         break;
       case ChartEvent.onTapNPci:
-        print("ChartEvent.onTapNPci");
+        final placeTableData = PlaceTableData(
+          placeData: state.placeData!,
+          tableData: event.extra,
+        );
+        context.pushNamed(
+          NpciScreen.routeName,
+          extra: placeTableData,
+        );
         break;
       case ChartEvent.onTapWeb:
         final excelRequestData = ExcelRequestData(

@@ -56,6 +56,7 @@ class TableView extends StatelessWidget {
         headingRowColor: MaterialStateProperty.resolveWith<Color?>(
           (states) => const Color(0x10000000),
         ),
+        showBottomBorder: true,
         rows: getRows(),
       ),
     );
@@ -115,7 +116,7 @@ class TableView extends StatelessWidget {
                         onChanged: (value) => onTapNId(e),
                       ),
                     ),
-                    Text(e.nId.toString()),
+                    Text(e.nearby().toString()),
                   ],
                 ),
                 onTap: () => onTapNId(e),

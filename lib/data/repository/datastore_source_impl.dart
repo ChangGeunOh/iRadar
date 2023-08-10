@@ -1,3 +1,4 @@
+import 'package:googlemap/domain/model/meta_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
 import '../../domain/model/place_data.dart';
@@ -32,14 +33,12 @@ class DataStoreSourceImpl extends DataStoreSource {
 
   @override
   Future<void> savePlaceList(WirelessType type, List<PlaceData> placeList) async {
-    final key = type == WirelessType.wLte ? keyLTEPlaceList : key5GPlaceList;
-    await _dataStore.saveListData(key, placeList);
+    await _dataStore.saveListData(type, placeList);
   }
 
   @override
-  Future<void> remove() async {
-    await _dataStore.remove(key5GPlaceList);
-    await _dataStore.remove(keyLTEPlaceList);
+  Future<void> remove(WirelessType type) async {
+    await _dataStore.remove(type);
   }
 
   // @override

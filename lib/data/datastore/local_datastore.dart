@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:googlemap/domain/model/place_data.dart';
+import 'package:googlemap/domain/model/wireless_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const keyFunctionMenuList = "function_menu_list";
@@ -34,22 +35,17 @@ class LocalDataStore {
     final dataStore = await getSharedPreferences();
     final list = dataStore.getStringList(key);
 
-    if (list != null) {
-      return list.map((e) => jsonDecode(e)).toList();
-    } else {
-      return null;
-    }
+    return list?.map((e) => jsonDecode(e)).toList();
   }
 
-  Future<void> saveListData(String key, List<Object> list) async {
+  Future<void> saveListData(WirelessType type, List<Object> list) async {
     final dataStore = await getSharedPreferences();
     final encodedList = list.map((e) => jsonEncode(e)).toList();
-    await dataStore.setStringList(key, encodedList);
+    await dataStore.setStringList(type.name, encodedList);
   }
 
-  Future<void> remove(String key) async {
+  Future<void> remove(WirelessType type) async {
     final dataStore = await getSharedPreferences();
-    dataStore.remove(key);
+    dataStore.remove(type.name);
   }
-
 }

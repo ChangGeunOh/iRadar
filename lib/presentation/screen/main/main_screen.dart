@@ -109,6 +109,7 @@ class MainScreen extends StatelessWidget {
                             Expanded(
                               child: SideBody(
                                 measureList: state.placeList!,
+                                onLoadMore: bloc.loadMore,
                                 onTapItem: (value) {
                                   bloc.add(
                                     BlocEvent(MainEvent.onTapItem,

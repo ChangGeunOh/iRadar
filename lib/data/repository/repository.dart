@@ -7,6 +7,8 @@ import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
 import '../../domain/model/excel_response_data.dart';
+import '../../domain/model/meta_data.dart';
+import '../../domain/model/table_data.dart';
 import '../../domain/repository/database_source.dart';
 import '../../domain/repository/datacache_source.dart';
 import '../../domain/repository/datastore_source.dart';
@@ -41,22 +43,49 @@ class Repository {
     return responseData.meta.code == 200;
   }
 
+  // Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
+  //   var placeList = await _dataStoreSource.loadPlaceList(type);
+  //   if (placeList.isEmpty) {
+  //     final response = await _networkSource.loadPlaceList(type: type.name);
+  //     if (response.meta.code == 200) {
+  //       placeList = response.data!;
+  //       _dataCacheSource.setMetaData(response.meta)
+  //       _dataStoreSource.savePlaceList(type, placeList)
+  //     }
+  //   }
+  //   return placeList;
+  // }
+
+  bool hasMorePlaceList(WirelessType type) {
+    var metaData = _dataCacheSource.getMetaData(type);
+    return metaData.page < metaData.total || metaData.total == 0;
+  }
+
   Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
+    var metaData = _dataCacheSource.getMetaData(type);
     var placeList = await _dataStoreSource.loadPlaceList(type);
-    if (placeList.isEmpty) {
-      final response = await _networkSource.loadPlaceList(type.name);
+    if (metaData.page < metaData.total || metaData.total == 0) {
+      var response = await _networkSource.loadPlaceList(
+        type: type.name,
+        page: metaData.page + 1,
+        count: metaData.count,
+        total: metaData.total,
+      );
+
       if (response.meta.code == 200) {
-        placeList = response.data!.map((e) {
-          return PlaceData.fromAreaData(e);
-        }).toList();
+        print('loadPlaceList>${response.data!.length}');
+        placeList += response.data!;
+        _dataCacheSource.setMetaData(type, response.meta);
+        _dataStoreSource.savePlaceList(type, placeList);
       }
-      _dataStoreSource.savePlaceList(type, placeList);
     }
+    print('loadPlaceList>${placeList.length}');
     return placeList;
   }
 
-  Future<void> remove() async {
-    await _dataStoreSource.remove();
+  Future<void> remove(WirelessType type) async {
+    _dataCacheSource.setMetaData(type, MetaData(code: 0, message: ''));
+    await _dataStoreSource.remove(type);
   }
 
   Future<MapData?> loadMapData(PlaceData placeData) async {
@@ -128,5 +157,13 @@ class Repository {
 
   List<Marker>? getBaseMarkers(PlaceData placeData) {
     return _dataCacheSource.getBaseMarkers(placeData.link);
+  }
+
+  Future<List<TableData>?> loadNpciTableList(
+    String link,
+    String nPci,
+  ) async {
+    final response = await _networkSource.loadNpciTableList(link, nPci);
+    return response.data;
   }
 }

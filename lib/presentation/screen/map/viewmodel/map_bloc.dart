@@ -91,7 +91,9 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
               ),
             ),
           );
-
+          if (basePin == null) {
+            await Future.delayed(const Duration(milliseconds: 100));
+          }
           final baseMarkers = _getBaseMarkers(event.extra, mapData.baseList);
           final measureMarkers =
               _getMeasureMarkers(event.extra, mapData.measureList);

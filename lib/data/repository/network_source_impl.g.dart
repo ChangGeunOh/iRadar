@@ -109,13 +109,23 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
-  Future<ResponseData<List<AreaData>>> loadPlaceList(String type) async {
+  Future<ResponseData<List<PlaceData>>> loadPlaceList({
+    required String type,
+    int page = 30,
+    int count = 1,
+    int total = 0,
+  }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'type': type};
+    final queryParameters = <String, dynamic>{
+      r'type': type,
+      r'page': page,
+      r'count': count,
+      r'total': total,
+    };
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<AreaData>>>(Options(
+        _setStreamType<ResponseData<List<PlaceData>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -131,12 +141,12 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = ResponseData<List<AreaData>>.fromJson(
+    final value = ResponseData<List<PlaceData>>.fromJson(
       _result.data!,
       (json) => json is List<dynamic>
           ? json
-              .map<AreaData>(
-                  (i) => AreaData.fromJson(i as Map<String, dynamic>))
+              .map<PlaceData>(
+                  (i) => PlaceData.fromJson(i as Map<String, dynamic>))
               .toList()
           : List.empty(),
     );
@@ -243,6 +253,47 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
           ? json
               .map<ExcelResponseData>(
                   (i) => ExcelResponseData.fromJson(i as Map<String, dynamic>))
+              .toList()
+          : List.empty(),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<List<TableData>>> loadNpciTableList(
+    String link,
+    String npci,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'a': link,
+      r'pci': npci,
+    };
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<List<TableData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'dtl_pci.php',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<List<TableData>>.fromJson(
+      _result.data!,
+      (json) => json is List<dynamic>
+          ? json
+              .map<TableData>(
+                  (i) => TableData.fromJson(i as Map<String, dynamic>))
               .toList()
           : List.empty(),
     );

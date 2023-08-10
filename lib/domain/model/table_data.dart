@@ -8,6 +8,7 @@ part 'table_data.g.dart';
 class TableData {
   final String pci;
   final String nPci;
+  final String pciMw;
   final String nTime;
   final String nRsrp;
   final String index;
@@ -35,12 +36,13 @@ class TableData {
 
   TableData({
     required this.pci,
-    required this.nPci,
+    String? nPci,
+    String? pciMw,
     required this.nTime,
     required this.nRsrp,
     required this.index,
     required this.sTime,
-    required this.rp,
+    String? rp,
     required this.cqi,
     required this.ri,
     required this.dlMcs,
@@ -52,7 +54,9 @@ class TableData {
     required this.nId,
     required this.checked,
     required this.hasColor,
-  });
+  })  : nPci = nPci ?? "",
+        pciMw = pciMw ?? "",
+        rp = rp ?? "";
 
   TableData copyWith({
     bool? checked,
@@ -60,6 +64,7 @@ class TableData {
     return TableData(
       pci: pci,
       nPci: nPci,
+      pciMw: pciMw,
       nTime: nTime,
       nRsrp: nRsrp,
       index: index,
@@ -79,7 +84,6 @@ class TableData {
     );
   }
 
-
   void toggle() {
     checked = !checked;
   }
@@ -87,6 +91,8 @@ class TableData {
   void isCheck(bool isCheck) {
     checked = isCheck;
   }
+
+  String nearby() => "($nDst $nId) $nRnm";
 
   Map<String, dynamic> toJson() => _$TableDataToJson(this);
 

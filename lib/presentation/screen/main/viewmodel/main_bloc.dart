@@ -32,7 +32,6 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     Emitter<MainState> emit,
   ) async {
     print('Event>${event.type.toString()}');
-
     switch (event.type) {
       case MainEvent.init:
         emit(state.copyWith(placeList: event.extra, isLoading: false));
@@ -57,22 +56,27 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(isShowSide: !state.isShowSide));
         break;
       case MainEvent.onTapItem:
-        emit(state.copyWith(measureData: event.extra, isRemove: false));
+        emit(state.copyWith(placeData: event.extra, isRemove: false));
         break;
       case MainEvent.onTapItemAll:
-        emit(state.copyWith(measureData: event.extra, isRemove: false));
+        emit(state.copyWith(placeData: event.extra, isRemove: false));
         break;
       case MainEvent.onTapItemRemove:
-        emit(state.copyWith(measureData: event.extra, isRemove: true));
+        emit(state.copyWith(placeData: event.extra, isRemove: true));
         break;
       case MainEvent.isLoading:
         emit(state.copyWith(isLoading: event.extra));
         break;
       case MainEvent.onTapRefresh:
         emit(state.copyWith(isLoading: true, placeList: List.empty()));
-        await repository.remove();
+        await repository.remove(state.type);
         final list = await repository.loadPlaceList(state.type);
         emit(state.copyWith(placeList: list, type: event.extra, isLoading: false));
+        break;
+      case MainEvent.onMoreLoading:
+        emit(state.copyWith(isLoading: true));
+        final list = await repository.loadPlaceList(state.type);
+        emit(state.copyWith(placeList: list, isLoading: false));
         break;
     }
   }
@@ -86,5 +90,11 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       list.add(measureData);
     });
     return list;
+  }
+
+  void loadMore() {
+    if (repository.hasMorePlaceList(state.type)) {
+      add(BlocEvent(MainEvent.onMoreLoading));
+    }
   }
 }

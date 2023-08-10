@@ -5,12 +5,13 @@ import '../../../../common/const/color.dart';
 import '../../../../domain/model/place_data.dart';
 import '../../../../domain/model/wireless_type.dart';
 
-class SideBody extends StatelessWidget {
+class SideBody extends StatefulWidget {
   final List<PlaceData> measureList;
   final ValueChanged onTapItem;
   final ValueChanged onTapAll;
   final ValueChanged onTapRemove;
   final ValueChanged<PlaceData> onLongPress;
+  final VoidCallback onLoadMore;
 
   const SideBody({
     required this.measureList,
@@ -18,27 +19,55 @@ class SideBody extends StatelessWidget {
     required this.onTapAll,
     required this.onTapRemove,
     required this.onLongPress,
+    required this.onLoadMore,
     super.key,
   });
 
   @override
+  State<SideBody> createState() => _SideBodyState();
+}
+
+class _SideBodyState extends State<SideBody> {
+  final controller = ScrollController();
+
+  @override
+  void initState() {
+    controller.addListener(listener);
+    super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    controller.removeListener(listener);
+    super.dispose();
+  }
+
+  void listener() {
+    if (controller.offset > controller.position.maxScrollExtent - 300) {
+      widget.onLoadMore();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      controller: controller,
       itemBuilder: (context, index) {
-        final measureData = measureList[index];
+        final measureData = widget.measureList[index];
         return MeasureDataCard(
           measureData: measureData,
           onTapItem: () {
-            onTapItem(measureData);
+            widget.onTapItem(measureData);
           },
           onTapAll: () {
-            onTapAll(measureData);
+            widget.onTapAll(measureData);
           },
           onTapRemove: () {
-            onTapRemove(measureData);
+            widget.onTapRemove(measureData);
           },
           onLongPress: () {
-            onLongPress(measureData);
+            widget.onLongPress(measureData);
           },
         );
       },
@@ -48,7 +77,7 @@ class SideBody extends StatelessWidget {
           color: Color(0xffd9d9d9),
         );
       },
-      itemCount: measureList.length,
+      itemCount: widget.measureList.length,
     );
   }
 }

@@ -1,8 +1,10 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/meta_data.dart';
 import 'package:googlemap/domain/repository/datacache_source.dart';
 
+import '../../domain/model/wireless_type.dart';
 import '../datacache/local_datacache.dart';
 
 
@@ -72,6 +74,14 @@ class DataCacheSourceImpl extends DataCacheSource {
     return _dataCache.cacheMeasureMarkers[link];
   }
 
+  @override
+  MetaData getMetaData(WirelessType type) {
+    return _dataCache.cacheMetaData[type] ?? MetaData(code: 0, message: '');
+  }
 
+  @override
+  void setMetaData(WirelessType type, MetaData metaData) {
+    _dataCache.cacheMetaData[type] =  metaData;
+  }
 
 }
