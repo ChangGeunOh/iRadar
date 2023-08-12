@@ -43,7 +43,7 @@ class UploadScreen extends StatelessWidget {
                     TopLayout(
                       onTapFile: () =>
                           bloc.add(BlocEvent(UploadEvent.onTapFile)),
-                      location: state.location,
+                      group: state.group,
                       division: state.division,
                       area: state.area,
                       fileName: state.fileName,

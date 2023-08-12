@@ -5,11 +5,11 @@ part 'login_data.g.dart';
 @JsonSerializable()
 class LoginData {
   final int idx;
-  final String area;
+  final String group;
 
   LoginData({
     required this.idx,
-    required this.area,
+    required this.group,
   });
 
   Map<String, dynamic> toJson() => _$LoginDataToJson(this);

@@ -2,6 +2,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
+import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
@@ -38,6 +39,9 @@ class Repository {
       area: location,
       password: password,
     );
+    if (responseData.meta.code == 200) {
+      _dataCacheSource.setLoginData(responseData.data!);
+    }
     print('retrofit response>${responseData.toString()}');
     print('retrofit response>${responseData.data?.toJson()}');
     return responseData.meta.code == 200;
@@ -165,5 +169,10 @@ class Repository {
   ) async {
     final response = await _networkSource.loadNpciTableList(link, nPci);
     return response.data;
+  }
+
+  LoginData getLoginData() {
+    // TODO: null 체크 부문 수정 요함
+    return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
   }
 }

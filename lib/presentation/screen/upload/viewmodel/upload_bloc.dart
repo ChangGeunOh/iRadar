@@ -16,7 +16,9 @@ import 'package:googlemap/presentation/screen/upload/viewmodel/upload_state.dart
 import '../../../../domain/model/intf_data.dart';
 
 class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
-  UploadBloc(super.context, super.initialState);
+  UploadBloc(super.context, super.initialState) {
+    add(BlocEvent(UploadEvent.init));
+  }
 
   @override
   FutureOr<void> onBlocEvent(
@@ -25,7 +27,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
   ) async {
     switch (event.type) {
       case UploadEvent.init:
-        // final id = repository.get
+        emit(state.copyWith(group: repository.getLoginData().group));
         break;
       case UploadEvent.onChanged:
         emit(_getState(event.extra, state));

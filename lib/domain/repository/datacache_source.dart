@@ -1,5 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/login_data.dart';
 
 import '../model/map_data.dart';
 import '../model/meta_data.dart';
@@ -29,5 +30,8 @@ abstract class DataCacheSource {
 
   void setMetaData(WirelessType type, MetaData metaData);
   MetaData getMetaData(WirelessType type);
+
+  void setLoginData(LoginData loginData);
+  LoginData? getLoginData();
 
 }

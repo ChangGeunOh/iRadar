@@ -7,7 +7,7 @@ import '../../../component/edit_text.dart';
 
 class TopLayout extends StatelessWidget {
   final VoidCallback onTapFile;
-  final String location;
+  final String group;
   final String division;
   final String fileName;
   final String area;
@@ -15,7 +15,7 @@ class TopLayout extends StatelessWidget {
 
   const TopLayout({
     required this.onTapFile,
-    required this.location,
+    required this.group,
     required this.division,
     required this.area,
     required this.fileName,
@@ -34,7 +34,7 @@ class TopLayout extends StatelessWidget {
           child: EditText(
             onChanged: (value) {},
             label: '지역',
-            value: location,
+            value: group,
             enabled: false,
           ),
         ),
