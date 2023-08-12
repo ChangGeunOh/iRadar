@@ -62,6 +62,7 @@ dependencies:
   cookie_jar:
   fl_chart: ^0.63.0
   excel: 2.1.0
+  file_picker: ^5.3.3
 
 dev_dependencies:
   flutter_test:

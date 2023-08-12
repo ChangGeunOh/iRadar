@@ -10,6 +10,34 @@ extension Date on int {
   }
 }
 
+extension DynamicToDouble on dynamic {
+  double? toDouble() {
+    return runtimeType == double ? this : toString().isEmpty ? null : double.parse(toString());
+  }
+}
+
+extension StringToDouble on String {
+  double? toDouble() {
+    return isNotEmpty ? double.parse(this) : null;
+  }
+}
+
+extension ExcelDateToDateTime on double {
+  DateTime toDateTime() {
+    // Excel의 기본 시작 날짜는 1900년 1월 1일입니다.
+    final baseDate = DateTime(1899, 12, 30);
+
+    // 주어진 excelDate에서 정수 부분은 날짜를, 소수점 부분은 시간을 나타냅니다.
+    final days = floor();
+    final dayFraction = this - days;
+
+    // 기본 날짜에 일 수를 더하고, 소수점 부분을 사용하여 시간, 분, 초를 계산합니다.
+    return baseDate.add(Duration(
+        days: days,
+        microseconds: (dayFraction * Duration.microsecondsPerDay).round()));
+  }
+}
+
 extension LatLngDistance on LatLng {
   double distanceTo(LatLng latLng) {
     const double earthRadius = 6371.0; // 지구의

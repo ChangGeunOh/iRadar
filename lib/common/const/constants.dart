@@ -25,7 +25,6 @@ const kWebHeaders = [
 
 // x 1.35
 
-
 const initCameraPosition = CameraPosition(
   target: LatLng(35.16861, 129.05091),
   zoom: 14.4746,
@@ -63,6 +62,8 @@ List<DropdownMenuItem<String>> get dropdownItems {
   ];
   return menuItems;
 }
+
+const divisionList = ['행정동', '인빌딩', '테마'];
 
 class Country {
   const Country({

@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_layout.dart';

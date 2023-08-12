@@ -4,17 +4,23 @@ import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/place_table_data.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
 import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
+import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
 import 'package:googlemap/presentation/screen/web/web_screen.dart';
 
 import '../../presentation/screen/login/login_screen.dart';
 
 final routerConfig = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/upload2',
   routes: [
     GoRoute(
       path: '/login',
       name: LoginScreen.routeName,
       builder: (_, __) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/upload2',
+      name: 'upload2',
+      builder: (_, __) => const UploadScreen(),
     ),
     GoRoute(
       path: '/main',
@@ -34,6 +40,11 @@ final routerConfig = GoRouter(
           builder: (context, state) => NpciScreen(
             placeTableData: state.extra as PlaceTableData,
           ),
+        ),
+        GoRoute(
+          path: 'upload',
+          name: UploadScreen.routeName,
+          builder: (_, __) => const UploadScreen(),
         ),
       ],
     ),

@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_event.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
+import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 
@@ -77,6 +79,9 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(isLoading: true));
         final list = await repository.loadPlaceList(state.type);
         emit(state.copyWith(placeList: list, isLoading: false));
+        break;
+      case MainEvent.onTapMenu:
+        context.pushNamed(UploadScreen.routeName);
         break;
     }
   }

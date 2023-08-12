@@ -8,11 +8,13 @@ class SideHeader extends StatelessWidget {
   final ValueChanged onTapWirelessType;
   final ValueChanged<String> onSearch;
   final VoidCallback onTapRefresh;
+  final VoidCallback onTapMenu;
 
   const SideHeader({
     required this.onSearch,
     required this.onTapWirelessType,
     required this.onTapRefresh,
+    required this.onTapMenu,
     super.key,
   });
 
@@ -33,7 +35,7 @@ class SideHeader extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: onTapMenu,
                   icon: const Icon(
                     Icons.menu,
                     color: Colors.white,

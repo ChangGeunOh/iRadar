@@ -104,6 +104,9 @@ class MainScreen extends StatelessWidget {
                                 MainEvent.onTapRefresh,
                               )
                             ),
+                            onTapMenu: ()=> bloc.add(
+                              BlocEvent(MainEvent.onTapMenu)
+                            ),
                           ),
                           if (state.placeList != null)
                             Expanded(

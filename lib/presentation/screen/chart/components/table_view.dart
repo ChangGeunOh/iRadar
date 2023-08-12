@@ -45,18 +45,7 @@ class TableView extends StatelessWidget {
       child: DataTable(
         columns: getColumns(),
         horizontalMargin: 16.0,
-        headingTextStyle: const TextStyle(
-          fontSize: 12,
-          height: 1.1,
-        ),
-        dataTextStyle: const TextStyle(
-          fontSize: 12,
-          height: 1.1,
-        ),
-        headingRowColor: MaterialStateProperty.resolveWith<Color?>(
-          (states) => const Color(0x10000000),
-        ),
-        showBottomBorder: true,
+
         rows: getRows(),
       ),
     );
