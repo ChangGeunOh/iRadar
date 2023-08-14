@@ -1,5 +1,6 @@
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
+import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
@@ -32,5 +33,9 @@ abstract class NetworkSource {
   Future<ResponseData<List<TableData>>> loadNpciTableList(
     String link,
     String npci,
+  );
+
+  Future<ResponseData<String>> uploadMeasureData(
+      MeasureUploadData measureUploadData,
   );
 }

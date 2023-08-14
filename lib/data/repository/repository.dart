@@ -4,6 +4,7 @@ import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
@@ -174,5 +175,22 @@ class Repository {
   LoginData getLoginData() {
     // TODO: null 체크 부문 수정 요함
     return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
+  }
+
+  Future<void> uploadMeasureData(MeasureUploadData measureUploadData) async {
+    final data = MeasureUploadData(
+      intf5GList: measureUploadData.intf5GList.sublist(0, 1),
+      intfLteList: measureUploadData.intfLteList.sublist(0, 1),
+      intfTTList: measureUploadData.intfTTList.sublist(0, 1),
+    );
+    data.group = measureUploadData.group;
+    data.area = measureUploadData.area;
+    data.password = measureUploadData.password;
+    data.type = measureUploadData.type;
+
+    print (measureUploadData.toJson());
+
+    final result = await _networkSource.uploadMeasureData(measureUploadData);
+    // print('uploadMeasureData>${result.toString()}');
   }
 }

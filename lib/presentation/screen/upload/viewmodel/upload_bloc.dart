@@ -74,7 +74,8 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         break;
       case UploadEvent.onTapSave:
         emit(state.copyWith(isLoading: true));
-        _saveData(state.measureUploadData!, state.group, state.area, state.password);
+        await _saveData(state.measureUploadData!, state.group, state.area, state.password);
+        state.copyWith(isLoading: false);
         break;
     }
   }
@@ -88,6 +89,8 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
     measureUploadData.area = area;
     measureUploadData.password = password;
     measureUploadData.group = group;
+
+    await repository.uploadMeasureData(measureUploadData);
 
     return true;
   }
@@ -120,7 +123,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
       final isNoLocation = table.maxCols == 20 || table.maxCols == 10;
       final isLteOnly = table.maxCols == 11 || table.maxCols == 13;
       final sheetName = table.sheetName;
-      print('$sheetName -------------------->${table.maxCols} :: $isLteOnly');
+      // print('$sheetName -------------------->${table.maxCols} :: $isLteOnly');
       table.rows.forEachIndexed((index, row) {
         if (row.first != null && row.first!.value.runtimeType == double) {
           final line = _columnToList(row, isNoLocation, isLteOnly);
@@ -184,7 +187,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
 
     final regexLte = RegExp(r"(\d+)\[(-?\d+\.\d+)\]\[(-?\d+\.\d+)\]");
     for (var match in regexLte.allMatches(list[6].toString())) {
-      print("${match.group(1)}, ${match.group(2)}, ${match.group(3)}");
+      // print("${match.group(1)}, ${match.group(2)}, ${match.group(3)}");
       final rp = double.parse(match.group(2)!);
       final intfData = IntfData(
         idx: 0,

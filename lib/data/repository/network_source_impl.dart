@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart'  hide Headers;
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:retrofit/retrofit.dart';
@@ -66,5 +67,11 @@ abstract class NetworkSourceImpl extends NetworkSource {
   Future<ResponseData<List<TableData>>> loadNpciTableList(
     @Query('a') String link,
     @Query('pci') String npci,
+  );
+
+  @override
+  @POST('api/upload.php')
+  Future<ResponseData<String>> uploadMeasureData(
+    @Body() MeasureUploadData measureUploadData,
   );
 }

@@ -21,7 +21,7 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
   @override
   FutureOr<void> onBlocEvent(
       BlocEvent<LoginEvent> event, Emitter<LoginState> emit) {
-    print(event.toString());
+    // print(event.toString());
     switch (event.type) {
       case LoginEvent.onLocation:
         emit(

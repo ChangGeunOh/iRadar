@@ -6,6 +6,9 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 class LocalNetwork {
   static Dio get dio {
     final dio = Dio();
+    // dio.options.connectTimeout = const Duration(seconds: 5);
+    // dio.options.receiveTimeout = const Duration(seconds: 5);
+    // dio.options.sendTimeout = const Duration(seconds: 5);
     dio.interceptors.add(CustomInterceptor());
     dio.interceptors.add(
       PrettyDioLogger(
@@ -24,7 +27,7 @@ class LocalNetwork {
 
 class CustomInterceptor extends Interceptor {
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioError err, ErrorInterceptorHandler handler) async {
     print(handler.toString());
     print('onError${err.response.toString()}');
     // super.onError(err, handler);

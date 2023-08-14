@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:googlemap/presentation/screen/upload/component/bottom_layout.dart';
 
 import '../../../domain/bloc/bloc_event.dart';
 import '../../../domain/bloc/bloc_layout.dart';
-import 'component/checkbox_layout.dart';
+import 'component/bottom_layout.dart';
 import 'component/table_layout.dart';
 import 'component/top_layout.dart';
 import 'viewmodel/upload_bloc.dart';
