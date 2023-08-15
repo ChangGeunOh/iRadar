@@ -10,7 +10,9 @@ class MeasureUploadData {
   late String group;
   late String area;
   late String type;
-  late String? password;
+  late String password;
+  late bool isAddData;
+  late bool isWideArea;
   final List<IntfData> intf5GList;
   final List<IntfData> intfLteList;
   final List<IntfTtData> intfTTList;

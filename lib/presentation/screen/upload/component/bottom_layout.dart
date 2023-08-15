@@ -62,7 +62,9 @@ class BottomLayout extends StatelessWidget {
           child: TextField(
             obscureText: true,
             onChanged: onChangedPassword,
+            maxLength: 10,
             decoration: InputDecoration(
+              counterText: "",
               label: const Text(
                 '비밀번호',
                 style: TextStyle(

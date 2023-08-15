@@ -188,9 +188,7 @@ class Repository {
     data.password = measureUploadData.password;
     data.type = measureUploadData.type;
 
-    print (measureUploadData.toJson());
-
     final result = await _networkSource.uploadMeasureData(measureUploadData);
-    // print('uploadMeasureData>${result.toString()}');
+    print('uploadMeasureData>${result.toString()}');
   }
 }

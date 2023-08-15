@@ -21,7 +21,9 @@ MeasureUploadData _$MeasureUploadDataFromJson(Map<String, dynamic> json) =>
       ..group = json['group'] as String
       ..area = json['area'] as String
       ..type = json['type'] as String
-      ..password = json['password'] as String?;
+      ..password = json['password'] as String
+      ..isAddData = json['isAddData'] as bool
+      ..isWideArea = json['isWideArea'] as bool;
 
 Map<String, dynamic> _$MeasureUploadDataToJson(MeasureUploadData instance) =>
     <String, dynamic>{
@@ -29,6 +31,8 @@ Map<String, dynamic> _$MeasureUploadDataToJson(MeasureUploadData instance) =>
       'area': instance.area,
       'type': instance.type,
       'password': instance.password,
+      'isAddData': instance.isAddData,
+      'isWideArea': instance.isWideArea,
       'intf5GList': instance.intf5GList.map((e) => e.toJson()).toList(),
       'intfLteList': instance.intfLteList.map((e) => e.toJson()).toList(),
       'intfTTList': instance.intfTTList.map((e) => e.toJson()).toList(),

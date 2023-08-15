@@ -1,6 +1,7 @@
+import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 
-import '../../../../domain/model/measure_upload_data.dart';
+import '../../../../domain/model/excel_file.dart';
 
 class UploadState {
   final bool isNoLocation;
@@ -14,9 +15,9 @@ class UploadState {
   final String fileName;
   final bool isLoading;
   final FilePickerResult? filePickerResult;
-  final MeasureUploadData? measureUploadData;
   final bool enabledSave;
   final String password;
+  final ExcelFile? excelFile;
 
   UploadState({
     bool? isNoLocation,
@@ -30,15 +31,15 @@ class UploadState {
     String? fileName,
     bool? isLoading,
     this.filePickerResult,
-    this.measureUploadData,
     bool? enabledSave,
     String? password,
+    this.excelFile,
   })  : isNoLocation = isNoLocation ?? false,
         isLteOnly = isLteOnly ?? false,
         isWideArea = isWideArea ?? false,
         isAddData = isAddData ?? false,
         group = group ?? '',
-        division = division ?? '행정동',
+        division = division ?? '',
         area = area ?? '',
         location = location ?? '',
         fileName = fileName ?? '',
@@ -58,9 +59,9 @@ class UploadState {
     String? fileName,
     bool? isLoading,
     FilePickerResult? filePickerResult,
-    MeasureUploadData? measureUploadData,
     bool? enabledSave,
     String? password,
+    ExcelFile? excelFile,
   }) {
     return UploadState(
       isNoLocation: isNoLocation ?? this.isNoLocation,
@@ -74,9 +75,9 @@ class UploadState {
       fileName: fileName ?? this.fileName,
       isLoading: isLoading ?? this.isLoading,
       filePickerResult: filePickerResult ?? this.filePickerResult,
-      measureUploadData: measureUploadData ?? this.measureUploadData,
       enabledSave: enabledSave ?? this.enabledSave,
       password: password ?? this.password,
+      excelFile: excelFile ?? this.excelFile,
     );
   }
 }

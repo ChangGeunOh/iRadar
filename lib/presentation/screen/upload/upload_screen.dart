@@ -19,6 +19,10 @@ class UploadScreen extends StatelessWidget {
     return BlocLayout<UploadBloc, UploadState>(
       create: (context) => UploadBloc(context, UploadState()),
       builder: (context, bloc, state) {
+        print('isLoading ::: ${state.isLoading}');
+        if (state.isLoading && state.excelFile == null && state.filePickerResult != null) {
+          bloc.add(BlocEvent(UploadEvent.onReadExcel, extra: state.filePickerResult));
+        }
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -54,18 +58,18 @@ class UploadScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    if (state.measureUploadData != null)
+                    if (state.excelFile != null)
                       Expanded(
                         child: SingleChildScrollView(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: TableLayout(
-                              intfTtList: state.measureUploadData!.intfTTList,
+                              intfTtList: state.excelFile!.measureUploadData.intfTTList,
                             ),
                           ),
                         ),
                       ),
-                    if (state.measureUploadData == null) const Spacer(),
+                    if (state.excelFile == null) const Spacer(),
                     const SizedBox(height: 16),
                     BottomLayout(
                       isNoLocation: state.isNoLocation,
