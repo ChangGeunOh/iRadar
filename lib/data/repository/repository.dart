@@ -191,4 +191,15 @@ class Repository {
     final result = await _networkSource.uploadMeasureData(measureUploadData);
     print('uploadMeasureData>${result.toString()}');
   }
+
+  Future<int> getCountArea({required String group, required String area}) async {
+    final response = await _networkSource.getCountArea(
+      group: group,
+      area: area,
+    );
+    if (response.data != null) {
+      return int.parse(response.data!);
+    }
+    return 0;
+  }
 }

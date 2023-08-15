@@ -17,11 +17,15 @@ class UploadScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocLayout<UploadBloc, UploadState>(
-      create: (context) => UploadBloc(context, UploadState()),
+      create: (context) {
+        return UploadBloc(context, UploadState());
+      },
       builder: (context, bloc, state) {
-        print('isLoading ::: ${state.isLoading}');
-        if (state.isLoading && state.excelFile == null && state.filePickerResult != null) {
-          bloc.add(BlocEvent(UploadEvent.onReadExcel, extra: state.filePickerResult));
+        if (state.isLoading &&
+            state.excelFile == null &&
+            state.filePickerResult != null) {
+          bloc.add(BlocEvent(UploadEvent.onReadExcel,
+              extra: state.filePickerResult));
         }
         return Scaffold(
           appBar: AppBar(
@@ -56,6 +60,7 @@ class UploadScreen extends StatelessWidget {
                           extra: UploadChangeData(type: type, value: value),
                         ),
                       ),
+                      isDuplicate: state.isDuplicate,
                     ),
                     const SizedBox(height: 24),
                     if (state.excelFile != null)
@@ -64,7 +69,8 @@ class UploadScreen extends StatelessWidget {
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: TableLayout(
-                              intfTtList: state.excelFile!.measureUploadData.intfTTList,
+                              intfTtList:
+                                  state.excelFile!.measureUploadData.intfTTList,
                             ),
                           ),
                         ),
@@ -78,14 +84,20 @@ class UploadScreen extends StatelessWidget {
                       isWideArea: state.isWideArea,
                       onAddData: (value) => bloc.add(
                         BlocEvent(
-                          UploadEvent.onAddData,
-                          extra: value,
+                          UploadEvent.onChanged,
+                          extra: UploadChangeData(
+                            type: UploadChangedType.isAddData,
+                            value: value,
+                          ),
                         ),
                       ),
                       onWideArea: (value) => bloc.add(
                         BlocEvent(
-                          UploadEvent.onWideArea,
-                          extra: value,
+                          UploadEvent.onChanged,
+                          extra: UploadChangeData(
+                            type: UploadChangedType.isWideArea,
+                            value: value,
+                          ),
                         ),
                       ),
                       onChangedPassword: (value) => bloc.add(
@@ -98,15 +110,46 @@ class UploadScreen extends StatelessWidget {
                         ),
                       ),
                       enabledSave: state.enabledSave,
-                      onTapSave: ()=>bloc.add(BlocEvent(UploadEvent.onTapSave)),
+                      onTapSave: () {
+                        bloc.add(BlocEvent(UploadEvent.onLoading, extra: true));
+                        bloc.add(BlocEvent(UploadEvent.onTapSave));
+                      },
                     ),
                   ],
                 ),
+                if (state.message.isNotEmpty)
+                  _showMessage(state.message, () {
+                    bloc.add(BlocEvent(UploadEvent.onDoneToast));
+                  })
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _showMessage(String message, VoidCallback callback) {
+    Future.delayed(const Duration(milliseconds: 2500)).then((value) {
+      callback();
+    });
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 48.0,
+          vertical: 32.0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          color: Colors.white,
+        ),
+        child: Text(
+          message,
+          style: const TextStyle(
+            fontSize: 18.0,
+          ),
+        ),
+      ),
     );
   }
 }

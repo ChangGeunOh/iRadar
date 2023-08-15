@@ -36,6 +36,11 @@ abstract class NetworkSource {
   );
 
   Future<ResponseData<String>> uploadMeasureData(
-      MeasureUploadData measureUploadData,
+    MeasureUploadData measureUploadData,
   );
+
+  Future<ResponseData<String>> getCountArea({
+    required String group,
+    required String area,
+  });
 }

@@ -74,4 +74,11 @@ abstract class NetworkSourceImpl extends NetworkSource {
   Future<ResponseData<String>> uploadMeasureData(
     @Body() MeasureUploadData measureUploadData,
   );
+
+  @override
+  @GET('api/get_area.php')
+  Future<ResponseData<String>> getCountArea({
+    @Query('group') required String group,
+    @Query('area') required String area,
+  });
 }

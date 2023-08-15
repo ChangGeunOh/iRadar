@@ -31,9 +31,7 @@ class _EditTextState extends State<EditText> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.value != null &&
-        widget.value!.isNotEmpty &&
-        widget.value != controller.text) {
+    if (widget.value != null && controller.text.isEmpty) {
       setState(() {
         controller.text = widget.value!;
       });

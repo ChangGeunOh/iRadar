@@ -20,7 +20,7 @@ final routerConfig = GoRouter(
     GoRoute(
       path: '/upload2',
       name: 'upload2',
-      builder: (_, __) => const UploadScreen(),
+      builder: (_, __) => UploadScreen(),
     ),
     GoRoute(
       path: '/main',
@@ -44,7 +44,7 @@ final routerConfig = GoRouter(
         GoRoute(
           path: 'upload',
           name: UploadScreen.routeName,
-          builder: (_, __) => const UploadScreen(),
+          builder: (_, __) => UploadScreen(),
         ),
       ],
     ),

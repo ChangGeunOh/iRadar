@@ -11,6 +11,7 @@ class TopLayout extends StatelessWidget {
   final String division;
   final String fileName;
   final String area;
+  final bool isDuplicate;
   final Function(UploadChangedType type, String value) onChanged;
 
   const TopLayout({
@@ -20,6 +21,7 @@ class TopLayout extends StatelessWidget {
     required this.area,
     required this.fileName,
     required this.onChanged,
+    required this.isDuplicate,
     super.key,
   });
 
@@ -59,7 +61,7 @@ class TopLayout extends StatelessWidget {
             value: fileName,
             onChanged: (value) {},
             suffixIcon: IconButton(
-              onPressed: (){
+              onPressed: () {
                 FocusScope.of(context).nextFocus();
                 FocusScope.of(context).nextFocus();
                 onTapFile();
@@ -79,6 +81,18 @@ class TopLayout extends StatelessWidget {
             ),
             label: '측정장소',
             value: area,
+            suffixIcon: isDuplicate
+                ? Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 16),
+                    // color: Colors.red,
+                    child: const Text(
+                      '중복',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                  )
+                : null,
           ),
         ),
         // const SizedBox(width: 16),

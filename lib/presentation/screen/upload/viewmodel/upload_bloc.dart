@@ -1,20 +1,14 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:collection/collection.dart';
-import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:googlemap/common/utils/extension.dart';
+import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/model/excel_file.dart';
-import 'package:googlemap/domain/model/intf_tt_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/presentation/screen/upload/viewmodel/upload_event.dart';
 import 'package:googlemap/presentation/screen/upload/viewmodel/upload_state.dart';
-
-import '../../../../domain/model/intf_data.dart';
 
 class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
   UploadBloc(super.context, super.initialState) {
@@ -31,7 +25,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         emit(state.copyWith(group: repository.getLoginData().group));
         break;
       case UploadEvent.onChanged:
-        emit(_getState(event.extra, state));
+        emit(await _getState(event.extra, state));
         break;
       case UploadEvent.onTapFile:
         FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -69,7 +63,6 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         emit(state.copyWith(isWideArea: event.extra));
         break;
       case UploadEvent.onTapSave:
-        emit(state.copyWith(isLoading: true));
         final excelFile = state.excelFile;
         final uploadData = excelFile!.getUploadData(
           type: state.division,
@@ -80,7 +73,11 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
           isWideArea: state.isWideArea,
         );
         await _saveData(uploadData);
-        emit(state.copyWith(isLoading: false));
+        emit(state.copyWith(message: '자료를 등록 하였습니디.', isLoading: false));
+        break;
+      case UploadEvent.onDoneToast:
+        emit(state.copyWith(message: ''));
+        context.pop();
         break;
     }
   }
@@ -92,7 +89,8 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
     return true;
   }
 
-  UploadState _getState(UploadChangeData uploadChangeData, UploadState state) {
+  Future<UploadState> _getState(
+      UploadChangeData uploadChangeData, UploadState state) async {
     switch (uploadChangeData.type) {
       case UploadChangedType.isNoLocation:
         return state.copyWith(isNoLocation: uploadChangeData.value);
@@ -101,25 +99,34 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
       case UploadChangedType.isWideArea:
         return state.copyWith(isWideArea: uploadChangeData.value);
       case UploadChangedType.isAddData:
-        return state.copyWith(isAddData: uploadChangeData.value);
+        final tempState = state.copyWith(isAddData: uploadChangeData.value);
+        return tempState.copyWith(enabledSave: _enabledSave(tempState));
       case UploadChangedType.onDivision:
-        final enableButton = state.password.length > 3 &&
-            state.area.length > 5 &&
-            uploadChangeData.value.toString().isNotEmpty;
-        return state.copyWith(
-            division: uploadChangeData.value, enabledSave: enableButton);
+        final tempState = state.copyWith(division: uploadChangeData.value);
+        return tempState.copyWith(enabledSave: _enabledSave(tempState));
       case UploadChangedType.onArea:
-        final enableButton = state.password.length > 3 &&
-            uploadChangeData.value.toString().length > 5 &&
-            state.division.isNotEmpty;
-        return state.copyWith(
-            area: uploadChangeData.value, enabledSave: enableButton);
+        final loginData = repository.getLoginData();
+        final rowCount = await repository.getCountArea(
+          group: loginData.group,
+          area: uploadChangeData.value,
+        );
+        final tempState = state.copyWith(
+          area: uploadChangeData.value,
+          isDuplicate: rowCount > 0,
+        );
+        return tempState.copyWith(enabledSave: _enabledSave(tempState));
       case UploadChangedType.onPassword:
-        final enableButton = uploadChangeData.value.toString().length > 3 &&
-            state.area.length > 5 &&
-            state.division.isNotEmpty;
-        return state.copyWith(
-            password: uploadChangeData.value, enabledSave: enableButton);
+        final tempState = state.copyWith(password: uploadChangeData.value);
+        return tempState.copyWith(enabledSave: _enabledSave(tempState));
     }
+  }
+
+  bool _enabledSave(UploadState state) {
+    final checkDuplicate =
+        state.isDuplicate && state.isAddData || !state.isDuplicate;
+    return checkDuplicate &&
+        state.password.length > 3 &&
+        state.area.length > 3 &&
+        state.division.isNotEmpty;
   }
 }

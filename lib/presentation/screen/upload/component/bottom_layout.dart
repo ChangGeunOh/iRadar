@@ -51,7 +51,10 @@ class BottomLayout extends StatelessWidget {
         ),
         const SizedBox(width: 24),
         CheckTextBox(
-          onChanged: onAddData,
+          onChanged: (value){
+            print('isAddValue>${value}');
+            onAddData(value);
+          },
           text: '기존자료에 추가',
           checkColor: Colors.red,
           value: isAddData,

@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../../../domain/model/excel_file.dart';
 
 class UploadState {
+  final String message;
   final bool isNoLocation;
   final bool isLteOnly;
   final bool isWideArea;
@@ -18,6 +19,7 @@ class UploadState {
   final bool enabledSave;
   final String password;
   final ExcelFile? excelFile;
+  final bool isDuplicate;
 
   UploadState({
     bool? isNoLocation,
@@ -30,9 +32,11 @@ class UploadState {
     String? location,
     String? fileName,
     bool? isLoading,
+    bool? isDuplicate,
     this.filePickerResult,
     bool? enabledSave,
     String? password,
+    String? message,
     this.excelFile,
   })  : isNoLocation = isNoLocation ?? false,
         isLteOnly = isLteOnly ?? false,
@@ -45,7 +49,9 @@ class UploadState {
         fileName = fileName ?? '',
         isLoading = isLoading ?? false,
         enabledSave = enabledSave ?? false,
-        password = password ?? '';
+        password = password ?? '',
+        isDuplicate = isDuplicate ?? false,
+        message = message ?? '';
 
   UploadState copyWith({
     bool? isNoLocation,
@@ -62,6 +68,8 @@ class UploadState {
     bool? enabledSave,
     String? password,
     ExcelFile? excelFile,
+    String? message,
+    bool? isDuplicate,
   }) {
     return UploadState(
       isNoLocation: isNoLocation ?? this.isNoLocation,
@@ -78,6 +86,8 @@ class UploadState {
       enabledSave: enabledSave ?? this.enabledSave,
       password: password ?? this.password,
       excelFile: excelFile ?? this.excelFile,
+      message: message ?? this.message,
+      isDuplicate: isDuplicate ?? this.isDuplicate,
     );
   }
 }

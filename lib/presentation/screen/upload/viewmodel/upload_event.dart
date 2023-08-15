@@ -5,7 +5,9 @@ enum UploadEvent {
   onReadExcel,
   onLoading,
   onAddData,
-  onWideArea, onTapSave,
+  onWideArea,
+  onTapSave,
+  onDoneToast,
 }
 
 enum UploadChangedType {
