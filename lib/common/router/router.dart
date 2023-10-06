@@ -10,7 +10,7 @@ import 'package:googlemap/presentation/screen/web/web_screen.dart';
 import '../../presentation/screen/login/login_screen.dart';
 
 final routerConfig = GoRouter(
-  initialLocation: '/upload2',
+  initialLocation: '/login',
   routes: [
     GoRoute(
       path: '/login',

@@ -34,8 +34,9 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @GET('5gtl.php')
+  @GET('place_list.php')
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
+    @Query('group') required String group,
     @Query('type') required String type,
     @Query('page') int page = 30,
     @Query('count') int count = 1,

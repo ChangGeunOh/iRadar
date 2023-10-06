@@ -17,6 +17,7 @@ abstract class NetworkSource {
       {required String area, required String password});
 
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
+    required String group,
     required String type,
     int page,
     int count,

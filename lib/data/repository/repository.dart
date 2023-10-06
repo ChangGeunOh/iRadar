@@ -67,10 +67,13 @@ class Repository {
   }
 
   Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
+
     var metaData = _dataCacheSource.getMetaData(type);
     var placeList = await _dataStoreSource.loadPlaceList(type);
+
     if (metaData.page < metaData.total || metaData.total == 0) {
       var response = await _networkSource.loadPlaceList(
+        group: getLoginData().group,
         type: type.name,
         page: metaData.page + 1,
         count: metaData.count,
@@ -139,7 +142,7 @@ class Repository {
         .toList();
 
     final response = await _networkSource.loadExcelResponseData(
-      excelRequestData.placeData.wirelessType.name,
+      excelRequestData.placeData.type.name,
       excelRequestData.placeData.link,
       bts,
       '',

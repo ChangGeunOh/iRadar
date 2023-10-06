@@ -83,17 +83,21 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       case MainEvent.onTapMenu:
         context.pushNamed(UploadScreen.routeName);
         break;
+        case MainEvent.onTapItemWithShift:
+          final PlaceData placeData = event.extra;
+         // state.selectedPlace.contains(placeData.name) ? state.selectedPlace.remove(placeData.name) : state.selectedPlace.add(placeData.name);
+          break;
     }
   }
 
   Future<List<PlaceData>> readSampleData() async {
     final List<PlaceData> list = List.empty(growable: true);
     String lines = await rootBundle.loadString('assets/files/sample_data.csv');
-    LineSplitter.split(lines).forEach((line) {
-      final values = line.split(',');
-      final measureData = PlaceData.fromLine(values);
-      list.add(measureData);
-    });
+    // LineSplitter.split(lines).forEach((line) {
+    //   final values = line.split(',');
+    //   final measureData = PlaceData.fromLine(values);
+    //   list.add(measureData);
+    // });
     return list;
   }
 

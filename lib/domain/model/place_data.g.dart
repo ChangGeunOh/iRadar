@@ -7,19 +7,36 @@ part of 'place_data.dart';
 // **************************************************************************
 
 PlaceData _$PlaceDataFromJson(Map<String, dynamic> json) => PlaceData(
-      wirelessType: $enumDecode(_$WirelessTypeEnumMap, json['type']),
-      regDate: json['date'] as String,
-      link: json['area'] as String,
+      idx: json['idx'] as int,
+      type: $enumDecode(_$WirelessTypeEnumMap, json['type']),
+      name: json['name'] as String,
+      division: $enumDecode(_$LocationTypeEnumMap, json['division']),
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      dateTime: json['dateTime'] as String,
+      link: json['link'] as String?,
     );
 
 Map<String, dynamic> _$PlaceDataToJson(PlaceData instance) => <String, dynamic>{
-      'type': _$WirelessTypeEnumMap[instance.wirelessType]!,
-      'date': instance.regDate,
-      'area': instance.link,
+      'idx': instance.idx,
+      'type': _$WirelessTypeEnumMap[instance.type]!,
+      'name': instance.name,
+      'division': _$LocationTypeEnumMap[instance.division]!,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+      'dateTime': instance.dateTime,
+      'link': instance.link,
     };
 
 const _$WirelessTypeEnumMap = {
   WirelessType.wLte: 'LTE',
   WirelessType.w5G: '5G',
   WirelessType.undefined: 'undefined',
+};
+
+const _$LocationTypeEnumMap = {
+  LocationType.inBuilding: '인빌딩',
+  LocationType.adminBuilding: '행정동',
+  LocationType.theme: '테마',
+  LocationType.undefined: 'undefined',
 };

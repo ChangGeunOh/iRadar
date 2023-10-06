@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -11,6 +13,7 @@ class SideBody extends StatefulWidget {
   final ValueChanged onTapAll;
   final ValueChanged onTapRemove;
   final ValueChanged<PlaceData> onLongPress;
+  final ValueChanged onTapWithShift;
   final VoidCallback onLoadMore;
 
   const SideBody({
@@ -20,6 +23,7 @@ class SideBody extends StatefulWidget {
     required this.onTapRemove,
     required this.onLongPress,
     required this.onLoadMore,
+    required this.onTapWithShift,
     super.key,
   });
 
@@ -29,13 +33,14 @@ class SideBody extends StatefulWidget {
 
 class _SideBodyState extends State<SideBody> {
   final controller = ScrollController();
+  final focusNode = FocusNode();
+  bool isShiftPressed = false;
 
   @override
   void initState() {
     controller.addListener(listener);
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -51,33 +56,45 @@ class _SideBodyState extends State<SideBody> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      controller: controller,
-      itemBuilder: (context, index) {
-        final measureData = widget.measureList[index];
-        return MeasureDataCard(
-          measureData: measureData,
-          onTapItem: () {
-            widget.onTapItem(measureData);
-          },
-          onTapAll: () {
-            widget.onTapAll(measureData);
-          },
-          onTapRemove: () {
-            widget.onTapRemove(measureData);
-          },
-          onLongPress: () {
-            widget.onLongPress(measureData);
-          },
-        );
+    return RawKeyboardListener(
+      focusNode: focusNode,
+      autofocus: true,
+      onKey: (event) {
+        isShiftPressed = event.isShiftPressed;
       },
-      separatorBuilder: (context, index) {
-        return const Divider(
-          thickness: 1,
-          color: Color(0xffd9d9d9),
-        );
-      },
-      itemCount: widget.measureList.length,
+      child: ListView.separated(
+        controller: controller,
+        itemBuilder: (context, index) {
+          final measureData = widget.measureList[index];
+          return MeasureDataCard(
+            measureData: measureData,
+            onTapItem: () {
+              print('onTapItem>$index, isShiftPressed>$isShiftPressed');
+              if (isShiftPressed) {
+                widget.onTapWithShift(measureData);
+              } else {
+                widget.onTapItem(measureData);
+              }
+            },
+            onTapAll: () {
+              widget.onTapAll(measureData);
+            },
+            onTapRemove: () {
+              widget.onTapRemove(measureData);
+            },
+            onLongPress: () {
+              widget.onLongPress(measureData);
+            },
+          );
+        },
+        separatorBuilder: (context, index) {
+          return const Divider(
+            thickness: 1,
+            color: Color(0xffd9d9d9),
+          );
+        },
+        itemCount: widget.measureList.length,
+      ),
     );
   }
 }
@@ -118,7 +135,7 @@ class MeasureDataCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                            measureData.wirelessType == WirelessType.wLte
+                            measureData.type == WirelessType.wLte
                                 ? 'assets/icons/ic_lte.svg'
                                 : 'assets/icons/ic_5g.svg'),
                         const SizedBox(width: 8),
@@ -139,7 +156,7 @@ class MeasureDataCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          measureData.location,
+                          measureData.division.name,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -147,7 +164,7 @@ class MeasureDataCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          measureData.locationType.name,
+                          measureData.type.name,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -155,7 +172,7 @@ class MeasureDataCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          measureData.regDate,
+                          measureData.dateTime.split(' ').first,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,

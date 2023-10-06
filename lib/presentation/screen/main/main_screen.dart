@@ -130,6 +130,12 @@ class MainScreen extends StatelessWidget {
                                   BlocEvent(MainEvent.onTapItemRemove,
                                       extra: value),
                                 ),
+                                onTapWithShift: (value) {
+                                  bloc.add(
+                                    BlocEvent(MainEvent.onTapItemWithShift,
+                                        extra: value),
+                                  );
+                                },
                                 onLongPress: (PlaceData value) {
                                   showDialog(
                                     context: context,

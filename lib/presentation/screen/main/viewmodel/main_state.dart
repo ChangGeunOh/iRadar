@@ -12,6 +12,7 @@ class MainState {
   final bool isRemove;
   final bool isLoading;
   final bool hasMoreData;
+  final Set<int> selectedPlace;
 
   MainState({
     this.placeList,
@@ -23,6 +24,7 @@ class MainState {
     bool? isRemove,
     bool? isLoading,
     bool? hasMoreData,
+    Set<int>? selectedPlace,
   })  : type = type ?? WirelessType.w5G,
         metaData = metaData ??
             MetaData(
@@ -36,7 +38,8 @@ class MainState {
         isShowSide = isShowSide ?? true,
         isRemove = isRemove ?? false,
         isLoading = isLoading ?? false,
-        hasMoreData = hasMoreData ?? true;
+        hasMoreData = hasMoreData ?? true,
+        selectedPlace = selectedPlace ?? <int>{};
 
   MainState copyWith({
     List<PlaceData>? placeList,
@@ -48,6 +51,7 @@ class MainState {
     bool? isRemove,
     bool? isLoading,
     bool? hasMoreData,
+    Set<int>? selectedPlace,
   }) {
     return MainState(
       placeList: placeList ?? this.placeList,
@@ -59,6 +63,7 @@ class MainState {
       isRemove: isRemove ?? this.isRemove,
       isLoading: isLoading ?? this.isLoading,
       hasMoreData: hasMoreData ?? this.hasMoreData,
+      selectedPlace: selectedPlace ?? this.selectedPlace,
     );
   }
 }

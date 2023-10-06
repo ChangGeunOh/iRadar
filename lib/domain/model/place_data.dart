@@ -7,45 +7,41 @@ part 'place_data.g.dart';
 
 @JsonSerializable()
 class PlaceData {
-  @JsonKey(name: 'type')
-  final WirelessType wirelessType;
-  final String location;
-  final LocationType locationType;
+  final int idx;
+  final WirelessType type;
   final String name;
-  @JsonKey(name: 'date')
-  final String regDate;
-  @JsonKey(name: 'area')
+  final LocationType division;
+  final double latitude;
+  final double longitude;
+  final String dateTime;
   final String link;
 
+  /*
+          {
+            "idx": 104,
+            "type": "5G",
+            "area": "[MOS]중구_보수동",
+            "division": "행정동",
+            "latitude": 35.10589,
+            "longitude": 129.02375,
+            "datetime": "2023-07-17 12:59:16"
+        },
+   */
+
   PlaceData({
-    required this.wirelessType,
-    required this.regDate,
-    required this.link,
-  })  : location = _getLocation(link),
-        name = _getName(link),
-        locationType = _getLocationType(link);
+    required this.idx,
+    required this.type,
+    required this.name,
+    required this.division,
+    required this.latitude,
+    required this.longitude,
+    required this.dateTime,
+    String? link,
+  }): link = link ?? '';
 
-  static String _getLocation(String area) {
-    return area.split('_').first;
-  }
 
-  static String _getName(String area) {
-    return area.split(' ').last;
-  }
-
-  static LocationType _getLocationType(String area) {
-    return LocationType.getByName(area.split(' ').first.split('_').last);
-  }
-
-  factory PlaceData.fromJson(Map<String, dynamic> json) =>
-      _$PlaceDataFromJson(json);
+  factory PlaceData.fromJson(Map<String, dynamic> json) => _$PlaceDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlaceDataToJson(this);
 
-  factory PlaceData.fromLine(List<String> values) {
-    return PlaceData(
-        wirelessType: WirelessType.getByName(values[0]),
-        regDate: values.last,
-        link: values.join(" "));
-  }
 }

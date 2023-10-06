@@ -110,6 +110,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
+    required String group,
     required String type,
     int page = 30,
     int count = 1,
@@ -117,6 +118,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
+      r'group': group,
       r'type': type,
       r'page': page,
       r'count': count,
@@ -132,7 +134,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              '5gtl.php',
+              'place_list.php',
               queryParameters: queryParameters,
               data: _data,
             )
