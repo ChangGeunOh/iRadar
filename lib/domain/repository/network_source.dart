@@ -6,7 +6,7 @@ import 'package:googlemap/domain/model/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 
 import '../model/chart_table_data.dart';
-import '../model/map_data.dart';
+import '../model/map_base_data.dart';
 
 abstract class NetworkSource {
   Future<List<String>> loadBanners();
@@ -21,12 +21,17 @@ abstract class NetworkSource {
     required String type,
     int page,
     int count,
-    int total,
   });
 
-  Future<ResponseData<MapData>> loadMapData(String area);
+  Future<ResponseData<MapBaseData>> loadMapBaseData({
+    required String group,
+    required int idx,
+  });
 
-  Future<ResponseData<ChartTableData>> loadChartTableData(String link);
+  Future<ResponseData<ChartTableData>> loadChartTableData({
+    required String group,
+    required int idx,
+  });
 
   Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
       String tbl, String area, List<String> bts, String cmd);

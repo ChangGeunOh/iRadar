@@ -8,13 +8,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
-import 'package:googlemap/domain/model/measure_data.dart';
+import 'package:googlemap/domain/model/map_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/base_data.dart';
-import '../../../../domain/model/map_data.dart';
+import '../../../../domain/model/map_base_data.dart';
 import 'map_state.dart';
 
 class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
@@ -65,46 +65,109 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     BlocEvent<MapEvent> event,
     Emitter<MapState> emit,
   ) async {
+    print('Event>${event.type.toString()}');
     switch (event.type) {
       case MapEvent.init:
         break;
-      case MapEvent.onPlaceData:
-        emit(state.copyWith(placeData: event.extra));
-
-        final mapData = await repository.loadMapData(event.extra);
-        emit(state.copyWith(mapData: mapData));
-
-        if (mapData != null) {
-          // 지도 이동
-          final measureData = mapData.measureList.first;
-          if (controller == null &&
-              repository.getGoogleMapController() != null) {
-            controller = repository.getGoogleMapController();
-            await Future.delayed(const Duration(milliseconds: 300));
-          }
-
-          controller?.animateCamera(
-            CameraUpdate.newLatLng(
-              LatLng(
-                measureData.latitude,
-                measureData.longitude,
-              ),
-            ),
-          );
-          if (basePin == null) {
-            await Future.delayed(const Duration(milliseconds: 100));
-          }
-          final baseMarkers = _getBaseMarkers(event.extra, mapData.baseList);
-          final measureMarkers =
-              _getMeasureMarkers(event.extra, mapData.measureList);
-
-          emit(
-            state.copyWith(
-              baseMarkers: baseMarkers,
-              measureMarkers: measureMarkers,
-            ),
-          );
+      case MapEvent.onInit:
+        var placeDataList = List<PlaceData>.empty(growable: true);
+        for (var placeData in event.extra as Set<PlaceData>) {
+          placeDataList.add(placeData);
         }
+
+        var latitude = placeDataList.fold(0.0,
+                (previousValue, element) => previousValue + element.latitude) /
+            placeDataList.length;
+        var longitude = placeDataList.fold(0.0,
+                (previousValue, element) => previousValue + element.longitude) /
+            placeDataList.length;
+        // Move Camera
+        if (controller == null && repository.getGoogleMapController() != null) {
+          controller = repository.getGoogleMapController();
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
+        controller?.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(
+              latitude,
+              longitude,
+            ),
+          ),
+        );
+        emit(
+          state.copyWith(
+            placeDataList: placeDataList,
+            isLoading: true,
+          ),
+        );
+        break;
+      case MapEvent.onDataLoading:
+
+        final measureMarkerList = state.measureMarkers.toList(growable: true);
+        final baseMarkerList = List<Marker>.empty(growable: true);
+
+        // Check Remove or Add Marker
+        final removeMarker = state.markerSet.difference(state.placeDataList.toSet());
+        final addMarker = state.placeDataList.toSet().difference(state.markerSet);
+
+        if (removeMarker.isNotEmpty) {
+          for (var placeData in removeMarker) {
+            final measureMarkers = repository.getMeasureMarkers(placeData);
+            if (measureMarkers != null) {
+              measureMarkerList.removeWhere((element) =>
+                  measureMarkers.any((e) => e.markerId == element.markerId));
+            }
+          }
+        }
+
+        if (addMarker.isNotEmpty) {
+          for (var placeData in addMarker) {
+            final mapBaseData = await repository.loadMapBaseData(placeData);
+            if (mapBaseData != null) {
+              final measureMarkers = _getMeasureMarkers(placeData, mapBaseData.measureList);
+              measureMarkerList.addAll(measureMarkers);
+            }
+          }
+        }
+
+        for (var placeData in state.placeDataList) {
+          final mapBaseData = await repository.loadMapBaseData(placeData);
+          if (mapBaseData != null) {
+            final baseMarkers = _getBaseMarkers(
+              placeData,
+              mapBaseData.baseList,
+            );
+            baseMarkerList.addAll(baseMarkers);
+          }
+        }
+
+        emit(state.copyWith(
+          isLoading: false,
+          markerSet: state.placeDataList.toSet(),
+          measureMarkers: measureMarkerList,
+          baseMarkers: baseMarkerList,
+        ));
+        break;
+      case MapEvent.onPlaceDataSet:
+        // print("onPlaceData>${event.extra}");
+        // final mapBaseData = state.mapBaseData;
+        // if (!mapBaseData!.isEmpty()) {
+        //   if (basePin == null) {
+        //     // 이미지 로딩이 안됐을 경우
+        //     await Future.delayed(const Duration(milliseconds: 100));
+        //   }
+        //   final baseMarkers =
+        //       _getBaseMarkers(event.extra, mapBaseData.baseList);
+        //   final measureMarkers =
+        //       _getMeasureMarkers(event.extra, mapBaseData.measureList);
+        //
+        //   emit(
+        //     state.copyWith(
+        //       baseMarkers: baseMarkers,
+        //       measureMarkers: measureMarkers,
+        //     ),
+        //   );
+        // }
         break;
       case MapEvent.onTapRectangle:
         if (event.extra) {
@@ -215,7 +278,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
   // final rsrpList = [-999999, -120, -110, -100, -90, -80, -70, -60];
   BitmapDescriptor getRsrp5Marker(double rsrp5) {
-    print('MapPin>$rsrp5');
+    // print('MapPin>$rsrp5');
     // final index = rsrpList.lastIndexWhere((element) => rsrp5 > element);
     final index = rsrp5 < -120
         ? 0
@@ -230,7 +293,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
                         : rsrp5 < -70
                             ? 8
                             : 10;
-    print('MapPin>$rsrp5 :: $index');
+    // print('MapPin>$rsrp5 :: $index');
     return mapPins![index];
   }
 
@@ -240,7 +303,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
   List<Marker> _getMeasureMarkers(
     PlaceData placeData,
-    List<MeasureData> measureList,
+    List<MapData> measureList,
   ) {
     var markers = repository.getMeasureMarkers(placeData);
     if (markers == null) {

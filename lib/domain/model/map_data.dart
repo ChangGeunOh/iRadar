@@ -1,38 +1,29 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'base_data.dart';
-import 'measure_data.dart';
-
 part 'map_data.g.dart';
 
 @JsonSerializable()
 class MapData {
-  @JsonKey(name: 'measure_list')
-  final List<MeasureData> measureList;
-  @JsonKey(name: 'base_list')
-  final List<BaseData> baseList;
-  @JsonKey(
-    includeFromJson: false,
-    includeToJson: true,
-  )
-  final bool isSelected;
+  final int idx;
+  @JsonKey(name: 'lat')
+  final double latitude;
+  @JsonKey(name: 'lng')
+  final double longitude;
+  final int pci;
+  final int pci5;
+  @JsonKey(name: 'rp5')
+  final double rsrp5;
 
   MapData({
-    required this.measureList,
-    required this.baseList,
-    bool? isSelected,
-  }) : isSelected = isSelected ?? true;
-
+    required this.idx,
+    required this.latitude,
+    required this.longitude,
+    required this.pci,
+    required this.pci5,
+    required this.rsrp5,
+  });
+  
   Map<String, dynamic> toJson() => _$MapDataToJson(this);
+  factory MapData.fromJson(Map<String, dynamic> json) => _$MapDataFromJson(json);
 
-  factory MapData.fromJson(Map<String, dynamic> json) =>
-      _$MapDataFromJson(json);
-
-  MapData copyWith(bool? isSelected) {
-    return MapData(
-      measureList: measureList,
-      baseList: baseList,
-      isSelected: isSelected ?? this.isSelected,
-    );
-  }
 }

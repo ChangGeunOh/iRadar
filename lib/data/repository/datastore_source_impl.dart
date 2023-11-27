@@ -21,13 +21,9 @@ class DataStoreSourceImpl extends DataStoreSource {
     required LocalDataStore dataStore,
   }) : _dataStore = dataStore;
 
-  @override
-  Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-    print('DataStoreSourceImpl>${type.toString()}');
+  @override Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
     final key = type == WirelessType.wLte ? keyLTEPlaceList : key5GPlaceList;
-    print('DataStoreSourceImpl>${type.toString()} :: $key');
-    final list = await _dataStore.loadListData(key);
-    print('DataStoreSourceImpl>${list?.first?.toString()}');
+    final list = await _dataStore.loadListData(type.name);
     return list?.map((e) => PlaceData.fromJson(e)).toList() ?? List<PlaceData>.empty();
   }
 

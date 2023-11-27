@@ -1,39 +1,40 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../domain/model/map_cursor_state.dart';
-import '../../../../domain/model/map_data.dart';
+import '../../../../domain/model/map_base_data.dart';
 import '../../../../domain/model/place_data.dart';
 
 class MapState {
-  final PlaceData? placeData;
-  final MapData? mapData;
+  final List<PlaceData> placeDataList;
+  final Set<MapBaseData> mapBaseDataSet;
+  final Set<PlaceData> markerSet;
+  final bool isRectangleMode;
+  final Set<Polygon> polygonSet;
   final List<Marker> baseMarkers;
   final List<Marker> measureMarkers;
-  final bool isRectangleMode; // onTapRectangle
-  final Set<Polygon>? polygonSet;
-  final Set<Circle>? circleSet;
+  final Set<Circle> circleSet;
   final double radius;
+  final bool isLoading;
   final MapCursorState cursorState;
 
   MapState({
-    this.mapData,
-    this.placeData,
-    bool? isRectangleMode,
-    this.polygonSet,
-    List<Marker>? baseMarkers,
-    List<Marker>? measureMarkers,
-    this.circleSet,
-    double? radius,
-    MapCursorState? cursorState,
-  })  : baseMarkers = baseMarkers ?? List.empty(),
-        measureMarkers = measureMarkers ?? List.empty(),
-        radius = radius ?? 20,
-        cursorState = cursorState ?? MapCursorState.none,
-        isRectangleMode = isRectangleMode ?? false;
+    this.placeDataList = const [],
+    this.mapBaseDataSet = const {},
+    this.markerSet = const {},
+    this.isRectangleMode = false,
+    this.polygonSet = const {},
+    this.baseMarkers = const [],
+    this.measureMarkers = const [],
+    this.circleSet = const {},
+    this.radius = 20,
+    this.isLoading = false,
+    this.cursorState = MapCursorState.none,
+  });
 
   MapState copyWith({
-    MapData? mapData,
-    PlaceData? placeData,
+    List<PlaceData>? placeDataList,
+    Set<MapBaseData>? mapBaseDataSet,
+    Set<PlaceData>? markerSet,
     bool? isRectangleMode,
     Set<Polygon>? polygonSet,
     List<Marker>? baseMarkers,
@@ -41,10 +42,12 @@ class MapState {
     Set<Circle>? circleSet,
     double? radius,
     MapCursorState? cursorState,
+    bool? isLoading,
   }) {
     return MapState(
-      mapData: mapData ?? this.mapData,
-      placeData: placeData ?? this.placeData,
+      placeDataList: placeDataList ?? this.placeDataList,
+      mapBaseDataSet: mapBaseDataSet ?? this.mapBaseDataSet,
+      markerSet: markerSet ?? this.markerSet,
       isRectangleMode: isRectangleMode ?? this.isRectangleMode,
       polygonSet: polygonSet ?? this.polygonSet,
       baseMarkers: baseMarkers ?? this.baseMarkers,
@@ -52,6 +55,7 @@ class MapState {
       circleSet: circleSet ?? this.circleSet,
       radius: radius ?? this.radius,
       cursorState: cursorState ?? this.cursorState,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 }

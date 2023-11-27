@@ -14,11 +14,11 @@ import 'component/statefull_slider.dart';
 import 'viewmodel/map_event.dart';
 
 class MapScreen extends StatelessWidget {
-  final PlaceData? placeData;
+  final Set<PlaceData> placeDataSet;
   final bool isRemove;
 
   const MapScreen({
-    required this.placeData,
+    required this.placeDataSet,
     required this.isRemove,
     super.key,
   });
@@ -36,13 +36,20 @@ class MapScreen extends StatelessWidget {
 
     return BlocLayout<MapBloc, MapState>(
       create: (context) {
-        return MapBloc(context, MapState());
+        return MapBloc(
+          context,
+          MapState(),
+        );
       },
       builder: (context, bloc, state) {
-        if (placeData != null && placeData != state.placeData) {
-          bloc.add(BlocEvent(MapEvent.onPlaceData, extra: placeData));
+        print('MapScreen::: ${state.placeDataList.length} : ${placeDataSet.length}');
+        if (placeDataSet.isNotEmpty && (placeDataSet.length != state.placeDataList.length)) {
+          print('MapScreen::: ${placeDataSet != state.placeDataList.toSet()}');
+          bloc.add(BlocEvent(MapEvent.onInit, extra: placeDataSet));
         }
-
+        if (state.isLoading) {
+          bloc.add(BlocEvent(MapEvent.onDataLoading));
+        }
         return Stack(
           children: [
             Listener(
@@ -102,15 +109,15 @@ class MapScreen extends StatelessWidget {
                     print('google map> onTap');
                     bloc.add(BlocEvent(MapEvent.onTapMap, extra: value));
                   },
-                  polygons: state.polygonSet ?? const <Polygon>{},
-                  circles: state.circleSet ?? const <Circle>{},
+                  polygons: state.polygonSet,
+                  circles: state.circleSet,
                   onCameraMove: (value) {
                     bloc.setCameraPosition(value);
                   },
                 ),
               ),
             ),
-            if (placeData != null)
+            if (placeDataSet.isNotEmpty)
               Positioned(
                 top: 0,
                 left: 0,
@@ -118,7 +125,9 @@ class MapScreen extends StatelessWidget {
                 child: AppBar(
                   backgroundColor: Colors.transparent,
                   centerTitle: true,
-                  title: Text(placeData!.name),
+                  title: Text(
+                    placeDataSet.map((e) => e.name).join(', '),
+                  ),
                   actions: [
                     IconButton(
                       onPressed: () {
@@ -137,6 +146,13 @@ class MapScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 24),
                   ],
+                ),
+              ),
+            if (state.isLoading)
+              Positioned.fill(
+                child: Container(
+                  color: const Color(0x40000000),
+                  child: const Center(child: CircularProgressIndicator()),
                 ),
               ),
           ],

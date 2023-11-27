@@ -112,9 +112,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
     required String group,
     required String type,
-    int page = 30,
-    int count = 1,
-    int total = 0,
+    int page = 1,
+    int count = 30,
   }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -122,7 +121,6 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       r'type': type,
       r'page': page,
       r'count': count,
-      r'total': total,
     };
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
@@ -134,7 +132,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'place_list.php',
+              'iradar_area_list.php',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -156,20 +154,26 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
-  Future<ResponseData<MapData>> loadMapData(String area) async {
+  Future<ResponseData<MapBaseData>> loadMapBaseData({
+    required String group,
+    required int idx,
+  }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'area': area};
+    final queryParameters = <String, dynamic>{
+      r'group': group,
+      r'idx': idx,
+    };
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<MapData>>(Options(
+        _setStreamType<ResponseData<MapBaseData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              'pcitt.php',
+              'iradar_map_base.php',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -178,17 +182,23 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = ResponseData<MapData>.fromJson(
+    final value = ResponseData<MapBaseData>.fromJson(
       _result.data!,
-      (json) => MapData.fromJson(json as Map<String, dynamic>),
+      (json) => MapBaseData.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }
 
   @override
-  Future<ResponseData<ChartTableData>> loadChartTableData(String area) async {
+  Future<ResponseData<ChartTableData>> loadChartTableData({
+    required String group,
+    required int idx,
+  }) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'area': area};
+    final queryParameters = <String, dynamic>{
+      r'group': group,
+      r'idx': idx,
+    };
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
@@ -199,7 +209,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'dtl.php',
+              'iradar_chart_table.php',
               queryParameters: queryParameters,
               data: _data,
             )

@@ -5,6 +5,8 @@ enum WirelessType {
   wLte('LTE'),
   @JsonValue('5G')
   w5G('5G'),
+  @JsonValue('ALL')
+  all('ALL'),
   undefined('undefined');
 
   final String name;

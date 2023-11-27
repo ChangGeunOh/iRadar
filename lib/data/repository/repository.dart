@@ -3,7 +3,7 @@ import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
@@ -67,9 +67,11 @@ class Repository {
   }
 
   Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-
     var metaData = _dataCacheSource.getMetaData(type);
-    var placeList = await _dataStoreSource.loadPlaceList(type);
+    List<PlaceData> placeList = List.empty(growable: true);
+    List<PlaceData> list = await _dataStoreSource.loadPlaceList(type);
+    print('::Saved PlaceList>${list.length}');
+    placeList.addAll(list);
 
     if (metaData.page < metaData.total || metaData.total == 0) {
       var response = await _networkSource.loadPlaceList(
@@ -77,12 +79,14 @@ class Repository {
         type: type.name,
         page: metaData.page + 1,
         count: metaData.count,
-        total: metaData.total,
       );
 
       if (response.meta.code == 200) {
-        print('loadPlaceList>${response.data!.length}');
-        placeList += response.data!;
+        print('::Download PlaceList>${response.data!.length}');
+        List<PlaceData> list = response.data!;
+        print('::Total PlaceList>${placeList!.length}');
+        placeList.addAll(list);
+        print('::Total PlaceList>${placeList!.length}');
         _dataCacheSource.setMetaData(type, response.meta);
         _dataStoreSource.savePlaceList(type, placeList);
       }
@@ -96,14 +100,37 @@ class Repository {
     await _dataStoreSource.remove(type);
   }
 
-  Future<MapData?> loadMapData(PlaceData placeData) async {
-    if (_dataCacheSource.getMapData(placeData.link) == null) {
-      final responseData = await _networkSource.loadMapData(placeData.link);
+  Future<MapBaseData?> loadMapBaseData(PlaceData placeData) async {
+    var mapBaseData = _dataCacheSource.getMapBaseData(placeData.idx);
+
+    if (mapBaseData == null) {
+      final responseData = await _networkSource.loadMapBaseData(
+        group: placeData.group,
+        idx: placeData.idx,
+      );
       if (responseData.data != null) {
-        _dataCacheSource.setMapData(placeData.link, responseData.data!);
+        mapBaseData = responseData.data!;
+        _dataCacheSource.setMapBaseData(placeData.idx, mapBaseData);
       }
     }
-    return _dataCacheSource.getMapData(placeData.link);
+    print("MapBaseData>${mapBaseData?.toJson()}");
+    return mapBaseData;
+  }
+
+  Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
+    var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
+
+    if (chartTableData == null) {
+      final responseData = await _networkSource.loadChartTableData(
+        group: placeData.group,
+        idx: placeData.idx,
+      );
+      if (responseData.data != null) {
+        chartTableData = responseData.data!;
+        _dataCacheSource.setChartTableData(placeData.idx, chartTableData);
+      }
+    }
+    return chartTableData;
   }
 
   void setGoogleMapController(GoogleMapController controller) {
@@ -122,16 +149,6 @@ class Repository {
     return _dataCacheSource.getCameraPosition() ?? initCameraPosition;
   }
 
-  Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
-    if (_dataCacheSource.getChartTableData(placeData.link) == null) {
-      final responseData =
-          await _networkSource.loadChartTableData(placeData.link);
-      if (responseData.data != null) {
-        _dataCacheSource.setChartTableData(placeData.link, responseData.data!);
-      }
-    }
-    return _dataCacheSource.getChartTableData(placeData.link);
-  }
 
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
@@ -152,19 +169,19 @@ class Repository {
   }
 
   void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {
-    _dataCacheSource.setMeasureMarkers(placeData.link, markers);
+    _dataCacheSource.setMeasureMarkers(placeData.idx, markers);
   }
 
   List<Marker>? getMeasureMarkers(PlaceData placeData) {
-    return _dataCacheSource.getMeasureMarkers(placeData.link);
+    return _dataCacheSource.getMeasureMarkers(placeData.idx);
   }
 
   void setBaseMarkers(PlaceData placeData, List<Marker> markers) {
-    _dataCacheSource.setBaseMarkers(placeData.link, markers);
+    _dataCacheSource.setBaseMarkers(placeData.idx, markers);
   }
 
   List<Marker>? getBaseMarkers(PlaceData placeData) {
-    return _dataCacheSource.getBaseMarkers(placeData.link);
+    return _dataCacheSource.getBaseMarkers(placeData.idx);
   }
 
   Future<List<TableData>?> loadNpciTableList(
@@ -195,7 +212,8 @@ class Repository {
     print('uploadMeasureData>${result.toString()}');
   }
 
-  Future<int> getCountArea({required String group, required String area}) async {
+  Future<int> getCountArea(
+      {required String group, required String area}) async {
     final response = await _networkSource.getCountArea(
       group: group,
       area: area,

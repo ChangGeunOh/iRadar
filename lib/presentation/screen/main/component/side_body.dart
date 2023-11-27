@@ -8,7 +8,8 @@ import '../../../../domain/model/place_data.dart';
 import '../../../../domain/model/wireless_type.dart';
 
 class SideBody extends StatefulWidget {
-  final List<PlaceData> measureList;
+  final Set<PlaceData> selectedPlaceSet;
+  final List<PlaceData> placeList;
   final ValueChanged onTapItem;
   final ValueChanged onTapAll;
   final ValueChanged onTapRemove;
@@ -17,7 +18,8 @@ class SideBody extends StatefulWidget {
   final VoidCallback onLoadMore;
 
   const SideBody({
-    required this.measureList,
+    required this.selectedPlaceSet,
+    required this.placeList,
     required this.onTapItem,
     required this.onTapAll,
     required this.onTapRemove,
@@ -56,62 +58,71 @@ class _SideBodyState extends State<SideBody> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.selectedPlaceSet.toString());
     return RawKeyboardListener(
       focusNode: focusNode,
       autofocus: true,
       onKey: (event) {
+        print("isShiftPressed>${event.isShiftPressed} :: ${widget.selectedPlaceSet.length}}");
+        if (isShiftPressed && !event.isShiftPressed && widget.selectedPlaceSet.length > 1) {
+            print("Show Merge Dialog");
+        }
         isShiftPressed = event.isShiftPressed;
       },
       child: ListView.separated(
         controller: controller,
         itemBuilder: (context, index) {
-          final measureData = widget.measureList[index];
+          final placeData = widget.placeList[index];
           return MeasureDataCard(
-            measureData: measureData,
+            placeData: placeData,
             onTapItem: () {
               print('onTapItem>$index, isShiftPressed>$isShiftPressed');
               if (isShiftPressed) {
-                widget.onTapWithShift(measureData);
+                widget.onTapWithShift(placeData);
               } else {
-                widget.onTapItem(measureData);
+                widget.onTapItem(placeData);
               }
             },
             onTapAll: () {
-              widget.onTapAll(measureData);
+              widget.onTapAll(placeData);
             },
             onTapRemove: () {
-              widget.onTapRemove(measureData);
+              widget.onTapRemove(placeData);
             },
             onLongPress: () {
-              widget.onLongPress(measureData);
+              widget.onLongPress(placeData);
             },
+            isSelected: widget.selectedPlaceSet.contains(placeData),
           );
         },
         separatorBuilder: (context, index) {
           return const Divider(
+            height: 1,
             thickness: 1,
             color: Color(0xffd9d9d9),
           );
         },
-        itemCount: widget.measureList.length,
+        itemCount: widget.placeList.length,
       ),
     );
   }
 }
 
 class MeasureDataCard extends StatelessWidget {
-  final PlaceData measureData;
+  final PlaceData placeData;
   final VoidCallback onTapItem;
   final VoidCallback onTapAll;
   final VoidCallback onTapRemove;
   final VoidCallback onLongPress;
+  final bool isSelected;
 
   const MeasureDataCard({
-    required this.measureData,
+    required this.placeData,
     required this.onTapItem,
     required this.onTapAll,
     required this.onTapRemove,
     required this.onLongPress,
+    required this.isSelected,
     super.key,
   });
 
@@ -122,9 +133,9 @@ class MeasureDataCard extends StatelessWidget {
       onLongPress: onLongPress,
       child: Container(
         width: 400,
-        color: Colors.white,
+        color: isSelected ? const Color(0xffe6f7ff) : Colors.white,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Row(
             children: [
               Expanded(
@@ -135,13 +146,13 @@ class MeasureDataCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SvgPicture.asset(
-                            measureData.type == WirelessType.wLte
+                            placeData.type == WirelessType.wLte
                                 ? 'assets/icons/ic_lte.svg'
                                 : 'assets/icons/ic_5g.svg'),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            measureData.name,
+                            placeData.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -156,7 +167,7 @@ class MeasureDataCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          measureData.division.name,
+                          placeData.group,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -164,7 +175,7 @@ class MeasureDataCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          measureData.type.name,
+                          placeData.division.name,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -172,7 +183,7 @@ class MeasureDataCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          measureData.dateTime.split(' ').first,
+                          placeData.dateTime.split(' ').first,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,

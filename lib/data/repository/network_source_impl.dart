@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart'  hide Headers;
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
@@ -15,6 +15,7 @@ part 'network_source_impl.g.dart';
 
 @RestApi()
 abstract class NetworkSourceImpl extends NetworkSource {
+
   factory NetworkSourceImpl(Dio dio, {String baseUrl}) = _NetworkSourceImpl;
 
   @override
@@ -34,24 +35,31 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @GET('place_list.php')
+  @GET('iradar_area_list.php')
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
     @Query('group') required String group,
     @Query('type') required String type,
-    @Query('page') int page = 30,
-    @Query('count') int count = 1,
-    @Query('total') int total = 0,
+    @Query('page') int page = 1,
+    @Query('count') int count = 30
+  });
+
+  // @override
+  // @GET('pcitt.php')
+  // Future<ResponseData<MapData>> loadMapData(@Query('area') String area);
+  
+  @override
+  @GET('iradar_map_base.php')
+  Future<ResponseData<MapBaseData>> loadMapBaseData({
+    @Query('group') required String group,
+    @Query('idx') required int idx,
   });
 
   @override
-  @GET('pcitt.php')
-  Future<ResponseData<MapData>> loadMapData(@Query('area') String area);
-
-  @override
-  @GET('dtl.php')
-  Future<ResponseData<ChartTableData>> loadChartTableData(
-    @Query('area') String area,
-  );
+  @GET('iradar_chart_table.php')
+  Future<ResponseData<ChartTableData>> loadChartTableData({
+    @Query('group') required String group,
+    @Query('idx') required int idx,
+  });
 
   @override
   @POST('bts_ex.php')

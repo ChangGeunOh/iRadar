@@ -28,6 +28,7 @@ class MainScreen extends StatelessWidget {
         MainState(),
       ),
       builder: (context, bloc, state) {
+        print('MainScreen::: ${state.selectedPlaceSet.length}');
         return DefaultTabController(
           initialIndex: 1,
           length: 2,
@@ -46,7 +47,7 @@ class MainScreen extends StatelessWidget {
                         placeData: state.placeData,
                       ),
                       MapScreen(
-                        placeData: state.placeData,
+                        placeDataSet: state.selectedPlaceSet,
                         isRemove: state.isRemove,
                       ),
                     ],
@@ -99,31 +100,33 @@ class MainScreen extends StatelessWidget {
                                 extra: type,
                               ),
                             ),
-                            onTapRefresh: ()=> bloc.add(
-                              BlocEvent(
-                                MainEvent.onTapRefresh,
-                              )
-                            ),
-                            onTapMenu: ()=> bloc.add(
-                              BlocEvent(MainEvent.onTapMenu)
-                            ),
+                            onTapRefresh: () => bloc.add(BlocEvent(
+                              MainEvent.onTapRefresh,
+                            )),
+                            onTapMenu: () =>
+                                bloc.add(BlocEvent(MainEvent.onTapMenu)),
                           ),
                           if (state.placeList != null)
                             Expanded(
                               child: SideBody(
-                                measureList: state.placeList!,
+                                selectedPlaceSet: state.selectedPlaceSet,
+                                placeList: state.placeList!,
                                 onLoadMore: bloc.loadMore,
                                 onTapItem: (value) {
                                   bloc.add(
-                                    BlocEvent(MainEvent.onTapItem,
-                                        extra: value),
+                                    BlocEvent(
+                                      MainEvent.onTapItem,
+                                      extra: value,
+                                    ),
                                   );
                                 },
                                 onTapAll: (value) {
                                   print("onTapAll>${value.toString()}");
                                   bloc.add(
-                                    BlocEvent(MainEvent.onTapItemAll,
-                                        extra: value),
+                                    BlocEvent(
+                                      MainEvent.onTapItemAll,
+                                      extra: value,
+                                    ),
                                   );
                                 },
                                 onTapRemove: (value) => bloc.add(
@@ -132,8 +135,10 @@ class MainScreen extends StatelessWidget {
                                 ),
                                 onTapWithShift: (value) {
                                   bloc.add(
-                                    BlocEvent(MainEvent.onTapItemWithShift,
-                                        extra: value),
+                                    BlocEvent(
+                                      MainEvent.onTapItemWithShift,
+                                      extra: value,
+                                    ),
                                   );
                                 },
                                 onLongPress: (PlaceData value) {

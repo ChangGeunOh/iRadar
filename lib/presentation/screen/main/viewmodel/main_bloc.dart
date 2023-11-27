@@ -41,7 +41,8 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       case MainEvent.onTapType:
         emit(state.copyWith(isLoading: true, placeList: List.empty()));
         final list = await repository.loadPlaceList(event.extra);
-        emit(state.copyWith(placeList: list, type: event.extra, isLoading: false));
+        emit(state.copyWith(
+            placeList: list, type: event.extra, isLoading: false));
         break;
       case MainEvent.onDelete:
         break;
@@ -58,7 +59,20 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(isShowSide: !state.isShowSide));
         break;
       case MainEvent.onTapItem:
-        emit(state.copyWith(placeData: event.extra, isRemove: false));
+        final PlaceData placeData = event.extra;
+        emit(state.copyWith(
+          placeData: event.extra,
+          selectedPlaceSet: {placeData},
+        ));
+        // Loading MapDataList and Loading ChartDataList
+        // final mapBaseList = await repository.loadMapBaseData(placeData);
+        // emit(state.copyWith(
+        //   mapBaseData: mapBaseList,
+        // ));
+        // final chartTableList = await repository.loadChartTableData(placeData);
+        // emit(state.copyWith(
+        //   chartTableData: chartTableList,
+        // ));
         break;
       case MainEvent.onTapItemAll:
         emit(state.copyWith(placeData: event.extra, isRemove: false));
@@ -73,7 +87,8 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(isLoading: true, placeList: List.empty()));
         await repository.remove(state.type);
         final list = await repository.loadPlaceList(state.type);
-        emit(state.copyWith(placeList: list, type: event.extra, isLoading: false));
+        emit(state.copyWith(
+            placeList: list, type: event.extra, isLoading: false));
         break;
       case MainEvent.onMoreLoading:
         emit(state.copyWith(isLoading: true));
@@ -83,10 +98,16 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       case MainEvent.onTapMenu:
         context.pushNamed(UploadScreen.routeName);
         break;
-        case MainEvent.onTapItemWithShift:
-          final PlaceData placeData = event.extra;
-         // state.selectedPlace.contains(placeData.name) ? state.selectedPlace.remove(placeData.name) : state.selectedPlace.add(placeData.name);
-          break;
+      case MainEvent.onTapItemWithShift:
+        final PlaceData placeData = event.extra;
+        var selectedPlace = state.selectedPlaceSet;
+        if (selectedPlace.contains(placeData)) {
+          selectedPlace.remove(placeData);
+        } else {
+          selectedPlace.add(placeData);
+        }
+        emit(state.copyWith(selectedPlaceSet: selectedPlace));
+        break;
     }
   }
 

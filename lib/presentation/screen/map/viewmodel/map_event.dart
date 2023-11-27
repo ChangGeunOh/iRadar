@@ -1,9 +1,9 @@
 enum MapEvent {
   init,
-  onPlaceData,
+  onPlaceDataSet,
   onTapRectangle,
   onTapMap,
   onMoveCursor,
   onChangeRadius,
-  onChangeCursorState,
+  onChangeCursorState, onInit, onDataLoading,
 }

@@ -9,12 +9,14 @@ part 'place_data.g.dart';
 class PlaceData {
   final int idx;
   final WirelessType type;
+  final String group;
   final String name;
   final LocationType division;
   final double latitude;
   final double longitude;
   final String dateTime;
   final String link;
+  late bool isSelected = false;
 
   /*
           {
@@ -31,17 +33,37 @@ class PlaceData {
   PlaceData({
     required this.idx,
     required this.type,
+    required this.group,
     required this.name,
     required this.division,
     required this.latitude,
     required this.longitude,
     required this.dateTime,
     String? link,
-  }): link = link ?? '';
+    bool? isSelected,
+  })  : link = link ?? '';
 
-
-  factory PlaceData.fromJson(Map<String, dynamic> json) => _$PlaceDataFromJson(json);
+  factory PlaceData.fromJson(Map<String, dynamic> json) =>
+      _$PlaceDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlaceDataToJson(this);
 
+  PlaceData copy() {
+    return PlaceData(
+      idx: idx,
+      type: type,
+      group: group,
+      name: name,
+      division: division,
+      latitude: latitude,
+      longitude: longitude,
+      dateTime: dateTime,
+      link: link,
+      isSelected: isSelected,
+    );
+  }
+
+  toggle() {
+    isSelected = !isSelected;
+  }
 }

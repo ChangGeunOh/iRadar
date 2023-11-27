@@ -34,14 +34,19 @@ class LocalDataStore {
   Future<List?> loadListData(String key) async {
     final dataStore = await getSharedPreferences();
     final list = dataStore.getStringList(key);
-
+    print("Load List -----------------------$key");
+    print("::$list");
     return list?.map((e) => jsonDecode(e)).toList();
   }
 
   Future<void> saveListData(WirelessType type, List<Object> list) async {
     final dataStore = await getSharedPreferences();
     final encodedList = list.map((e) => jsonEncode(e)).toList();
+    print(encodedList.toString());
     await dataStore.setStringList(type.name, encodedList);
+    var savedList = dataStore.getStringList(type.name);
+    print("Save List-----------------------${type.name}");
+    print(savedList.toString());
   }
 
   Future<void> remove(WirelessType type) async {

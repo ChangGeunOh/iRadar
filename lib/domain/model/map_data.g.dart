@@ -7,16 +7,19 @@ part of 'map_data.dart';
 // **************************************************************************
 
 MapData _$MapDataFromJson(Map<String, dynamic> json) => MapData(
-      measureList: (json['measure_list'] as List<dynamic>)
-          .map((e) => MeasureData.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      baseList: (json['base_list'] as List<dynamic>)
-          .map((e) => BaseData.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      idx: json['idx'] as int,
+      latitude: (json['lat'] as num).toDouble(),
+      longitude: (json['lng'] as num).toDouble(),
+      pci: json['pci'] as int,
+      pci5: json['pci5'] as int,
+      rsrp5: (json['rp5'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$MapDataToJson(MapData instance) => <String, dynamic>{
-      'measure_list': instance.measureList,
-      'base_list': instance.baseList,
-      'isSelected': instance.isSelected,
+      'idx': instance.idx,
+      'lat': instance.latitude,
+      'lng': instance.longitude,
+      'pci': instance.pci,
+      'pci5': instance.pci5,
+      'rp5': instance.rsrp5,
     };

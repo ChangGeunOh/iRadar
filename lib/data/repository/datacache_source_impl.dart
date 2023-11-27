@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_data.dart';
+import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/meta_data.dart';
 import 'package:googlemap/domain/repository/datacache_source.dart';
 
@@ -38,43 +38,43 @@ class DataCacheSourceImpl extends DataCacheSource {
   }
 
   @override
-  MapData? getMapData(String link) {
-    return _dataCache.cacheMapData[link];
+  MapBaseData? getMapBaseData(int idx) {
+    return _dataCache.cacheMapData[idx];
   }
 
   @override
-  void setMapData(String link, MapData mapData) {
-    _dataCache.cacheMapData[link] = mapData;
+  void setMapBaseData(int idx, MapBaseData mapData) {
+    _dataCache.cacheMapData[idx] = mapData;
   }
 
   @override
-  void setChartTableData(String link, ChartTableData chartTableData) {
-    _dataCache.cacheChartTableData[link] = chartTableData;
+  void setChartTableData(int idx, ChartTableData chartTableData) {
+    _dataCache.cacheChartTableData[idx] = chartTableData;
   }
 
   @override
-  ChartTableData? getChartTableData(String link) {
-    return _dataCache.cacheChartTableData[link];
+  ChartTableData? getChartTableData(int idx) {
+    return _dataCache.cacheChartTableData[idx];
   }
 
   @override
-  void setBaseMarkers(String link, List<Marker> markers) {
-    _dataCache.cacheBaseMarkers[link] = markers;
+  void setBaseMarkers(int idx, List<Marker> markers) {
+    _dataCache.cacheBaseMarkers[idx] = markers;
   }
 
   @override
-  List<Marker>? getBaseMarkers(String link) {
-    return _dataCache.cacheBaseMarkers[link];
+  List<Marker>? getBaseMarkers(int idx) {
+    return _dataCache.cacheBaseMarkers[idx];
   }
 
   @override
-  void setMeasureMarkers(String link, List<Marker> markers) {
-    _dataCache.cacheMeasureMarkers[link] = markers;
+  void setMeasureMarkers(int idx, List<Marker> markers) {
+    _dataCache.cacheMeasureMarkers[idx] = markers;
   }
 
   @override
-  List<Marker>? getMeasureMarkers(String link) {
-    return _dataCache.cacheMeasureMarkers[link];
+  List<Marker>? getMeasureMarkers(int idx) {
+    return _dataCache.cacheMeasureMarkers[idx];
   }
 
   @override
