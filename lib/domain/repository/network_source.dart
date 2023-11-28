@@ -35,8 +35,13 @@ abstract class NetworkSource {
     required int idx,
   });
 
-  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
-      String tbl, String area, List<String> bts, String cmd);
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData({
+    required String group,
+    required String type,
+    required int idx,
+    required List<String> bts,
+    required String cmd,
+  });
 
   Future<ResponseData<List<TableData>>> loadNpciTableList(
     String link,

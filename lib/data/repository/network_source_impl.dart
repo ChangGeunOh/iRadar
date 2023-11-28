@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart'  hide Headers;
+import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_base_data.dart';
@@ -15,7 +15,6 @@ part 'network_source_impl.g.dart';
 
 @RestApi()
 abstract class NetworkSourceImpl extends NetworkSource {
-
   factory NetworkSourceImpl(Dio dio, {String baseUrl}) = _NetworkSourceImpl;
 
   @override
@@ -36,17 +35,16 @@ abstract class NetworkSourceImpl extends NetworkSource {
 
   @override
   @GET('iradar_area_list.php')
-  Future<ResponseData<List<PlaceData>>> loadPlaceList({
-    @Query('group') required String group,
-    @Query('type') required String type,
-    @Query('page') int page = 1,
-    @Query('count') int count = 30
-  });
+  Future<ResponseData<List<PlaceData>>> loadPlaceList(
+      {@Query('group') required String group,
+      @Query('type') required String type,
+      @Query('page') int page = 1,
+      @Query('count') int count = 30});
 
   // @override
   // @GET('pcitt.php')
   // Future<ResponseData<MapData>> loadMapData(@Query('area') String area);
-  
+
   @override
   @GET('iradar_map_base.php')
   Future<ResponseData<MapBaseData>> loadMapBaseData({
@@ -64,12 +62,13 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @POST('bts_ex.php')
   @FormUrlEncoded()
-  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
-    @Field('tbl') String tbl,
-    @Field('area') String area,
-    @Field('bts[]') List<String> bts,
-    @Field('cmd') String cmd,
-  );
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData({
+    @Field('group') required String group,
+    @Field('type') required String type,
+    @Field('idx') required int idx,
+    @Field('bts[]') required List<String> bts,
+    @Field('cmd') required String cmd,
+  });
 
   @override
   @GET('dtl_pci.php')
@@ -104,5 +103,3 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Field('merged_idx[]') required List<int> mergedIdxList,
   });
 }
-
-

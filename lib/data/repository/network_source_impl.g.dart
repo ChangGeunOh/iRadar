@@ -226,18 +226,20 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
-  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData(
-    String tbl,
-    String area,
-    List<String> bts,
-    String cmd,
-  ) async {
+  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData({
+    required String group,
+    required String type,
+    required int idx,
+    required List<String> bts,
+    required String cmd,
+  }) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {
-      'tbl': tbl,
-      'area': area,
+      'group': group,
+      'type': type,
+      'idx': idx,
       'bts[]': bts,
       'cmd': cmd,
     };

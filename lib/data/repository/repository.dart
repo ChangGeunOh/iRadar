@@ -156,12 +156,13 @@ class Repository {
         .where((element) => element.checked)
         .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
         .toList();
-
+    final loginData = getLoginData();
     final response = await _networkSource.loadExcelResponseData(
-      excelRequestData.placeData.type.name,
-      excelRequestData.placeData.link,
-      bts,
-      '',
+      group: loginData.group,
+      type: excelRequestData.placeData.type.name,
+      idx: excelRequestData.placeData.idx,
+      bts: bts,
+      cmd: '',
     );
 
     return response.data;
