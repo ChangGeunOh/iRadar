@@ -1,5 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../domain/model/login_data.dart';
 import '../../../../domain/model/map_cursor_state.dart';
 import '../../../../domain/model/map_base_data.dart';
 import '../../../../domain/model/place_data.dart';
@@ -16,6 +17,8 @@ class MapState {
   final double radius;
   final bool isLoading;
   final MapCursorState cursorState;
+  final bool isMergeData;
+  final LoginData? loginData;
 
   MapState({
     this.placeDataList = const [],
@@ -29,6 +32,8 @@ class MapState {
     this.radius = 20,
     this.isLoading = false,
     this.cursorState = MapCursorState.none,
+    this.isMergeData = false,
+    this.loginData,
   });
 
   MapState copyWith({
@@ -43,6 +48,8 @@ class MapState {
     double? radius,
     MapCursorState? cursorState,
     bool? isLoading,
+    bool? isMergeData,
+    LoginData? loginData,
   }) {
     return MapState(
       placeDataList: placeDataList ?? this.placeDataList,
@@ -56,6 +63,8 @@ class MapState {
       radius: radius ?? this.radius,
       cursorState: cursorState ?? this.cursorState,
       isLoading: isLoading ?? this.isLoading,
+      isMergeData: isMergeData ?? this.isMergeData,
+      loginData: loginData ?? this.loginData,
     );
   }
 }

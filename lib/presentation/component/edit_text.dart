@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 class EditText extends StatefulWidget {
   final ValueChanged onChanged;
   final String label;
+  final double? labelFontSize;
   final String? value;
+  final double? valueFontSize;
   final bool? enabled;
   final Widget? suffixIcon;
 
   const EditText({
     required this.onChanged,
     required this.label,
+    this.labelFontSize,
     this.value,
+    this.valueFontSize,
     this.enabled,
     this.suffixIcon,
     super.key,
@@ -44,8 +48,9 @@ class _EditTextState extends State<EditText> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
             widget.label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.black87,
+              fontSize: widget.labelFontSize ?? 14.0,
             ),
           ),
         ),
@@ -62,8 +67,8 @@ class _EditTextState extends State<EditText> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
           ),
           onChanged: widget.onChanged,
-          style: const TextStyle(
-            fontSize: 16.0,
+          style: TextStyle(
+            fontSize: widget.valueFontSize ?? 16.0,
           ),
         ),
       ],

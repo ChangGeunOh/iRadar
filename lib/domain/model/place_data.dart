@@ -16,6 +16,7 @@ class PlaceData {
   final double longitude;
   final String dateTime;
   final String link;
+  final String password;
   late bool isSelected = false;
 
   /*
@@ -39,6 +40,7 @@ class PlaceData {
     required this.latitude,
     required this.longitude,
     required this.dateTime,
+    this.password = '',
     String? link,
     bool? isSelected,
   })  : link = link ?? '';

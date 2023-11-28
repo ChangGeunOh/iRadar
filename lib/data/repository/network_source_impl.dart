@@ -90,4 +90,19 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Query('group') required String group,
     @Query('area') required String area,
   });
+
+  @override
+  @POST('api/save_merged_data.php')
+  @FormUrlEncoded()
+  Future<void> saveMergedData({
+    @Field('name') required String name,
+    @Field('division') required String division,
+    @Field('latitude') required double latitude,
+    @Field('longitude') required double longitude,
+    @Field('password') required String password,
+    @Field('type') required String type,
+    @Field('merged_idx[]') required List<int> mergedIdxList,
+  });
 }
+
+

@@ -14,6 +14,7 @@ import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/base_data.dart';
+import '../../../../domain/model/login_data.dart';
 import '../../../../domain/model/map_base_data.dart';
 import 'map_state.dart';
 
@@ -37,6 +38,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   }
 
   Future<void> _init() async {
+    final loginData = repository.getLoginData();
     final filenames = List.generate(
         12, (index) => 'assets/icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
     mapPins = await Future.wait(filenames.map((e) async {
@@ -58,6 +60,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         fillColor: const Color(0x80ff0000),
       ),
     );
+    add(BlocEvent(MapEvent.init, extra: loginData));
   }
 
   @override
@@ -68,6 +71,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     print('Event>${event.type.toString()}');
     switch (event.type) {
       case MapEvent.init:
+        final loginData = event.extra as LoginData;
+        emit(state.copyWith(loginData: loginData));
         break;
       case MapEvent.onInit:
         var placeDataList = List<PlaceData>.empty(growable: true);
@@ -102,13 +107,14 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         );
         break;
       case MapEvent.onDataLoading:
-
         final measureMarkerList = state.measureMarkers.toList(growable: true);
         final baseMarkerList = List<Marker>.empty(growable: true);
 
         // Check Remove or Add Marker
-        final removeMarker = state.markerSet.difference(state.placeDataList.toSet());
-        final addMarker = state.placeDataList.toSet().difference(state.markerSet);
+        final removeMarker =
+            state.markerSet.difference(state.placeDataList.toSet());
+        final addMarker =
+            state.placeDataList.toSet().difference(state.markerSet);
 
         if (removeMarker.isNotEmpty) {
           for (var placeData in removeMarker) {
@@ -124,7 +130,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           for (var placeData in addMarker) {
             final mapBaseData = await repository.loadMapBaseData(placeData);
             if (mapBaseData != null) {
-              final measureMarkers = _getMeasureMarkers(placeData, mapBaseData.measureList);
+              final measureMarkers =
+                  _getMeasureMarkers(placeData, mapBaseData.measureList);
               measureMarkerList.addAll(measureMarkers);
             }
           }
@@ -148,27 +155,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           baseMarkers: baseMarkerList,
         ));
         break;
-      case MapEvent.onPlaceDataSet:
-        // print("onPlaceData>${event.extra}");
-        // final mapBaseData = state.mapBaseData;
-        // if (!mapBaseData!.isEmpty()) {
-        //   if (basePin == null) {
-        //     // 이미지 로딩이 안됐을 경우
-        //     await Future.delayed(const Duration(milliseconds: 100));
-        //   }
-        //   final baseMarkers =
-        //       _getBaseMarkers(event.extra, mapBaseData.baseList);
-        //   final measureMarkers =
-        //       _getMeasureMarkers(event.extra, mapBaseData.measureList);
-        //
-        //   emit(
-        //     state.copyWith(
-        //       baseMarkers: baseMarkers,
-        //       measureMarkers: measureMarkers,
-        //     ),
-        //   );
-        // }
-        break;
       case MapEvent.onTapRectangle:
         if (event.extra) {
           await Future.delayed(const Duration(milliseconds: 200));
@@ -177,6 +163,15 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           emit(state.copyWith(polygonSet: null));
         }
         print(state.isRectangleMode);
+        break;
+      case MapEvent.onMergeData:
+        final placeDataList = state.placeDataList;
+        final mergedPlaceData = event.extra as PlaceData;
+
+        // Transfer Data to Merged Data
+        emit(state.copyWith(isLoading: true));
+        await repository.saveMergedData(mergedPlaceData, placeDataList);
+        emit(state.copyWith(isLoading: false));
         break;
       case MapEvent.onTapMap:
         if (state.isRectangleMode) {

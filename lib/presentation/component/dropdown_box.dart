@@ -5,12 +5,14 @@ class DropdownBox extends StatelessWidget {
   final String? hint;
   final List<String> items;
   final ValueChanged onChanged;
+  final String? value;
 
   const DropdownBox({
     required this.label,
     this.hint,
     required this.items,
     required this.onChanged,
+    this.value,
     super.key,
   });
 
@@ -25,11 +27,13 @@ class DropdownBox extends StatelessWidget {
             label,
             style: const TextStyle(
               color: Colors.black87,
+              fontSize: 14.0,
             ),
           ),
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField(
+          value: value,
           hint: hint == null ? null : Text(
             hint!,
             style: const TextStyle(

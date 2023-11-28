@@ -380,6 +380,47 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     return value;
   }
 
+  @override
+  Future<void> saveMergedData({
+    required String name,
+    required String division,
+    required double latitude,
+    required double longitude,
+    required String password,
+    required String type,
+    required List<int> mergedIdxList,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'name': name,
+      'division': division,
+      'latitude': latitude,
+      'longitude': longitude,
+      'password': password,
+      'type': type,
+      'merged_idx[]': mergedIdxList,
+    };
+    await _dio.fetch<void>(_setStreamType<void>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+        .compose(
+          _dio.options,
+          'api/save_merged_data.php',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        ))));
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

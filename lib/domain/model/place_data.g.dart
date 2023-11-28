@@ -15,6 +15,7 @@ PlaceData _$PlaceDataFromJson(Map<String, dynamic> json) => PlaceData(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       dateTime: json['dateTime'] as String,
+      password: json['password'] as String? ?? '',
       link: json['link'] as String?,
       isSelected: json['isSelected'] as bool?,
     );
@@ -29,6 +30,7 @@ Map<String, dynamic> _$PlaceDataToJson(PlaceData instance) => <String, dynamic>{
       'longitude': instance.longitude,
       'dateTime': instance.dateTime,
       'link': instance.link,
+      'password': instance.password,
       'isSelected': instance.isSelected,
     };
 

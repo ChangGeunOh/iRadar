@@ -149,7 +149,6 @@ class Repository {
     return _dataCacheSource.getCameraPosition() ?? initCameraPosition;
   }
 
-
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
   ) async {
@@ -212,8 +211,10 @@ class Repository {
     print('uploadMeasureData>${result.toString()}');
   }
 
-  Future<int> getCountArea(
-      {required String group, required String area}) async {
+  Future<int> getCountArea({
+    required String group,
+    required String area,
+  }) async {
     final response = await _networkSource.getCountArea(
       group: group,
       area: area,
@@ -222,5 +223,21 @@ class Repository {
       return int.parse(response.data!);
     }
     return 0;
+  }
+
+  Future<void> saveMergedData(
+    PlaceData mergedPlaceData,
+    List<PlaceData> placeDataList,
+  ) async {
+    final mergedIdxList = placeDataList.map((e) => e.idx).toList();
+    await _networkSource.saveMergedData(
+      name: mergedPlaceData.name,
+      division: mergedPlaceData.division.name,
+      latitude: mergedPlaceData.latitude,
+      longitude: mergedPlaceData.longitude,
+      type: mergedPlaceData.type.name,
+      mergedIdxList: mergedIdxList,
+      password: mergedPlaceData.password,
+    );
   }
 }

@@ -6,10 +6,16 @@ import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_bloc.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_state.dart';
+import 'package:intl/intl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
+import '../../../common/const/constants.dart';
 import '../../../domain/bloc/bloc_layout.dart';
+import '../../../domain/model/location_type.dart';
 import '../../../domain/model/place_data.dart';
+import '../../component/dropdown_box.dart';
+import '../../component/edit_text.dart';
+import '../../component/password_field.dart';
 import 'component/statefull_slider.dart';
 import 'viewmodel/map_event.dart';
 
@@ -42,8 +48,10 @@ class MapScreen extends StatelessWidget {
         );
       },
       builder: (context, bloc, state) {
-        print('MapScreen::: ${state.placeDataList.length} : ${placeDataSet.length}');
-        if (placeDataSet.isNotEmpty && (placeDataSet.length != state.placeDataList.length)) {
+        print(
+            'MapScreen::: ${state.placeDataList.length} : ${placeDataSet.length}');
+        if (placeDataSet.isNotEmpty &&
+            (placeDataSet.length != state.placeDataList.length)) {
           print('MapScreen::: ${placeDataSet != state.placeDataList.toSet()}');
           bloc.add(BlocEvent(MapEvent.onInit, extra: placeDataSet));
         }
@@ -128,24 +136,31 @@ class MapScreen extends StatelessWidget {
                   title: Text(
                     placeDataSet.map((e) => e.name).join(', '),
                   ),
-                  actions: [
-                    IconButton(
-                      onPressed: () {
+                ),
+              ),
+            if (placeDataSet.length > 1)
+              Positioned(
+                right: 24,
+                bottom: 130,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.red,
+                  onPressed: () {
+                    _showMergeDialog(
+                      context: context,
+                      placeDataList: state.placeDataList,
+                      onMergeData: (PlaceData placeData) {
                         bloc.add(
-                            BlocEvent(MapEvent.onTapRectangle, extra: true));
+                          BlocEvent(
+                            MapEvent.onMergeData,
+                            extra: placeData,
+                          ),
+                        );
                       },
-                      isSelected: state.isRectangleMode,
-                      selectedIcon: const Icon(
-                        Icons.rectangle,
-                      ),
-                      icon: Icon(
-                        state.isRectangleMode
-                            ? Icons.rectangle_outlined
-                            : Icons.rectangle,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                  ],
+                    );
+                  },
+                  child: const Icon(
+                    Icons.merge_rounded,
+                  ),
                 ),
               ),
             if (state.isLoading)
@@ -264,4 +279,138 @@ class MapScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+void _showMergeDialog({
+  required BuildContext context,
+  required List<PlaceData> placeDataList,
+  required Function(PlaceData) onMergeData,
+}) {
+  var name = '[Merge] ${placeDataList.map((e) => e.name).join(', ')}';
+  var locationType = placeDataList.first.division;
+  var password = '';
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("병합하기"),
+        content: SizedBox(
+          height: 200,
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 150,
+                    child: EditText(
+                      onChanged: (value) {},
+                      label: '지역',
+                      value: placeDataList.first.group,
+                      enabled: false,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  SizedBox(
+                    width: 200,
+                    child: DropdownBox(
+                      value: locationType.name,
+                      onChanged: (value) {
+                        locationType = LocationType.values
+                            .firstWhere((element) => element.name == value);
+                      },
+                      hint: '구분선택',
+                      label: '구분',
+                      items: divisionList,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  SizedBox(
+                    width: 200,
+                    child: PasswordField(
+                      onChanged: (value) {
+                        password = value;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: EditText(
+                  onChanged: (value) {
+                    name = value;
+                  },
+                  label: '측정장소',
+                  value: name,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              print('병합하기 :: ${locationType.name} : $name} : $password');
+              if (name.isEmpty || name.length < 5 || password.length < 5) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('측정장소나 비밀번호를 입력해주세요.'),
+                  ),
+                );
+                return;
+              }
+              _onMergeData(
+                locationType: locationType,
+                name: name,
+                placeDataList: placeDataList,
+                onMergeData: onMergeData,
+                password: password,
+              );
+            },
+            child: const Text("병합"),
+          ),
+          TextButton(
+            child: const Text("취소"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _onMergeData({
+  required LocationType locationType,
+  required String name,
+  required List<PlaceData> placeDataList,
+  required Function(PlaceData) onMergeData,
+  required String password,
+}) {
+  print('병합하기 :: ${locationType.name} : $name}');
+  final latitude = placeDataList
+          .map((e) => e.latitude)
+          .reduce((value, element) => value + element) /
+      placeDataList.length;
+  final longitude = placeDataList
+          .map((e) => e.longitude)
+          .reduce((value, element) => value + element) /
+      placeDataList.length;
+  final String formattedDate =
+      DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+  final placeData = PlaceData(
+    idx: -1,
+    type: placeDataList.first.type,
+    group: placeDataList.first.group,
+    name: name,
+    division: locationType,
+    latitude: latitude,
+    longitude: longitude,
+    dateTime: formattedDate,
+    password: password,
+  );
+  onMergeData(placeData);
 }
