@@ -60,7 +60,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @POST('bts_ex.php')
+  @POST('iradar_excel_data.php')
   @FormUrlEncoded()
   Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData({
     @Field('group') required String group,

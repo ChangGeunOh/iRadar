@@ -252,7 +252,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'bts_ex.php',
+              'iradar_excel_data.php',
               queryParameters: queryParameters,
               data: _data,
             )

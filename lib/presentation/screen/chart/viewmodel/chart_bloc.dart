@@ -27,11 +27,14 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       case ChartEvent.init:
         break;
       case ChartEvent.onPlaceData:
-        emit(state.copyWith(placeData: event.extra));
-        final chartTableData = await repository.loadChartTableData(event.extra);
+        emit(state.copyWith(placeData: event.extra, isLoading: true));
+        break;
+      case ChartEvent.onDataLoading:
+        final chartTableData = await repository.loadChartTableData(state.placeData!);
         if (chartTableData != null) {
           emit(state.copyWith(chartTableData: chartTableData));
         }
+        emit(state.copyWith(isLoading: false));
         break;
       case ChartEvent.onChatData:
         break;

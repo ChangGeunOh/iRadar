@@ -26,12 +26,16 @@ class WebScreen extends StatelessWidget {
       create: (context) => WebBloc(context, WebState()),
       builder: (context, bloc, state) {
         if (state.excelResponseList == null) {
-          bloc.add(
-            BlocEvent(
-              WebEvent.onInit,
+          if (!state.isLoading) {
+            bloc.add(
+              BlocEvent(WebEvent.onInit),
+            );
+          } else {
+            bloc.add(BlocEvent(
+              WebEvent.onLoading,
               extra: excelRequestData,
-            ),
-          );
+            ));
+          }
         }
 
         return Scaffold(
@@ -39,38 +43,46 @@ class WebScreen extends StatelessWidget {
             centerTitle: true,
             title: Text(excelRequestData.placeData.name),
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Table(
-                border: TableBorder.all(width: 1),
-                columnWidths: const {
-                  0: FlexColumnWidth(0.4),
-                  1: FlexColumnWidth(0.4),
-                  2: FlexColumnWidth(0.4),
-                  3: FlexColumnWidth(2.5),
-                  4: FlexColumnWidth(0.2),
-                  5: FlexColumnWidth(0.2),
-                  6: FlexColumnWidth(0.5),
-                  7: FlexColumnWidth(0.5),
-                  8: FlexColumnWidth(1),
-                  9: FlexColumnWidth(2),
-                  10: FlexColumnWidth(0.5),
-                  11: FlexColumnWidth(0.5),
-                  12: FlexColumnWidth(0.5),
-                  13: FlexColumnWidth(0.5),
-                  14: FlexColumnWidth(0.5),
-                  15: FlexColumnWidth(0.5),
-                  16: FlexColumnWidth(0.8),
-                  17: FlexColumnWidth(0.8),
-                },
-                children: [
-                  _getTableHeader(),
-                  if (state.excelResponseList != null)
-                    ..._getTableRow(state.excelResponseList!),
-                ],
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Table(
+                    border: TableBorder.all(width: 1),
+                    columnWidths: const {
+                      0: FlexColumnWidth(0.4),
+                      1: FlexColumnWidth(0.4),
+                      2: FlexColumnWidth(0.4),
+                      3: FlexColumnWidth(2.5),
+                      4: FlexColumnWidth(0.2),
+                      5: FlexColumnWidth(0.2),
+                      6: FlexColumnWidth(0.5),
+                      7: FlexColumnWidth(0.5),
+                      8: FlexColumnWidth(1),
+                      9: FlexColumnWidth(2),
+                      10: FlexColumnWidth(0.5),
+                      11: FlexColumnWidth(0.5),
+                      12: FlexColumnWidth(0.5),
+                      13: FlexColumnWidth(0.5),
+                      14: FlexColumnWidth(0.5),
+                      15: FlexColumnWidth(0.5),
+                      16: FlexColumnWidth(0.8),
+                      17: FlexColumnWidth(0.8),
+                    },
+                    children: [
+                      _getTableHeader(),
+                      if (state.excelResponseList != null)
+                        ..._getTableRow(state.excelResponseList!),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              if (state.isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ],
           ),
         );
       },

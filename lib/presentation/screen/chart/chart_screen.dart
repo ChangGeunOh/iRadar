@@ -29,60 +29,74 @@ class ChartScreen extends StatelessWidget {
           if (placeData != null && placeData != state.placeData) {
             bloc.add(BlocEvent(ChartEvent.onPlaceData, extra: placeData));
           }
-          return ListView(
+          if (state.isLoading) {
+            bloc.add(BlocEvent(ChartEvent.onDataLoading));
+          }
+          return Stack(
             children: [
-              if (state.placeData != null)
-                AppBar(
-                  centerTitle: true,
-                  title: Text(placeData!.name),
-                  actions: [
-                    ExpandedSearch(
-                      onSearchValue: (value) {
-                        print("value>$value");
-                      },
+              ListView(
+                children: [
+                  if (state.placeData != null)
+                    AppBar(
+                      centerTitle: true,
+                      title: Text(placeData!.name),
+                      actions: [
+                        ExpandedSearch(
+                          onSearchValue: (value) {
+                            print("value>$value");
+                          },
+                        ),
+                        IconButton(
+                          onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapWeb)),
+                          icon: const Icon(
+                            Icons.web,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: ()=> bloc.add(BlocEvent(ChartEvent.onTapExcel)),
+                          icon: const Icon(
+                            Icons.file_download,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                      ],
                     ),
-                    IconButton(
-                      onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapWeb)),
-                      icon: const Icon(
-                        Icons.web,
-                        color: Colors.black87,
+                  const SizedBox(height: 24),
+                  if (state.chartTableData != null)
+                    SizedBox(
+                      height: 350,
+                      child: ChartView(
+                        charList: state.chartTableData!.chartList,
                       ),
                     ),
-                    IconButton(
-                      onPressed: ()=> bloc.add(BlocEvent(ChartEvent.onTapExcel)),
-                      icon: const Icon(
-                        Icons.file_download,
-                        color: Colors.black87,
+                  const SizedBox(height: 24),
+                  if (state.chartTableData != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Center(
+                        child: TableView(
+                          isCheck: state.isCheck,
+                          tableData: state.chartTableData!.tableList,
+                          onTapNId: (tableData) => bloc.add(
+                              BlocEvent(ChartEvent.onTapNId, extra: tableData)),
+                          onTapToggle: () =>
+                              bloc.add(BlocEvent(ChartEvent.onTapToggle)),
+                          onTapPci: (tableData) => bloc.add(
+                              BlocEvent(ChartEvent.onTapPci, extra: tableData)),
+                          onTapNPci: (tableData) => bloc.add(
+                              BlocEvent(ChartEvent.onTapNPci, extra: tableData)),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 20),
-                  ],
-                ),
-              const SizedBox(height: 24),
-              if (state.chartTableData != null)
-                SizedBox(
-                  height: 350,
-                  child: ChartView(
-                    charList: state.chartTableData!.chartList,
-                  ),
-                ),
-              const SizedBox(height: 24),
-              if (state.chartTableData != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Center(
-                    child: TableView(
-                      isCheck: state.isCheck,
-                      tableData: state.chartTableData!.tableList,
-                      onTapNId: (tableData) => bloc.add(
-                          BlocEvent(ChartEvent.onTapNId, extra: tableData)),
-                      onTapToggle: () =>
-                          bloc.add(BlocEvent(ChartEvent.onTapToggle)),
-                      onTapPci: (tableData) => bloc.add(
-                          BlocEvent(ChartEvent.onTapPci, extra: tableData)),
-                      onTapNPci: (tableData) => bloc.add(
-                          BlocEvent(ChartEvent.onTapNPci, extra: tableData)),
-                    ),
+                ],
+              ),
+              if (state.isLoading)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
                   ),
                 ),
             ],

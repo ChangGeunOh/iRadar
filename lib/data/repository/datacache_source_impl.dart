@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/meta_data.dart';
@@ -95,5 +96,15 @@ class DataCacheSourceImpl extends DataCacheSource {
   @override
   void setLoginData(LoginData loginData) {
     _dataCache.loginData = loginData;
+  }
+
+  @override
+  List<ExcelResponseData>? getExcelResponseDataList(int idx) {
+    return _dataCache.cacheExcelResponseDataList[idx];
+  }
+
+  @override
+  void setExcelResponseDataList(int idx, List<ExcelResponseData> excelResponseDataList) {
+    _dataCache.cacheExcelResponseDataList[idx] = excelResponseDataList;
   }
 }

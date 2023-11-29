@@ -119,7 +119,6 @@ class Repository {
 
   Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
     var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
-
     if (chartTableData == null) {
       final responseData = await _networkSource.loadChartTableData(
         group: placeData.group,
@@ -157,15 +156,29 @@ class Repository {
         .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
         .toList();
     final loginData = getLoginData();
-    final response = await _networkSource.loadExcelResponseData(
-      group: loginData.group,
-      type: excelRequestData.placeData.type.name,
-      idx: excelRequestData.placeData.idx,
-      bts: bts,
-      cmd: '',
+    var excelResponseDataList = _dataCacheSource.getExcelResponseDataList(
+      excelRequestData.placeData.idx,
     );
 
-    return response.data;
+    if (excelResponseDataList == null) {
+      var responseData = await _networkSource.loadExcelResponseData(
+        group: loginData.group,
+        type: excelRequestData.placeData.type.name,
+        idx: excelRequestData.placeData.idx,
+        bts: bts,
+        cmd: '',
+      );
+
+      excelResponseDataList = responseData.data;
+      if (excelResponseDataList != null) {
+        _dataCacheSource.setExcelResponseDataList(
+          excelRequestData.placeData.idx,
+          excelResponseDataList,
+        );
+      }
+    }
+
+    return excelResponseDataList;
   }
 
   void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {

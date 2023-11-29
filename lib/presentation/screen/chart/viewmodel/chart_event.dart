@@ -7,5 +7,5 @@ enum ChartEvent {
   onTapPci,
   onTapNPci,
   onTapWeb,
-  onTapExcel,
+  onTapExcel, onDataLoading,
 }
