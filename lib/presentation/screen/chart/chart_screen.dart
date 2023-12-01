@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_layout.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/presentation/screen/chart/components/expanded_search.dart';
@@ -94,9 +95,11 @@ class ChartScreen extends StatelessWidget {
               ),
               if (state.isLoading)
                 Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withOpacity(0.2),
                   child: const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
                   ),
                 ),
             ],

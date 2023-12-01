@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_bloc.dart';
@@ -50,8 +51,8 @@ class MapScreen extends StatelessWidget {
       builder: (context, bloc, state) {
         print(
             'MapScreen::: ${state.placeDataList.length} : ${placeDataSet.length}');
-        if (placeDataSet.isNotEmpty &&
-            (placeDataSet.length != state.placeDataList.length)) {
+        if (placeDataSet.difference(state.placeDataList.toSet()).isNotEmpty ||
+            state.placeDataList.toSet().difference(placeDataSet).isNotEmpty) {
           print('MapScreen::: ${placeDataSet != state.placeDataList.toSet()}');
           bloc.add(BlocEvent(MapEvent.onInit, extra: placeDataSet));
         }
@@ -167,7 +168,11 @@ class MapScreen extends StatelessWidget {
               Positioned.fill(
                 child: Container(
                   color: const Color(0x40000000),
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: primaryColor,
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -266,10 +271,12 @@ class MapScreen extends StatelessWidget {
                           onTapMenuItem(MapCursorState.none);
                           Navigator.pop(context);
                         },
-                  child: const Text(
-                    '선택 완료',
-                    textAlign: TextAlign.center,
-                  ),
+                  child: const Text('선택 완료',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      )),
                 ),
               ),
             ],

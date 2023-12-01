@@ -22,7 +22,7 @@ class SideHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 400,
-      height: 162,
+      height: 165,
       color: primaryColor,
       child: Padding(
         padding: const EdgeInsets.symmetric(

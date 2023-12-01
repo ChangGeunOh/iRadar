@@ -30,6 +30,7 @@ class _StatefulSliderState extends State<StatefulSlider> {
       max: 500,
       divisions: 490,
       value: value,
+      activeColor: Colors.red,
       label: value.round().toString(),
       onChanged: (value) {
         setState(() {

@@ -80,25 +80,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           placeDataList.add(placeData);
         }
 
-        var latitude = placeDataList.fold(0.0,
-                (previousValue, element) => previousValue + element.latitude) /
-            placeDataList.length;
-        var longitude = placeDataList.fold(0.0,
-                (previousValue, element) => previousValue + element.longitude) /
-            placeDataList.length;
-        // Move Camera
-        if (controller == null && repository.getGoogleMapController() != null) {
-          controller = repository.getGoogleMapController();
-          await Future.delayed(const Duration(milliseconds: 300));
-        }
-        controller?.animateCamera(
-          CameraUpdate.newLatLng(
-            LatLng(
-              latitude,
-              longitude,
-            ),
-          ),
-        );
+        await _moveCarmeraToPlaceCenter(placeDataList);
         emit(
           state.copyWith(
             placeDataList: placeDataList,
@@ -148,6 +130,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           }
         }
 
+        await _moveCarmeraToPlaceCenter(state.placeDataList);
         emit(state.copyWith(
           isLoading: false,
           markerSet: state.placeDataList.toSet(),
@@ -269,6 +252,28 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         emit(state.copyWith(cursorState: event.extra, circleSet: circleSet));
         break;
     }
+  }
+
+  Future<void> _moveCarmeraToPlaceCenter(List<PlaceData> placeDataList) async {
+    var latitude = placeDataList.fold(0.0,
+            (previousValue, element) => previousValue + element.latitude) /
+        placeDataList.length;
+    var longitude = placeDataList.fold(0.0,
+            (previousValue, element) => previousValue + element.longitude) /
+        placeDataList.length;
+    // Move Camera
+    if (controller == null && repository.getGoogleMapController() != null) {
+      controller = repository.getGoogleMapController();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
+    controller?.animateCamera(
+      CameraUpdate.newLatLng(
+        LatLng(
+          latitude,
+          longitude,
+        ),
+      ),
+    );
   }
 
   // final rsrpList = [-999999, -120, -110, -100, -90, -80, -70, -60];

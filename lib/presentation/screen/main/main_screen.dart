@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_layout.dart';
 import 'package:googlemap/domain/model/place_data.dart';
@@ -199,7 +200,11 @@ class MainScreen extends StatelessWidget {
                   Positioned.fill(
                     child: Container(
                       color: const Color(0x40000000),
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
+                      ),
                     ),
                   ),
               ],
