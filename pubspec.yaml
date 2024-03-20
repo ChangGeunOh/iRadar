@@ -36,13 +36,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   google_maps_flutter:
-  pointer_interceptor: ^0.9.3+4
+  pointer_interceptor:
   url_launcher:
   flutter_bloc:
   sqflite:
   go_router:
   path:
-  json_annotation: ^4.8.1
+  json_annotation:
   json_serializable:
   uuid:
   dio:
@@ -60,9 +60,9 @@ dependencies:
   http:
   dio_cookie_manager:
   cookie_jar:
-  fl_chart: ^0.63.0
-  excel: 2.1.0
-  file_picker: ^5.3.3
+  fl_chart:
+  excel:
+  file_picker:
 
 dev_dependencies:
   flutter_test:
@@ -73,7 +73,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints:
   build_runner:
   retrofit_generator:
 

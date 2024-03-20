@@ -65,7 +65,7 @@ class ExcelMaker {
       sheet.cell(
         CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0),
       )
-        ..value = placeData.link
+        ..value = TextCellValue(placeData.link)
         ..cellStyle = CellStyle(
           bold: true,
           underline: Underline.Single,
@@ -75,8 +75,8 @@ class ExcelMaker {
       var cell = sheet.cell(
         CellIndex.indexByColumnRow(columnIndex: index, rowIndex: 1),
       );
-      sheet.setColWidth(index, excelCellWidths[index]);
-      cell.value = element;
+      sheet.setColumnWidth(index, excelCellWidths[index]); // setColWidth(index, excelCellWidths[index]);
+      cell.value = TextCellValue(element.toString()); // element.toString(
       cell.cellStyle = _cellStyle('#D4D4D4');
     });
   }
@@ -130,7 +130,7 @@ class ExcelMaker {
         columnIndex: column,
       ),
     )
-      ..value = value
+      ..value = TextCellValue(value)
       ..cellStyle = _cellStyle(background);
   }
 }

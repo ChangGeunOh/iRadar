@@ -15,8 +15,10 @@ abstract class NetworkSource {
 
   Future<dynamic> loadMovieChart();
 
-  Future<ResponseData<LoginData>> login(
-      {required String area, required String password});
+  Future<ResponseData<LoginData>> login({
+    required String area,
+    required String password,
+  });
 
   Future<ResponseData<List<PlaceData>>> loadPlaceList({
     required String group,

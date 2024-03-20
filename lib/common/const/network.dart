@@ -1,1 +1,1 @@
-const kNetworkBaseUrl = 'http://localhost:5500/';
+const kNetworkBaseUrl = 'http://localhost:5600/';

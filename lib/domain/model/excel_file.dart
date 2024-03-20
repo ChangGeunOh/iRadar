@@ -29,8 +29,8 @@ class ExcelFile {
   Future<void> _init() async {
     excel = Excel.decodeBytes(bytes);
     sheet = excel.sheets.values.first;
-    isNoLocation = sheet.maxCols == 20 || sheet.maxCols == 10;
-    isLteOnly = sheet.maxCols == 11 || sheet.maxCols == 13;
+    isNoLocation = sheet.maxColumns == 20 || sheet.maxColumns == 10;
+    isLteOnly = sheet.maxColumns == 11 || sheet.maxColumns == 13;
     getMeasureData();
   }
 
@@ -95,7 +95,7 @@ class ExcelFile {
         rp: rp,
         rpmw: pow(10, rp / 10.0).toDouble(),
         spci: list[4].toString(),
-        srp: list[5], // double
+        srp: list[5] as double, // double
       );
       measureUploadData.intf5GList.add(intf5GData);
     }
@@ -116,7 +116,7 @@ class ExcelFile {
         // $rpmw = pow( 10 , ($spci[1]/10));
         spci: list[7].toString(),
         // int
-        srp: list[8], // double
+        srp: list[8] as double, // double
       );
       measureUploadData.intfLteList.add(intfData);
     }
