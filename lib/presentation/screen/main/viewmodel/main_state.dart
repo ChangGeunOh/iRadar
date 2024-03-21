@@ -1,6 +1,6 @@
 import '../../../../domain/model/chart_table_data.dart';
 import '../../../../domain/model/map_base_data.dart';
-import '../../../../domain/model/meta_data.dart';
+import '../../../../domain/model/response/meta_data.dart';
 import '../../../../domain/model/place_data.dart';
 import '../../../../domain/model/wireless_type.dart';
 
@@ -36,9 +36,6 @@ class MainState {
             MetaData(
               code: 0,
               message: "",
-              count: 30,
-              total: 0,
-              page: 0,
             ),
         search = search ?? "",
         isShowSide = isShowSide ?? true,

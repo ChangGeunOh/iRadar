@@ -10,7 +10,8 @@ import 'package:googlemap/presentation/screen/login/viewmodel/login_state.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
 
 class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
-  final passwordController = TextEditingController();
+  final passwordController = TextEditingController(text: "00000000");
+  final useridController = TextEditingController(text: "12345678");
 
   LoginBloc(super.context, super.initialState) {
     _init();
@@ -19,10 +20,12 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
   void _init() {}
 
   @override
-  FutureOr<void> onBlocEvent(
-      BlocEvent<LoginEvent> event, Emitter<LoginState> emit) {
+  Future<FutureOr<void>> onBlocEvent(
+      BlocEvent<LoginEvent> event, Emitter<LoginState> emit) async {
     // print(event.toString());
     switch (event.type) {
+      case LoginEvent.init:
+        break;
       case LoginEvent.onLocation:
         emit(
           state.copyWith(
@@ -46,41 +49,71 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
           ),
         );
         break;
-      case LoginEvent.onTap:
-        onTap(event.extra, emit);
+      // case LoginEvent.onLogin:
+      //   if (event.extra) {
+      //     context.goNamed(MainScreen.routeName);
+      //   } else {
+      //     passwordController.clear();
+      //   }
+      //   break;
+      case LoginEvent.onUserId:
+        emit(state.copyWith(userId: event.extra));
         break;
-      case LoginEvent.onLogin:
-        print('loginResult>${event.extra}');
-        if (event.extra) {
-          context.goNamed(MainScreen.routeName);
+      case LoginEvent.onTapIssue:
+      // TODO: Handle this case.
+      case LoginEvent.onTapLogin:
+        final userid = useridController.value.text;
+        final password = passwordController.value.text;
+        final responseData = await repository.login(
+          userid: userid,
+          password: password,
+        );
+        if (responseData.meta.code == 200) {
+          // final tokenData = await repository.loadTokenData(
+          //   userid: userid,
+          //   password: password,
+          // );
+          add(BlocEvent(LoginEvent.onNextScreen, extra: MainScreen.routeName));
         } else {
           passwordController.clear();
         }
         break;
-      case LoginEvent.init:
+      case LoginEvent.onTapHide:
+        emit(state.copyWith(isHide: !state.isHide));
+        break;
+      // TODO: Handle this case.
+      case LoginEvent.onTapPolicy:
+      // TODO: Handle this case.
+      case LoginEvent.onTapTerms:
+      // TODO: Handle this case.
+      case LoginEvent.onTapPassword:
+      // TODO: Handle this case.
+      case LoginEvent.onNextScreen:
+        context.goNamed(event.extra);
         break;
     }
   }
 
-  void onTap(LoginTapType tapType, Emitter<LoginState> emit) async {
-    switch (tapType) {
-      case LoginTapType.login:
-        final isSuccess = await repository.login(
-          location: state.location!,
-          password: state.password!,
-        );
-        add(BlocEvent(LoginEvent.onLogin, extra: isSuccess));
-        break;
-      case LoginTapType.hide:
-        emit(state.copyWith(isHide: !state.isHide));
-        break;
-      default:
-    }
-  }
+  // Future<void> onTap(LoginTapType tapType, Emitter<LoginState> emit) async {
+  //   switch (tapType) {
+  //     case LoginTapType.login:
+  //       final isSuccess = await repository.login(
+  //         location: state.location!,
+  //         password: state.password!,
+  //       );
+  //       add(BlocEvent(LoginEvent.onLogin, extra: isSuccess));
+  //       break;
+  //     case LoginTapType.hide:
+  //       emit(state.copyWith(isHide: !state.isHide));
+  //       break;
+  //     default:
+  //   }
+  // }
 
   @override
   Future<void> close() {
     passwordController.dispose();
+    useridController.dispose();
     return super.close();
   }
 }

@@ -9,15 +9,17 @@ part of 'meta_data.dart';
 MetaData _$MetaDataFromJson(Map<String, dynamic> json) => MetaData(
       code: Convert.dynamicToInt(json['code']),
       message: json['message'] as String,
-      count: Convert.dynamicToInt(json['count']),
-      total: Convert.dynamicToInt(json['total']),
-      page: Convert.dynamicToInt(json['page']),
+      timeStamp: json['time_stamp'] == null
+          ? 0
+          : Convert.dynamicToInt(json['time_stamp']),
+      pageData: json['page_data'] == null
+          ? null
+          : PageData.fromJson(json['page_data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$MetaDataToJson(MetaData instance) => <String, dynamic>{
       'code': instance.code,
       'message': instance.message,
-      'count': instance.count,
-      'total': instance.total,
-      'page': instance.page,
+      'time_stamp': instance.timeStamp,
+      'page_data': instance.pageData,
     };

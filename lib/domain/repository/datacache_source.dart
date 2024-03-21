@@ -4,7 +4,7 @@ import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 
 import '../model/map_base_data.dart';
-import '../model/meta_data.dart';
+import '../model/response/meta_data.dart';
 import '../model/wireless_type.dart';
 
 abstract class DataCacheSource {

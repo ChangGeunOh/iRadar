@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_layout.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_bloc.dart';
@@ -59,37 +58,45 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 38),
                       Text(
-                        'Select Location',
+                        'Employee Number',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 6),
-                      DropdownButtonFormField(
-                        items: dropdownItems,
-                        hint: Text(
-                          '지역을 선택하세요.',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        onChanged: (value) {
+                      TextField(
+                        controller: bloc.useridController,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        onSubmitted: (value) {
                           bloc.add(
                             BlocEvent(
-                              LoginEvent.onLocation,
-                              extra: value,
+                              LoginEvent.onTapLogin,
                             ),
                           );
                         },
-                        style: Theme.of(context).textTheme.bodySmall,
-                        elevation: 1,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 19,
-                          ),
-                          focusedBorder: OutlineInputBorder(
+                        onChanged: (value) {
+                          bloc.add(
+                              BlocEvent(LoginEvent.onUserId, extra: value));
+                        },
+                        decoration: InputDecoration(
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                          suffixIcon: state.userId.isNotEmpty
+                              ? IconButton(
+                                  onPressed: ()=>bloc.useridController.clear(),
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    size: 20,
+                                  ),
+                                )
+                              : null,
+                          enabledBorder: const OutlineInputBorder(
                             borderSide: BorderSide(color: Color(0x59666666)),
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0x59666666)),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color(0x59666666),
+                              width: 2,
+                            ),
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
@@ -104,11 +111,9 @@ class LoginScreen extends StatelessWidget {
                           const Spacer(),
                           InkWell(
                             onTap: () {
-                              print('onTap');
                               bloc.add(
                                 BlocEvent(
-                                  LoginEvent.onTap,
-                                  extra: LoginTapType.hide,
+                                  LoginEvent.onTapHide,
                                 ),
                               );
                             },
@@ -140,8 +145,7 @@ class LoginScreen extends StatelessWidget {
                         onSubmitted: (value) {
                           bloc.add(
                             BlocEvent(
-                              LoginEvent.onTap,
-                              extra: LoginTapType.login,
+                              LoginEvent.onTapLogin,
                             ),
                           );
                         },
@@ -150,6 +154,7 @@ class LoginScreen extends StatelessWidget {
                               BlocEvent(LoginEvent.onPassword, extra: value));
                         },
                         decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Color(0x59666666)),
                             borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -165,18 +170,19 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 22),
                       ElevatedButton(
-                        onPressed: () {
-                          bloc.add(
-                            BlocEvent(
-                              LoginEvent.onTap,
-                              extra: LoginTapType.login,
-                            ),
-                          );
-                        },
+                        onPressed: state.isEnableLoginButton
+                            ? () {
+                                bloc.add(
+                                  BlocEvent(
+                                    LoginEvent.onTapLogin,
+                                  ),
+                                );
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 22),
                           foregroundColor: Colors.white,
-                          backgroundColor: state.isEnableLogin
+                          backgroundColor: state.isEnableLoginButton
                               ? Colors.red
                               : const Color(0xffb8b8b8),
                           shape: RoundedRectangleBorder(
@@ -214,8 +220,7 @@ class LoginScreen extends StatelessWidget {
                                 ..onTap = () {
                                   bloc.add(
                                     BlocEvent(
-                                      LoginEvent.onTap,
-                                      extra: LoginTapType.terms,
+                                      LoginEvent.onTapTerms,
                                     ),
                                   );
                                 },
@@ -232,8 +237,7 @@ class LoginScreen extends StatelessWidget {
                                 ..onTap = () {
                                   bloc.add(
                                     BlocEvent(
-                                      LoginEvent.onTap,
-                                      extra: LoginTapType.policy,
+                                      LoginEvent.onTapPolicy,
                                     ),
                                   );
                                 },
@@ -247,8 +251,7 @@ class LoginScreen extends StatelessWidget {
                           InkWell(
                             onTap: () => bloc.add(
                               BlocEvent(
-                                LoginEvent.onTap,
-                                extra: LoginTapType.issue,
+                                LoginEvent.onTapIssue,
                               ),
                             ),
                             child: Text(
@@ -265,8 +268,7 @@ class LoginScreen extends StatelessWidget {
                           InkWell(
                             onTap: () => bloc.add(
                               BlocEvent(
-                                LoginEvent.onTap,
-                                extra: LoginTapType.password,
+                                LoginEvent.onTapPassword,
                               ),
                             ),
                             child: Text(

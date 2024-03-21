@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:googlemap/common/const/network.dart';
+import 'package:googlemap/domain/model/response/response_data.dart';
+import 'package:googlemap/domain/model/token_data.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+
+import '../../domain/model/response/meta_data.dart';
 
 class LocalNetwork {
   static Dio get dio {
@@ -15,7 +18,7 @@ class LocalNetwork {
         requestHeader: true,
         requestBody: true,
         responseBody: true,
-        responseHeader: false,
+        responseHeader: true,
         error: true,
         compact: true,
         maxWidth: 90,
@@ -26,24 +29,54 @@ class LocalNetwork {
 }
 
 class CustomInterceptor extends Interceptor {
+  TokenData tokenData = TokenData();
+
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
-    print(handler.toString());
-    print('onError${err.response.toString()}');
-    // super.onError(err, handler);
-    handler.next(err);
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final customResponse = Response(
+      requestOptions: err.requestOptions,
+      statusCode: err.response?.statusCode,
+      data: err.response?.data, // 사용자 정의 응답 내용
+    );
+
+    // 에러를 정상 응답으로 처리
+    handler.resolve(customResponse);
   }
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    _setToken(options);
     super.onRequest(options, handler);
-    print('onRequest${options.path}');
-    print('onRequest${options.data}');
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    if (response.statusCode == 200) {
+      _saveTokenData(response);
+    }
     super.onResponse(response, handler);
-    print('onResponse');
+  }
+
+  void _setToken(RequestOptions options) {
+    if (tokenData.accessToken != null) {
+      options.headers['Authorization'] = 'Bearer ${tokenData.accessToken}';
+    }
+  }
+
+  void _saveTokenData(Response response) {
+    if (response.requestOptions.path == (kPostTokenDataPath)) {
+      try {
+        final data = response.data as Map<String, dynamic>;
+        final token = ResponseData<TokenData>(
+          meta: MetaData.fromJson(data['meta'] as Map<String, dynamic>),
+          data: TokenData.fromJson(data['data'] as Map<String, dynamic>),
+        ).data;
+        if (token != null) {
+          tokenData = token;
+        }
+      } catch(e) {
+        print('Error parsing response data: $e');
+      }
+    }
   }
 }

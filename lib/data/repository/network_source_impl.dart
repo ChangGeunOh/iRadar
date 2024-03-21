@@ -1,14 +1,16 @@
 import 'package:dio/dio.dart' hide Headers;
+import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
-import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
-import 'package:googlemap/domain/model/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
+import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../../domain/model/excel_response_data.dart';
 import '../../domain/model/place_data.dart';
+import '../../domain/model/response/response_data.dart';
+import '../../domain/model/token_data.dart';
 import '../../domain/repository/network_source.dart';
 
 part 'network_source_impl.g.dart';
@@ -18,28 +20,19 @@ abstract class NetworkSourceImpl extends NetworkSource {
   factory NetworkSourceImpl(Dio dio, {String baseUrl}) = _NetworkSourceImpl;
 
   @override
-  @GET('path')
-  Future<List<String>> loadBanners();
-
-  @override
-  @GET('#none')
-  Future<dynamic> loadMovieChart();
-
-  @override
-  @POST('login.php')
-  @FormUrlEncoded()
-  Future<ResponseData<LoginData>> login({
-    @Field('area') required String area,
-    @Field('userid') required String password,
-  });
+  @POST(kPostUserPath)
+  @Headers(<String, dynamic>{
+    'Content-Type': 'application/json',
+  })
+  Future<ResponseData<UserData?>> login(@Body() String body,);
 
   @override
   @GET('iradar_area_list.php')
   Future<ResponseData<List<PlaceData>>> loadPlaceList(
       {@Query('group') required String group,
-      @Query('type') required String type,
-      @Query('page') int page = 1,
-      @Query('count') int count = 30});
+        @Query('type') required String type,
+        @Query('page') int page = 1,
+        @Query('count') int count = 30});
 
   // @override
   // @GET('pcitt.php')
@@ -73,15 +66,13 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @GET('dtl_pci.php')
   Future<ResponseData<List<TableData>>> loadNpciTableList(
-    @Query('a') String link,
-    @Query('pci') String npci,
-  );
+      @Query('a') String link,
+      @Query('pci') String npci,);
 
   @override
   @POST('api/upload.php')
   Future<ResponseData<String>> uploadMeasureData(
-    @Body() MeasureUploadData measureUploadData,
-  );
+      @Body() MeasureUploadData measureUploadData,);
 
   @override
   @GET('api/get_area.php')
@@ -102,4 +93,8 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Field('type') required String type,
     @Field('merged_idx[]') required List<int> mergedIdxList,
   });
+
+  @override
+  @POST(kPostTokenDataPath)
+  Future<ResponseData<TokenData?>> postTokenData(@Body() String jsonString);
 }

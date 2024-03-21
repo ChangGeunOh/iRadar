@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../common/utils/convert.dart';
+import '../../../common/utils/convert.dart';
+import 'page_data.dart';
 
 part 'meta_data.g.dart';
 
@@ -12,30 +13,25 @@ class MetaData {
   final int code;
   final String message;
   @JsonKey(
+    name: 'time_stamp',
     fromJson: Convert.dynamicToInt,
   )
-  final int count;
+  final int timeStamp;
   @JsonKey(
-    fromJson: Convert.dynamicToInt,
+    name: 'page_data'
   )
-  final int total;
-  @JsonKey(
-    fromJson: Convert.dynamicToInt,
-  )
-  final int page;
+  final PageData? pageData;
 
   MetaData({
     required this.code,
     required this.message,
-    int? count,
-    int? total,
-    int? page,
-  })  : count = count ?? 30,
-        total = total ?? 0,
-        page = page ?? 0;
+    this.timeStamp = 0,
+    this.pageData,
+  });
 
   factory MetaData.fromJson(Map<String, dynamic> json) =>
       _$MetaDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetaDataToJson(this);
 }
+

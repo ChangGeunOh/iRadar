@@ -6,10 +6,13 @@ import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
+import 'package:googlemap/domain/model/response/response_data.dart';
+import 'package:googlemap/domain/model/token_data.dart';
+import 'package:googlemap/domain/model/user_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
 import '../../domain/model/excel_response_data.dart';
-import '../../domain/model/meta_data.dart';
+import '../../domain/model/response/meta_data.dart';
 import '../../domain/model/table_data.dart';
 import '../../domain/repository/database_source.dart';
 import '../../domain/repository/datacache_source.dart';
@@ -32,20 +35,19 @@ class Repository {
         _networkSource = networkSource,
         _dataCacheSource = dataCacheSource;
 
-  Future<bool> login({
-    required String location,
+  Future<ResponseData> login({
+    required String userid,
     required String password,
   }) async {
-    final responseData = await _networkSource.login(
-      area: location,
+
+    final loginData = LoginData(
+      userid: userid,
       password: password,
     );
-    if (responseData.meta.code == 200) {
-      _dataCacheSource.setLoginData(responseData.data!);
-    }
-    print('retrofit response>${responseData.toString()}');
-    print('retrofit response>${responseData.data?.toJson()}');
-    return responseData.meta.code == 200;
+    final ResponseData<UserData?> response = await _networkSource.login(loginData.toJsonString());
+    final ResponseData<TokenData?> tokenResponse = await _networkSource.postTokenData(loginData.toJsonString());
+    print(tokenResponse.data?.toJson());
+    return response;
   }
 
   // Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
@@ -63,36 +65,37 @@ class Repository {
 
   bool hasMorePlaceList(WirelessType type) {
     var metaData = _dataCacheSource.getMetaData(type);
-    return metaData.page < metaData.total || metaData.total == 0;
+    return metaData.pageData!.page < metaData.pageData!.total || metaData.pageData!.total == 0;
   }
 
   Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-    var metaData = _dataCacheSource.getMetaData(type);
-    List<PlaceData> placeList = List.empty(growable: true);
-    List<PlaceData> list = await _dataStoreSource.loadPlaceList(type);
-    print('::Saved PlaceList>${list.length}');
-    placeList.addAll(list);
-
-    if (metaData.page < metaData.total || metaData.total == 0) {
-      var response = await _networkSource.loadPlaceList(
-        group: getLoginData().group,
-        type: type.name,
-        page: metaData.page + 1,
-        count: metaData.count,
-      );
-
-      if (response.meta.code == 200) {
-        print('::Download PlaceList>${response.data!.length}');
-        List<PlaceData> list = response.data!;
-        print('::Total PlaceList>${placeList!.length}');
-        placeList.addAll(list);
-        print('::Total PlaceList>${placeList!.length}');
-        _dataCacheSource.setMetaData(type, response.meta);
-        _dataStoreSource.savePlaceList(type, placeList);
-      }
-    }
-    print('loadPlaceList>${placeList.length}');
-    return placeList;
+    // var metaData = _dataCacheSource.getMetaData(type);
+    // List<PlaceData> placeList = List.empty(growable: true);
+    // List<PlaceData> list = await _dataStoreSource.loadPlaceList(type);
+    // print('::Saved PlaceList>${list.length}');
+    // placeList.addAll(list);
+    //
+    // if (metaData.page < metaData.total || metaData.total == 0) {
+    //   var response = await _networkSource.loadPlaceList(
+    //     group: getLoginData().group,
+    //     type: type.name,
+    //     page: metaData.page + 1,
+    //     count: metaData.count,
+    //   );
+    //
+    //   if (response.meta.code == 200) {
+    //     print('::Download PlaceList>${response.data!.length}');
+    //     List<PlaceData> list = response.data!;
+    //     print('::Total PlaceList>${placeList!.length}');
+    //     placeList.addAll(list);
+    //     print('::Total PlaceList>${placeList!.length}');
+    //     _dataCacheSource.setMetaData(type, response.meta);
+    //     _dataStoreSource.savePlaceList(type, placeList);
+    //   }
+    // }
+    // print('loadPlaceList>${placeList.length}');
+    // return placeList;
+    return [];
   }
 
   Future<void> remove(WirelessType type) async {
@@ -151,34 +154,34 @@ class Repository {
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
   ) async {
-    final List<String> bts = excelRequestData.tableList
-        .where((element) => element.checked)
-        .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
-        .toList();
-    final loginData = getLoginData();
-    var excelResponseDataList = _dataCacheSource.getExcelResponseDataList(
-      excelRequestData.placeData.idx,
-    );
-
-    if (excelResponseDataList == null) {
-      var responseData = await _networkSource.loadExcelResponseData(
-        group: loginData.group,
-        type: excelRequestData.placeData.type.name,
-        idx: excelRequestData.placeData.idx,
-        bts: bts,
-        cmd: '',
-      );
-
-      excelResponseDataList = responseData.data;
-      if (excelResponseDataList != null) {
-        _dataCacheSource.setExcelResponseDataList(
-          excelRequestData.placeData.idx,
-          excelResponseDataList,
-        );
-      }
-    }
-
-    return excelResponseDataList;
+    // final List<String> bts = excelRequestData.tableList
+    //     .where((element) => element.checked)
+    //     .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
+    //     .toList();
+    // final loginData = getLoginData();
+    // var excelResponseDataList = _dataCacheSource.getExcelResponseDataList(
+    //   excelRequestData.placeData.idx,
+    // );
+    //
+    // if (excelResponseDataList == null) {
+    //   var responseData = await _networkSource.loadExcelResponseData(
+    //     group: loginData.group,
+    //     type: excelRequestData.placeData.type.name,
+    //     idx: excelRequestData.placeData.idx,
+    //     bts: bts,
+    //     cmd: '',
+    //   );
+    //
+    //   excelResponseDataList = responseData.data;
+    //   if (excelResponseDataList != null) {
+    //     _dataCacheSource.setExcelResponseDataList(
+    //       excelRequestData.placeData.idx,
+    //       excelResponseDataList,
+    //     );
+    //   }
+    // }
+    //
+    // return excelResponseDataList;
   }
 
   void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {
@@ -207,7 +210,8 @@ class Repository {
 
   LoginData getLoginData() {
     // TODO: null 체크 부문 수정 요함
-    return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
+    // return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
+    return LoginData(userid: 'admin', password: 'admin');
   }
 
   Future<void> uploadMeasureData(MeasureUploadData measureUploadData) async {

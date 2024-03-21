@@ -3,7 +3,7 @@ import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map_base_data.dart';
-import 'package:googlemap/domain/model/meta_data.dart';
+import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
 class LocalDataCache {

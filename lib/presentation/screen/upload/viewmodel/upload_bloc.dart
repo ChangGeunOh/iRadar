@@ -22,7 +22,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
   ) async {
     switch (event.type) {
       case UploadEvent.init:
-        emit(state.copyWith(group: repository.getLoginData().group));
+        emit(state.copyWith(group: 'repository.getLoginData().group'));
         break;
       case UploadEvent.onChanged:
         emit(await _getState(event.extra, state));
@@ -107,7 +107,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
       case UploadChangedType.onArea:
         final loginData = repository.getLoginData();
         final rowCount = await repository.getCountArea(
-          group: loginData.group,
+          group: 'loginData.group',
           area: uploadChangeData.value,
         );
         final tempState = state.copyWith(

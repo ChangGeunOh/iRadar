@@ -1,4 +1,4 @@
-import 'package:googlemap/domain/model/meta_data.dart';
+import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/model/wireless_type.dart';
 
 import '../../domain/model/place_data.dart';
