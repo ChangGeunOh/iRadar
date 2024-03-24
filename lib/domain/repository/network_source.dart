@@ -6,6 +6,7 @@ import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 
+import '../model/area_data.dart';
 import '../model/chart_table_data.dart';
 import '../model/map_base_data.dart';
 
@@ -44,7 +45,7 @@ abstract class NetworkSource {
     String npci,
   );
 
-  Future<ResponseData<String>> uploadMeasureData(
+  Future<ResponseData> uploadMeasureData(
     MeasureUploadData measureUploadData,
   );
 
@@ -64,4 +65,6 @@ abstract class NetworkSource {
   });
 
   Future<ResponseData<TokenData?>> postTokenData(String jsonString);
+
+  Future<ResponseData<List<AreaData>>> getAreaList(String areaCode);
 }

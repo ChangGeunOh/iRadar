@@ -30,6 +30,7 @@ class IntfTtData {
   final double? mcs;
   final double? rb;
   final double? dl;
+  final DateTime? dt;
 
 
   IntfTtData({
@@ -59,6 +60,7 @@ class IntfTtData {
     required this.mcs,
     required this.rb,
     required this.dl,
+    required this.dt,
   });
 
   factory IntfTtData.fromJson(Map<String, dynamic> json) => _$IntfTtDataFromJson(json);

@@ -19,6 +19,8 @@ void main() {
   runApp(const MyApp());
 }
 
+final rootScaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
       },
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: rootScaffoldKey,
         scrollBehavior: AppScrollBehavior(),
         title: 'iRadar',
         theme: ThemeData(

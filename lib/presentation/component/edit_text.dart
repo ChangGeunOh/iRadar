@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class EditText extends StatefulWidget {
   final ValueChanged onChanged;
-  final String label;
+  final String? label;
   final double? labelFontSize;
   final String? value;
   final double? valueFontSize;
@@ -11,7 +11,7 @@ class EditText extends StatefulWidget {
 
   const EditText({
     required this.onChanged,
-    required this.label,
+    this.label,
     this.labelFontSize,
     this.value,
     this.valueFontSize,
@@ -44,17 +44,18 @@ class _EditTextState extends State<EditText> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              color: Colors.black87,
-              fontSize: widget.labelFontSize ?? 14.0,
+        if (widget.label != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              widget.label!,
+              style: TextStyle(
+                color: Colors.black87,
+                fontSize: widget.labelFontSize ?? 14.0,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 6),
+        if (widget.label != null) const SizedBox(height: 6),
         TextField(
           controller: controller,
           enabled: widget.enabled ?? true,

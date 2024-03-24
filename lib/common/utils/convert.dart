@@ -59,4 +59,19 @@ class Convert {
     }
     return convertedValue;
   }
+
+  static DateTime dynamicToDateTime(dynamic value) {
+    switch (value.runtimeType) {
+      case const (DateTime):
+        return value as DateTime;
+      case const (int):
+        value.fromMillisecondsSinceEpoch(value * 1000);
+      case const (String):
+        return DateTime.parse(value);
+      default:
+        return DateTime.now();
+    }
+    return DateTime.now();
+  }
+
 }

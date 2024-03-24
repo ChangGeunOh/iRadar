@@ -37,7 +37,8 @@ class ExcelFile {
   MeasureUploadData getMeasureData() {
     // MeasureUploadData measureUploadData = MeasureUploadData();
     sheet.rows.forEachIndexed((index, row) {
-      if (row.first != null && row.first!.value.runtimeType == double) {
+      if (row.first != null &&
+          row.first!.value.runtimeType == DateTimeCellValue) {
         final rowData = _makeData(row, isNoLocation, isLteOnly);
         measureUploadData.intf5GList.addAll(rowData.intf5GList);
         measureUploadData.intfLteList.addAll(rowData.intfLteList);
@@ -49,21 +50,19 @@ class ExcelFile {
   }
 
   MeasureUploadData getUploadData({
-    required String type,
+    required String areaCode,
     required String area,
-    required String group,
-    required String password,
-    required bool isAddData,
+    required String division,
     required bool isWideArea,
+    int? areaIdx = 0,
   }) {
-    measureUploadData.type = type;
-    measureUploadData.area = area;
-    measureUploadData.group = group;
-    measureUploadData.password = password;
-    measureUploadData.isAddData = isAddData;
-    measureUploadData.isWideArea = isWideArea;
-
-    return measureUploadData;
+    return measureUploadData.copyWith(
+      area: area,
+      division: division,
+      areaIdx: areaIdx,
+      areaCode: areaCode,
+      isWideArea: isWideArea,
+    );
   }
 
   MeasureUploadData _makeData(
@@ -81,34 +80,33 @@ class ExcelFile {
       list.insertAll(3, ['', '', '']);
       list.insertAll(9, ['', '', '', '', '', '']);
     }
+    final dateTime = (list.first as DateTimeCellValue).asDateTimeLocal();
 
     final regex5g = RegExp(r'(\d+)\(([^)]+)\)\(([^)]+)\)');
     for (var match in regex5g.allMatches(list[3].toString())) {
       final rp = double.parse(match.group(2)!);
       final intf5GData = IntfData(
-        idx: 0,
-        area: 'area',
-        pci: match.group(1)!,
-        dt: (list[0] as double).toDateTime(),
-        lat: double.parse(list[2].toString()),
-        lng: double.parse(list[1].toString()),
-        rp: rp,
-        rpmw: pow(10, rp / 10.0).toDouble(),
-        spci: list[4].toString(),
-        srp: list[5] as double, // double
-      );
+          idx: 0,
+          area: 'area',
+          pci: match.group(1)!,
+          dt: dateTime,
+          lat: double.parse(list[2].toString()),
+          lng: double.parse(list[1].toString()),
+          rp: rp,
+          rpmw: pow(10, rp / 10.0).toDouble(),
+          spci: list[4].toString(),
+          srp: (list[5] as DoubleCellValue).value);
       measureUploadData.intf5GList.add(intf5GData);
     }
 
     final regexLte = RegExp(r"(\d+)\[(-?\d+\.\d+)\]\[(-?\d+\.\d+)\]");
     for (var match in regexLte.allMatches(list[6].toString())) {
-      // print("${match.group(1)}, ${match.group(2)}, ${match.group(3)}");
       final rp = double.parse(match.group(2)!);
       final intfData = IntfData(
         idx: 0,
         area: 'area',
         pci: match.group(1)!,
-        dt: (list[0] as double).toDateTime(),
+        dt: dateTime,
         lat: double.parse(list[2].toString()),
         lng: double.parse(list[1].toString()),
         rp: rp,
@@ -116,7 +114,7 @@ class ExcelFile {
         // $rpmw = pow( 10 , ($spci[1]/10));
         spci: list[7].toString(),
         // int
-        srp: list[8] as double, // double
+        srp: _toDouble(list[8]) ?? 0, // double
       );
       measureUploadData.intfLteList.add(intfData);
     }
@@ -126,37 +124,43 @@ class ExcelFile {
     final intfTtData = IntfTtData(
       idx: 0,
       area: 'area',
-      lat: _getDouble(list[2]),
-      lng: _getDouble(list[1]),
+      lat: _toDouble(list[2]),
+      lng: _toDouble(list[1]),
       pci5: list[4].toString(),
-      rp5: _getDouble(list[5]),
+      rp5: _toDouble(list[5]),
       pci: list[7].toString(),
-      rp: _getDouble(list[8]),
+      rp: _toDouble(list[8]),
       pw: 'pw',
-      cqi5: _getDouble(list[9]),
-      ri5: _getDouble(list[10]),
-      dlmcs5: _getDouble(list[11]),
-      dll5: _getDouble(list[12]),
-      dlrb5: _getDouble(list[13]),
-      dl5: _getDouble(list[14]),
-      ear: _getDouble(list[15]),
-      ca: _getDouble(list[16]),
-      cqi: _getDouble(list[17]),
-      ri: _getDouble(list[18]),
-      mcs: _getDouble(list[19]),
-      rb: _getDouble(list[20]),
-      dl: _getDouble(list[21]),
+      cqi5: _toDouble(list[9]),
+      ri5: _toDouble(list[10]),
+      dlmcs5: _toDouble(list[11]),
+      dll5: _toDouble(list[12]),
+      dlrb5: _toDouble(list[13]),
+      dl5: _toDouble(list[14]),
+      ear: _toDouble(list[15]),
+      ca: _toDouble(list[16]),
+      cqi: _toDouble(list[17]),
+      ri: _toDouble(list[18]),
+      mcs: _toDouble(list[19]),
+      rb: _toDouble(list[20]),
+      dl: _toDouble(list[21]),
+      dt: dateTime,
     );
     measureUploadData.intfTTList.add(intfTtData);
 
     return measureUploadData;
   }
 
-  double? _getDouble(dynamic value) {
-    return value.runtimeType == double
-        ? value
-        : value.toString().isEmpty
-            ? null
-            : double.parse(value.toString());
+  double? _toDouble(dynamic value) {
+    switch (value.runtimeType) {
+      case const (DoubleCellValue):
+        return (value as DoubleCellValue).value;
+      case const (String):
+        return double.tryParse(value);
+      case const (double):
+        return value;
+      default:
+        return value.toString().isEmpty ? null : double.parse(value.toString());
+    }
   }
 }

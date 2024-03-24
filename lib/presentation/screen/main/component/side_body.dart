@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../common/const/color.dart';
 import '../../../../domain/model/place_data.dart';
-import '../../../../domain/model/wireless_type.dart';
+import '../../../../domain/model/enum/wireless_type.dart';
 
 class SideBody extends StatefulWidget {
   final Set<PlaceData> selectedPlaceSet;

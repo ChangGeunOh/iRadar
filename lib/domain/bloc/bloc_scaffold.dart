@@ -4,25 +4,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc_layout.dart';
 
 class BlocScaffold<B extends StateStreamableSource<S>, S>
-    extends BlocLayout<B, S> {
+    extends StatelessWidget {
+  final B Function(BuildContext context) create;
+  final Widget Function(BuildContext context, B bloc, S state) builder;
+
   final AppBar? appBar;
   final Color? backgroundColor;
   final Widget? bottomSheet;
   final Widget? floatingActionButton;
   final Widget Function(BuildContext context, B bloc, S state)? floatingBuilder;
   final Widget Function(BuildContext context, B bloc, S state)? bottomBuilder;
+  final AppBar? Function(B bloc, S state)? appBarBuilder;
 
   const BlocScaffold({
-    Key? key,
-    required super.create,
-    required super.builder,
+    super.key,
+    required this.create,
+    required this.builder,
     this.appBar,
+    this.appBarBuilder,
     this.backgroundColor,
     this.bottomSheet,
     this.floatingActionButton,
     this.floatingBuilder,
     this.bottomBuilder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,8 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
         builder: (context, state) {
           final bloc = context.read<B>();
           return Scaffold(
-            appBar: appBar,
+            appBar: appBar ??
+                (appBarBuilder == null ? null : appBarBuilder!(bloc, state)),
             backgroundColor: backgroundColor,
             body: builder(context, bloc, state),
             bottomSheet: bottomBuilder == null

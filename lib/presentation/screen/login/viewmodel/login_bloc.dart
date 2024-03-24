@@ -60,7 +60,7 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
         emit(state.copyWith(userId: event.extra));
         break;
       case LoginEvent.onTapIssue:
-      // TODO: Handle this case.
+        break;
       case LoginEvent.onTapLogin:
         final userid = useridController.value.text;
         final password = passwordController.value.text;

@@ -2,7 +2,7 @@ import '../../../../domain/model/chart_table_data.dart';
 import '../../../../domain/model/map_base_data.dart';
 import '../../../../domain/model/response/meta_data.dart';
 import '../../../../domain/model/place_data.dart';
-import '../../../../domain/model/wireless_type.dart';
+import '../../../../domain/model/enum/wireless_type.dart';
 
 class MainState {
   final List<PlaceData>? placeList;

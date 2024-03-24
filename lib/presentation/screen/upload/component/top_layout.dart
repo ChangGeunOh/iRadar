@@ -7,12 +7,14 @@ import '../../../component/edit_text.dart';
 
 class TopLayout extends StatelessWidget {
   final VoidCallback onTapFile;
+  final VoidCallback onTapSearch;
   final String group;
   final String division;
   final String fileName;
   final String area;
   final bool isDuplicate;
-  final Function(UploadChangedType type, String value) onChanged;
+  final ValueChanged<dynamic> onChangedArea;
+  final ValueChanged<dynamic> onChangedDivision;
 
   const TopLayout({
     required this.onTapFile,
@@ -20,37 +22,38 @@ class TopLayout extends StatelessWidget {
     required this.division,
     required this.area,
     required this.fileName,
-    required this.onChanged,
     required this.isDuplicate,
+    required this.onTapSearch,
+    required this.onChangedArea,
+    required this.onChangedDivision,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     // print('fileName>$fileName');
+    print('division>$division');
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        SizedBox(
-          width: 150,
-          child: EditText(
-            onChanged: (value) {},
-            label: '지역',
-            value: group,
-            enabled: false,
-          ),
-        ),
-        const SizedBox(width: 16),
+        // SizedBox(
+        //   width: 150,
+        //   child: EditText(
+        //     onChanged: (value) {},
+        //     label: '지역',
+        //     value: group,
+        //     enabled: false,
+        //   ),
+        // ),
+        // const SizedBox(width: 16),
         SizedBox(
           width: 200,
           child: DropdownBox(
-            onChanged: (value) => onChanged(
-              UploadChangedType.onDivision,
-              value,
-            ),
+            onChanged: onChangedDivision,
             hint: '구분선택',
             label: '구분',
             items: divisionList,
+            value: division.isEmpty ? null : division,
           ),
         ),
         const SizedBox(width: 16),
@@ -62,8 +65,8 @@ class TopLayout extends StatelessWidget {
             onChanged: (value) {},
             suffixIcon: IconButton(
               onPressed: () {
-                FocusScope.of(context).nextFocus();
-                FocusScope.of(context).nextFocus();
+                // FocusScope.of(context).nextFocus();
+                // FocusScope.of(context).nextFocus();
                 onTapFile();
               },
               icon: const Icon(
@@ -75,24 +78,15 @@ class TopLayout extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: EditText(
-            onChanged: (value) => onChanged(
-              UploadChangedType.onArea,
-              value,
-            ),
+            onChanged: (value) => onChangedArea(value),
             label: '측정장소',
             value: area,
-            suffixIcon: isDuplicate
-                ? Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 16),
-                    // color: Colors.red,
-                    child: const Text(
-                      '중복',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.red),
-                    ),
-                  )
-                : null,
+            suffixIcon: IconButton(
+              onPressed: onTapSearch,
+              icon: const Icon(
+                Icons.search_rounded,
+              ),
+            ),
           ),
         ),
         // const SizedBox(width: 16),

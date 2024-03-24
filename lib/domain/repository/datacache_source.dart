@@ -2,10 +2,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
+import 'package:googlemap/domain/model/user_data.dart';
 
 import '../model/map_base_data.dart';
 import '../model/response/meta_data.dart';
-import '../model/wireless_type.dart';
+import '../model/enum/wireless_type.dart';
 
 abstract class DataCacheSource {
 
@@ -37,5 +38,8 @@ abstract class DataCacheSource {
 
   void setExcelResponseDataList(int idx, List<ExcelResponseData> excelResponseDataList);
   List<ExcelResponseData>? getExcelResponseDataList(int idx);
+
+  void setUserData(UserData userData);
+  UserData? getUserData();
 
 }

@@ -9,8 +9,9 @@ import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
+import '../../domain/model/area_data.dart';
 import '../../domain/model/excel_response_data.dart';
 import '../../domain/model/response/meta_data.dart';
 import '../../domain/model/table_data.dart';
@@ -45,8 +46,10 @@ class Repository {
       password: password,
     );
     final ResponseData<UserData?> response = await _networkSource.login(loginData.toJsonString());
+    if (response.data != null) {
+      _dataCacheSource.setUserData(response.data!);
+    }
     final ResponseData<TokenData?> tokenResponse = await _networkSource.postTokenData(loginData.toJsonString());
-    print(tokenResponse.data?.toJson());
     return response;
   }
 
@@ -214,19 +217,11 @@ class Repository {
     return LoginData(userid: 'admin', password: 'admin');
   }
 
-  Future<void> uploadMeasureData(MeasureUploadData measureUploadData) async {
-    final data = MeasureUploadData(
-      intf5GList: measureUploadData.intf5GList.sublist(0, 1),
-      intfLteList: measureUploadData.intfLteList.sublist(0, 1),
-      intfTTList: measureUploadData.intfTTList.sublist(0, 1),
-    );
-    data.group = measureUploadData.group;
-    data.area = measureUploadData.area;
-    data.password = measureUploadData.password;
-    data.type = measureUploadData.type;
+  Future<ResponseData> uploadMeasureData(MeasureUploadData measureUploadData) async {
 
     final result = await _networkSource.uploadMeasureData(measureUploadData);
     print('uploadMeasureData>${result.toString()}');
+    return result;
   }
 
   Future<int> getCountArea({
@@ -257,5 +252,14 @@ class Repository {
       mergedIdxList: mergedIdxList,
       password: mergedPlaceData.password,
     );
+  }
+
+  UserData? getUserData() {
+    return _dataCacheSource.getUserData();
+  }
+
+  Future<ResponseData<List<AreaData>>>getAreaList() async {
+    final userData = getUserData();
+    return await _networkSource.getAreaList(userData?.areaCode ?? 'test');
   }
 }

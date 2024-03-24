@@ -8,7 +8,8 @@ import 'package:googlemap/domain/model/map_base_data.dart';
 import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/repository/datacache_source.dart';
 
-import '../../domain/model/wireless_type.dart';
+import '../../domain/model/user_data.dart';
+import '../../domain/model/enum/wireless_type.dart';
 import '../datacache/local_datacache.dart';
 
 class DataCacheSourceImpl extends DataCacheSource {
@@ -106,5 +107,15 @@ class DataCacheSourceImpl extends DataCacheSource {
   @override
   void setExcelResponseDataList(int idx, List<ExcelResponseData> excelResponseDataList) {
     _dataCache.cacheExcelResponseDataList[idx] = excelResponseDataList;
+  }
+
+  @override
+  void setUserData(UserData userData) {
+    _dataCache.userData = userData;
+  }
+
+  @override
+  UserData? getUserData() {
+    return _dataCache.userData;
   }
 }

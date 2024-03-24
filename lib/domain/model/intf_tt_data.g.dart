@@ -29,6 +29,7 @@ IntfTtData _$IntfTtDataFromJson(Map<String, dynamic> json) => IntfTtData(
       mcs: (json['mcs'] as num?)?.toDouble(),
       rb: (json['rb'] as num?)?.toDouble(),
       dl: (json['dl'] as num?)?.toDouble(),
+      dt: json['dt'] == null ? null : DateTime.parse(json['dt'] as String),
     );
 
 Map<String, dynamic> _$IntfTtDataToJson(IntfTtData instance) =>
@@ -55,4 +56,5 @@ Map<String, dynamic> _$IntfTtDataToJson(IntfTtData instance) =>
       'mcs': instance.mcs,
       'rb': instance.rb,
       'dl': instance.dl,
+      'dt': instance.dt?.toIso8601String(),
     };

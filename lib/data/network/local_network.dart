@@ -33,14 +33,17 @@ class CustomInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    final customResponse = Response(
-      requestOptions: err.requestOptions,
-      statusCode: err.response?.statusCode,
-      data: err.response?.data, // 사용자 정의 응답 내용
-    );
+    // final customResponse = Response(
+    //   requestOptions: err.requestOptions,
+    //   statusCode: err.response?.statusCode,
+    //   data: err.response?.data, // 사용자 정의 응답 내용
+    // );
+    //
+    // // 에러를 정상 응답으로 처리
+    // handler.resolve(customResponse);
+    final responseData = ResponseData(meta: MetaData(code: 200, message: '네트워크 장애 입니다. 잠시 후 다시 해 주세요.', timeStamp: DateTime.now().millisecondsSinceEpoch), data: null);
+    handler.resolve(Response(requestOptions: err.requestOptions, data: responseData.getJson(), statusCode: 200));
 
-    // 에러를 정상 응답으로 처리
-    handler.resolve(customResponse);
   }
 
   @override

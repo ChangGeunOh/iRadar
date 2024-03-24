@@ -1,7 +1,7 @@
 
 import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
 abstract class DataStoreSource {
   Future<List<PlaceData>> loadPlaceList(WirelessType type);

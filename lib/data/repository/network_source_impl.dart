@@ -7,6 +7,7 @@ import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../../domain/model/area_data.dart';
 import '../../domain/model/excel_response_data.dart';
 import '../../domain/model/place_data.dart';
 import '../../domain/model/response/response_data.dart';
@@ -70,8 +71,8 @@ abstract class NetworkSourceImpl extends NetworkSource {
       @Query('pci') String npci,);
 
   @override
-  @POST('api/upload.php')
-  Future<ResponseData<String>> uploadMeasureData(
+  @POST(kPostUploadDataPath)
+  Future<ResponseData> uploadMeasureData(
       @Body() MeasureUploadData measureUploadData,);
 
   @override
@@ -97,4 +98,8 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @POST(kPostTokenDataPath)
   Future<ResponseData<TokenData?>> postTokenData(@Body() String jsonString);
+
+  @override
+  @GET(kGetAreaDataPath)
+  Future<ResponseData<List<AreaData>>> getAreaList(String areaCode);
 }

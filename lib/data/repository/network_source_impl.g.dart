@@ -258,7 +258,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
-  Future<ResponseData<String>> uploadMeasureData(
+  Future<ResponseData<dynamic>> uploadMeasureData(
       MeasureUploadData measureUploadData) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -266,14 +266,14 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _data = <String, dynamic>{};
     _data.addAll(measureUploadData.toJson());
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<String>>(Options(
+        _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              'api/upload.php',
+              'upload/',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -282,9 +282,9 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = ResponseData<String>.fromJson(
+    final value = ResponseData<dynamic>.fromJson(
       _result.data!,
-      (json) => json as String,
+      (json) => json as dynamic,
     );
     return value;
   }
@@ -394,6 +394,41 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       (json) => json == null
           ? null
           : TokenData.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<List<AreaData>>> getAreaList(String areaCode) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<List<AreaData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'area/',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<List<AreaData>>.fromJson(
+      _result.data!,
+      (json) => json is List<dynamic>
+          ? json
+              .map<AreaData>(
+                  (i) => AreaData.fromJson(i as Map<String, dynamic>))
+              .toList()
+          : List.empty(),
     );
     return value;
   }

@@ -9,6 +9,7 @@ class BottomLayout extends StatelessWidget {
   final bool isAddData;
   final bool isWideArea;
   final bool enabledSave;
+  final bool enabledAddData;
   final ValueChanged onWideArea;
   final ValueChanged onAddData;
   final ValueChanged onChangedPassword;
@@ -24,11 +25,18 @@ class BottomLayout extends StatelessWidget {
     required this.enabledSave,
     required this.onChangedPassword,
     required this.onTapSave,
+    required this.enabledAddData,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final onChangedAddData = enabledAddData
+        ? (value) {
+            print('isAddValue>${value}');
+            onAddData(value);
+          }
+        : null;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -51,42 +59,39 @@ class BottomLayout extends StatelessWidget {
         ),
         const SizedBox(width: 24),
         CheckTextBox(
-          onChanged: (value){
-            print('isAddValue>${value}');
-            onAddData(value);
-          },
+          onChanged: onChangedAddData,
           text: '기존자료에 추가',
           checkColor: Colors.red,
           value: isAddData,
         ),
         const Spacer(),
-        SizedBox(
-          width: 150,
-          child: TextField(
-            obscureText: true,
-            onChanged: onChangedPassword,
-            maxLength: 10,
-            decoration: InputDecoration(
-              counterText: "",
-              label: const Text(
-                '비밀번호',
-                style: TextStyle(
-                  fontSize: 12,
-                ),
-              ),
-              hintText: '자료삭제시 사용',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(
-                    4.0), // Adjust the radius to your liking
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
-            ),
-            style: const TextStyle(
-              fontSize: 16.0,
-            ),
-          ),
-        ),
-        const SizedBox(width: 32),
+        // SizedBox(
+        //   width: 150,
+        //   child: TextField(
+        //     obscureText: true,
+        //     onChanged: onChangedPassword,
+        //     maxLength: 10,
+        //     decoration: InputDecoration(
+        //       counterText: "",
+        //       label: const Text(
+        //         '비밀번호',
+        //         style: TextStyle(
+        //           fontSize: 12,
+        //         ),
+        //       ),
+        //       hintText: '자료삭제시 사용',
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(
+        //             4.0), // Adjust the radius to your liking
+        //       ),
+        //       contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+        //     ),
+        //     style: const TextStyle(
+        //       fontSize: 16.0,
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(width: 32),
         SizedBox(
           width: 150,
           child: ElevatedButton(

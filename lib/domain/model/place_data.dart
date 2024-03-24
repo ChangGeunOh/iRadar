@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
-import 'location_type.dart';
-import 'wireless_type.dart';
+import 'enum/location_type.dart';
+import 'enum/wireless_type.dart';
 
 part 'place_data.g.dart';
 

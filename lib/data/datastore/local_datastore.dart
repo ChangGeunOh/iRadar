@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const keyFunctionMenuList = "function_menu_list";

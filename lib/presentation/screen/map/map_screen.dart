@@ -12,7 +12,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../common/const/constants.dart';
 import '../../../domain/bloc/bloc_layout.dart';
-import '../../../domain/model/location_type.dart';
+import '../../../domain/model/enum/location_type.dart';
 import '../../../domain/model/place_data.dart';
 import '../../component/dropdown_box.dart';
 import '../../component/edit_text.dart';

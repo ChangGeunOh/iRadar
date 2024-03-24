@@ -15,5 +15,12 @@ class ResponseData<T> {
   });
   factory ResponseData.fromJson(Map<String, dynamic> json, T Function(Object? json) fromJsonT) => _$ResponseDataFromJson(json, fromJsonT);
   Map<String, dynamic> toJson(Object Function(T value) toJsonT) => _$ResponseDataToJson(this, toJsonT);
+
+  Map<String, dynamic> getJson() {
+    return <String, dynamic>{
+      'meta': this.meta.toJson(),
+    };
+  }
+
 }
 
