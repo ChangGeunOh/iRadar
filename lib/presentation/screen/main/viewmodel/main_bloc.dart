@@ -33,7 +33,6 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     BlocEvent<MainEvent> event,
     Emitter<MainState> emit,
   ) async {
-    print('Event>${event.type.toString()}');
     switch (event.type) {
       case MainEvent.init:
         emit(state.copyWith(placeList: event.extra, isLoading: false));
@@ -96,7 +95,6 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(placeList: list, isLoading: false));
         break;
       case MainEvent.onTapMenu:
-        context.pushNamed(UploadScreen.routeName);
         break;
       case MainEvent.onTapItemWithShift:
         final PlaceData placeData = event.extra;
@@ -107,6 +105,9 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
           selectedPlace.add(placeData);
         }
         emit(state.copyWith(selectedPlaceSet: selectedPlace));
+        break;
+      case MainEvent.onTapUpload:
+        context.pushNamed(UploadScreen.routeName);
         break;
     }
   }
