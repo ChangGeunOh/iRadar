@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../domain/model/intf_tt_data.dart';
+import '../../../../domain/model/upload/intf_tt_data.dart';
 
 class TableLayout extends StatelessWidget {
   final List<IntfTtData> intfTtList;
@@ -42,9 +42,11 @@ class TableLayout extends StatelessWidget {
       DataCell(Text(e.lat.toString())),
       DataCell(Text(e.lng.toString())),
 
+      DataCell(Text(e.cells5 ?? '')),
       DataCell(Text(e.pci5 ?? '')),
       DataCell(Text(e.rp5.toString())),
 
+      DataCell(Text(e.cells ?? '')),
       DataCell(Text(e.pci ?? '')),
       DataCell(Text(e.rp.toString())),
 
@@ -73,9 +75,11 @@ class TableLayout extends StatelessWidget {
       'lat',
       'lng',
 
+      'cells5',
       'pci5',
       'rp5',
 
+      'cells',
       'pci',
       'rp',
 

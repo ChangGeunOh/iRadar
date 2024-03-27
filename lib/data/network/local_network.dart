@@ -41,9 +41,18 @@ class CustomInterceptor extends Interceptor {
     //
     // // 에러를 정상 응답으로 처리
     // handler.resolve(customResponse);
-    final responseData = ResponseData(meta: MetaData(code: 200, message: '네트워크 장애 입니다. 잠시 후 다시 해 주세요.', timeStamp: DateTime.now().millisecondsSinceEpoch), data: null);
-    handler.resolve(Response(requestOptions: err.requestOptions, data: responseData.getJson(), statusCode: 200));
-
+    final responseData = ResponseData(
+      meta: MetaData(
+        code: err.response?.statusCode ?? 200,
+        message: '네트워크 장애 입니다. 잠시 후 다시 해 주세요.',
+        timeStamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+      data: null,
+    );
+    handler.resolve(Response(
+        requestOptions: err.requestOptions,
+        data: responseData.getJson(),
+        statusCode: 200));
   }
 
   @override
@@ -77,7 +86,7 @@ class CustomInterceptor extends Interceptor {
         if (token != null) {
           tokenData = token;
         }
-      } catch(e) {
+      } catch (e) {
         print('Error parsing response data: $e');
       }
     }

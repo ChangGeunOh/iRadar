@@ -3,11 +3,10 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
-import 'package:googlemap/common/utils/extension.dart';
 
-import 'intf_data.dart';
-import 'intf_tt_data.dart';
-import 'measure_upload_data.dart';
+import 'upload/intf_data.dart';
+import 'upload/intf_tt_data.dart';
+import 'upload/measure_upload_data.dart';
 
 class ExcelFile {
   final Uint8List bytes;
@@ -126,11 +125,12 @@ class ExcelFile {
       area: 'area',
       lat: _toDouble(list[2]),
       lng: _toDouble(list[1]),
+      cells5: list[3].toString(),
       pci5: list[4].toString(),
       rp5: _toDouble(list[5]),
+      cells: list[6].toString(),
       pci: list[7].toString(),
       rp: _toDouble(list[8]),
-      pw: 'pw',
       cqi5: _toDouble(list[9]),
       ri5: _toDouble(list[10]),
       dlmcs5: _toDouble(list[11]),

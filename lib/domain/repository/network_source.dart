@@ -1,5 +1,4 @@
 import 'package:googlemap/domain/model/excel_response_data.dart';
-import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
@@ -10,6 +9,7 @@ import '../model/chart_table_data.dart';
 import '../model/map/area_data.dart';
 import '../model/map/map_base_data.dart';
 import '../model/map/map_data.dart';
+import '../model/upload/measure_upload_data.dart';
 
 abstract class NetworkSource {
   Future<ResponseData<UserData?>> login(

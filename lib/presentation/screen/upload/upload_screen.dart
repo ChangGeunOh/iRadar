@@ -158,27 +158,4 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
     );
   }
 
-  Widget _showMessage(String message, VoidCallback callback) {
-    Future.delayed(const Duration(milliseconds: 2500)).then((value) {
-      callback();
-    });
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 48.0,
-          vertical: 32.0,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
-          color: Colors.white,
-        ),
-        child: Text(
-          message,
-          style: const TextStyle(
-            fontSize: 18.0,
-          ),
-        ),
-      ),
-    );
-  }
 }

@@ -9,12 +9,15 @@ class IntfTtData {
   final double? lat;
   final double? lng;
 
+  final String cells5;
+
   final String? pci5;
   final double? rp5;
+
+  final String cells;
+
   final String? pci;
   final double? rp;
-
-  final String? pw;
 
   final double? cqi5;
   final double? ri5;
@@ -39,12 +42,14 @@ class IntfTtData {
     required this.lat,
     required this.lng,
 
+    required this.cells5,
+
     required this.pci5,
     required this.rp5,
+
+    required this.cells,
     required this.pci,
     required this.rp,
-
-    required this.pw,
 
     required this.cqi5,
     required this.ri5,

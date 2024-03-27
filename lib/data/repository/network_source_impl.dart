@@ -2,7 +2,6 @@ import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/map/map_base_data.dart';
-import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
@@ -13,6 +12,7 @@ import '../../domain/model/map/map_data.dart';
 import '../../domain/model/place_data.dart';
 import '../../domain/model/response/response_data.dart';
 import '../../domain/model/token_data.dart';
+import '../../domain/model/upload/measure_upload_data.dart';
 import '../../domain/repository/network_source.dart';
 
 part 'network_source_impl.g.dart';

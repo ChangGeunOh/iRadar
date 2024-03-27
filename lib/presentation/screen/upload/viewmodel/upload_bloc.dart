@@ -8,11 +8,9 @@ import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/excel_file.dart';
-import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/presentation/screen/upload/viewmodel/upload_event.dart';
 import 'package:googlemap/presentation/screen/upload/viewmodel/upload_state.dart';
 
-import '../../../../common/utils/mixin.dart';
 
 class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
   final TextEditingController searchEditingController = TextEditingController();
@@ -55,6 +53,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
           areaCode: userData?.areaCode ?? 'test',
         );
         final responseData = await repository.uploadMeasureData(uploadData);
+        print(responseData.meta.toJson());
         if (responseData.meta.code == 200) {
           emit(state.copyWith(message: '자료를 등록 하였습니다.', isLoading: false));
           add(BlocEvent(UploadEvent.onPreviousScreen));
