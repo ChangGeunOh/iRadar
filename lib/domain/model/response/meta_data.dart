@@ -23,8 +23,8 @@ class MetaData {
   final PageData? pageData;
 
   MetaData({
-    required this.code,
-    required this.message,
+    this.code = 200,
+    this.message = '',
     this.timeStamp = 0,
     this.pageData,
   });

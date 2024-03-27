@@ -1,7 +1,7 @@
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 
-import '../../../../domain/model/area_data.dart';
+import '../../../../domain/model/map/area_data.dart';
 import '../../../../domain/model/excel_file.dart';
 
 class UploadState {

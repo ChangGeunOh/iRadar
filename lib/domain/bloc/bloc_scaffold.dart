@@ -14,7 +14,8 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
   final Widget? floatingActionButton;
   final Widget Function(BuildContext context, B bloc, S state)? floatingBuilder;
   final Widget Function(BuildContext context, B bloc, S state)? bottomBuilder;
-  final AppBar? Function(B bloc, S state)? appBarBuilder;
+  final AppBar? Function(BuildContext context, B bloc, S state)? appBarBuilder;
+  final bool? extendBodyBehindAppBar;
 
   const BlocScaffold({
     super.key,
@@ -27,6 +28,7 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
     this.floatingActionButton,
     this.floatingBuilder,
     this.bottomBuilder,
+    this.extendBodyBehindAppBar,
   });
 
   @override
@@ -37,8 +39,9 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
         builder: (context, state) {
           final bloc = context.read<B>();
           return Scaffold(
+            extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
             appBar: appBar ??
-                (appBarBuilder == null ? null : appBarBuilder!(bloc, state)),
+                (appBarBuilder == null ? null : appBarBuilder!(context, bloc, state)),
             backgroundColor: backgroundColor,
             body: builder(context, bloc, state),
             bottomSheet: bottomBuilder == null

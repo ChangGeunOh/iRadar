@@ -2,7 +2,7 @@ import 'package:googlemap/domain/model/enum/location_type.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../common/utils/convert.dart';
+import '../../../common/utils/convert.dart';
 
 part 'area_data.g.dart';
 
@@ -10,8 +10,20 @@ part 'area_data.g.dart';
 class AreaData {
   final int idx;
   final String name;
+  @JsonKey(
+    name: 'type',
+    fromJson: Convert.dynamicToWirelessType,
+  )
   final WirelessType type;
   final LocationType division;
+  @JsonKey(
+    name: 'lat',
+  )
+  final double latitude;
+  @JsonKey(
+    name: 'lng',
+  )
+  final double longitude;
   @JsonKey(
     name: 'created_at',
     fromJson: Convert.dynamicToDateTime,
@@ -24,6 +36,8 @@ class AreaData {
     required this.date,
     required this.division,
     required this.type,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory AreaData.fromJson(Map<String, dynamic> json) =>

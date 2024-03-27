@@ -1,4 +1,11 @@
+import '../../domain/model/enum/wireless_type.dart';
+
 class Convert {
+  static WirelessType dynamicToWirelessType(dynamic value) {
+    final type = WirelessType.values.firstWhere((e) => e.name.toLowerCase() == value.toString().toLowerCase());
+    return type;
+  }
+
   static String dynamicToString(dynamic value) {
     return value.toString();
   }
@@ -42,6 +49,12 @@ class Convert {
   static int dynamicToInt(dynamic value) {
     value = value ?? 0;
     return value.runtimeType == int ? value as int : int.parse(value);
+  }
+  static double dynamicToDouble(dynamic value) {
+    if (value == null) {
+      return 0.0;
+    }
+    return value.runtimeType == double ? value as double : double.parse(value);
   }
 
   static bool dynamicToBool(dynamic value) {

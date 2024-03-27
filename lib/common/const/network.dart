@@ -6,3 +6,7 @@ const kPostTokenDataPath = 'token/';
 
 const kGetAreaDataPath = 'area/';
 const kPostUploadDataPath = 'upload/';
+
+const kGetMapDataPath = 'map/{idx}';
+
+const kGetBaseDataPath = 'map/base/{type}';

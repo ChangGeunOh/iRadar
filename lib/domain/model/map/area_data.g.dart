@@ -11,7 +11,9 @@ AreaData _$AreaDataFromJson(Map<String, dynamic> json) => AreaData(
       name: json['name'] as String,
       date: Convert.dynamicToDateTime(json['created_at']),
       division: $enumDecode(_$LocationTypeEnumMap, json['division']),
-      type: $enumDecode(_$WirelessTypeEnumMap, json['type']),
+      type: Convert.dynamicToWirelessType(json['type']),
+      latitude: (json['lat'] as num).toDouble(),
+      longitude: (json['lng'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
@@ -19,6 +21,8 @@ Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
       'name': instance.name,
       'type': _$WirelessTypeEnumMap[instance.type]!,
       'division': _$LocationTypeEnumMap[instance.division]!,
+      'lat': instance.latitude,
+      'lng': instance.longitude,
       'created_at': instance.date.toIso8601String(),
     };
 

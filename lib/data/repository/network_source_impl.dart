@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
-import 'package:googlemap/domain/model/map_base_data.dart';
+import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../../domain/model/area_data.dart';
 import '../../domain/model/excel_response_data.dart';
+import '../../domain/model/map/area_data.dart';
+import '../../domain/model/map/map_data.dart';
 import '../../domain/model/place_data.dart';
 import '../../domain/model/response/response_data.dart';
 import '../../domain/model/token_data.dart';
@@ -25,15 +26,17 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @Headers(<String, dynamic>{
     'Content-Type': 'application/json',
   })
-  Future<ResponseData<UserData?>> login(@Body() String body,);
+  Future<ResponseData<UserData?>> login(
+    @Body() String body,
+  );
 
   @override
   @GET('iradar_area_list.php')
   Future<ResponseData<List<PlaceData>>> loadPlaceList(
       {@Query('group') required String group,
-        @Query('type') required String type,
-        @Query('page') int page = 1,
-        @Query('count') int count = 30});
+      @Query('type') required String type,
+      @Query('page') int page = 1,
+      @Query('count') int count = 30});
 
   // @override
   // @GET('pcitt.php')
@@ -67,13 +70,15 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @GET('dtl_pci.php')
   Future<ResponseData<List<TableData>>> loadNpciTableList(
-      @Query('a') String link,
-      @Query('pci') String npci,);
+    @Query('a') String link,
+    @Query('pci') String npci,
+  );
 
   @override
   @POST(kPostUploadDataPath)
   Future<ResponseData> uploadMeasureData(
-      @Body() MeasureUploadData measureUploadData,);
+    @Body() MeasureUploadData measureUploadData,
+  );
 
   @override
   @GET('api/get_area.php')
@@ -102,4 +107,12 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @override
   @GET(kGetAreaDataPath)
   Future<ResponseData<List<AreaData>>> getAreaList(String areaCode);
+
+  @override
+  @GET(kGetMapDataPath)
+  Future<ResponseData<MapData>> getMapDataList({
+    @Query('code') required String areaCode,
+    @Path('idx') required int idx,
+  });
+
 }

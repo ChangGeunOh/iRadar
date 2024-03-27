@@ -4,7 +4,7 @@ import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 
-import '../model/map_base_data.dart';
+import '../model/map/map_base_data.dart';
 import '../model/response/meta_data.dart';
 import '../model/enum/wireless_type.dart';
 
@@ -24,11 +24,11 @@ abstract class DataCacheSource {
   ChartTableData? getChartTableData(int idx);
   void setChartTableData(int idx, ChartTableData chartTableData);
 
-  void setBaseMarkers(int idx, List<Marker> markers);
-  List<Marker>? getBaseMarkers(int idx);
+  void setBaseMarkers(int idx, Set<Marker> markers);
+  Set<Marker>? getBaseMarkers(int idx);
 
-  void setMeasureMarkers(int idx, List<Marker> markers);
-  List<Marker>? getMeasureMarkers(int idx);
+  void setMeasureMarkers(int idx, Set<Marker> markers);
+  Set<Marker>? getMeasureMarkers(int idx);
 
   void setMetaData(WirelessType type, MetaData metaData);
   MetaData getMetaData(WirelessType type);

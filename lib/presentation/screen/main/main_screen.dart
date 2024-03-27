@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
-import 'package:googlemap/domain/bloc/bloc_layout.dart';
 import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
-import 'package:googlemap/domain/model/place_data.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/presentation/screen/chart/chart_screen.dart';
 import 'package:googlemap/presentation/screen/main/component/side_header.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_bloc.dart';
@@ -13,6 +13,7 @@ import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 import 'package:googlemap/presentation/screen/map/map_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'component/main_drawer.dart';
 import 'component/side_body.dart';
 
 class MainScreen extends StatelessWidget {
@@ -47,8 +48,9 @@ class MainScreen extends StatelessWidget {
                       placeData: state.placeData,
                     ),
                     MapScreen(
-                      placeDataSet: state.selectedPlaceSet,
+                      areaDataSet: state.selectedAreaDataSet,
                       isRemove: state.isRemove,
+                      wirelessType: state.type,
                     ),
                   ],
                 ),
@@ -84,104 +86,9 @@ class MainScreen extends StatelessWidget {
                   top: 0,
                   bottom: 0,
                   left: 0,
-                  child: Container(
-                    width: 400,
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        SideHeader(
-                          onSearch: (search) {
-                            bloc.add(
-                                BlocEvent(MainEvent.onSearch, extra: search));
-                          },
-                          onTapWirelessType: (type) => bloc.add(
-                            BlocEvent(
-                              MainEvent.onTapType,
-                              extra: type,
-                            ),
-                          ),
-                          onTapRefresh: () => bloc.add(BlocEvent(
-                            MainEvent.onTapRefresh,
-                          )),
-                          onTapMenu: () =>
-                              bloc.add(BlocEvent(MainEvent.onTapMenu)),
-                        ),
-                        if (state.placeList != null)
-                          Expanded(
-                            child: SideBody(
-                              selectedPlaceSet: state.selectedPlaceSet,
-                              placeList: state.placeList!,
-                              onLoadMore: bloc.loadMore,
-                              onTapItem: (value) {
-                                bloc.add(
-                                  BlocEvent(
-                                    MainEvent.onTapItem,
-                                    extra: value,
-                                  ),
-                                );
-                              },
-                              onTapAll: (value) {
-                                print("onTapAll>${value.toString()}");
-                                bloc.add(
-                                  BlocEvent(
-                                    MainEvent.onTapItemAll,
-                                    extra: value,
-                                  ),
-                                );
-                              },
-                              onTapRemove: (value) => bloc.add(
-                                BlocEvent(MainEvent.onTapItemRemove,
-                                    extra: value),
-                              ),
-                              onTapWithShift: (value) {
-                                bloc.add(
-                                  BlocEvent(
-                                    MainEvent.onTapItemWithShift,
-                                    extra: value,
-                                  ),
-                                );
-                              },
-                              onLongPress: (PlaceData value) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text(
-                                        '자료삭제를 하시겠습니까?',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 22,
-                                        ),
-                                      ),
-                                      content: Text(
-                                        '"${value.name}" 자료가 삭제 됩니다.',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: const Text('취소'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            bloc.add(BlocEvent(
-                                                MainEvent.onDelete,
-                                                extra: value));
-                                          },
-                                          child: const Text('삭제'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
+                  child: MainDrawer(
+                    bloc: bloc,
+                    state: state,
                   ),
                 ),
               Positioned(
@@ -206,23 +113,6 @@ class MainScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.upload_rounded,
-                      color: Colors.grey,
-                      size: 32,
-                    ),
-                    onPressed: () {
-                      bloc.add(BlocEvent(MainEvent.onTapUpload));
-                    },
-                  ),
-                ),
-              ),
             ],
           ),
           // drawer: Drawer(width: 400, child: Text('test...'),),

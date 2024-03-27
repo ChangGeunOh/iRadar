@@ -7,8 +7,8 @@ part of 'meta_data.dart';
 // **************************************************************************
 
 MetaData _$MetaDataFromJson(Map<String, dynamic> json) => MetaData(
-      code: Convert.dynamicToInt(json['code']),
-      message: json['message'] as String,
+      code: json['code'] == null ? 200 : Convert.dynamicToInt(json['code']),
+      message: json['message'] as String? ?? '',
       timeStamp: json['time_stamp'] == null
           ? 0
           : Convert.dynamicToInt(json['time_stamp']),

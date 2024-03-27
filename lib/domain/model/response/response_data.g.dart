@@ -11,7 +11,9 @@ ResponseData<T> _$ResponseDataFromJson<T>(
   T Function(Object? json) fromJsonT,
 ) =>
     ResponseData<T>(
-      meta: MetaData.fromJson(json['meta'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : MetaData.fromJson(json['meta'] as Map<String, dynamic>),
       data: _$nullableGenericFromJson(json['data'], fromJsonT),
     );
 

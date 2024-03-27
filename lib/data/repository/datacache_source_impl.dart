@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_base_data.dart';
+import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/repository/datacache_source.dart';
 
@@ -60,22 +60,22 @@ class DataCacheSourceImpl extends DataCacheSource {
   }
 
   @override
-  void setBaseMarkers(int idx, List<Marker> markers) {
+  void setBaseMarkers(int idx, Set<Marker> markers) {
     _dataCache.cacheBaseMarkers[idx] = markers;
   }
 
   @override
-  List<Marker>? getBaseMarkers(int idx) {
+  Set<Marker>? getBaseMarkers(int idx) {
     return _dataCache.cacheBaseMarkers[idx];
   }
 
   @override
-  void setMeasureMarkers(int idx, List<Marker> markers) {
+  void setMeasureMarkers(int idx, Set<Marker> markers) {
     _dataCache.cacheMeasureMarkers[idx] = markers;
   }
 
   @override
-  List<Marker>? getMeasureMarkers(int idx) {
+  Set<Marker>? getMeasureMarkers(int idx) {
     return _dataCache.cacheMeasureMarkers[idx];
   }
 

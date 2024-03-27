@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
-import 'package:googlemap/domain/model/area_data.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/excel_file.dart';
 import 'package:googlemap/domain/model/measure_upload_data.dart';
 import 'package:googlemap/presentation/screen/upload/viewmodel/upload_event.dart';

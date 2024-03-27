@@ -1,0 +1,14 @@
+{
+  "name": "vendor_name/component",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "changgeunoh",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+  }
+}

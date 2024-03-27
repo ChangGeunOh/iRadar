@@ -4,7 +4,7 @@ import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
-import '../../../../domain/model/area_data.dart';
+import '../../../../domain/model/map/area_data.dart';
 import '../../../component/edit_text.dart';
 import '../viewmodel/upload_event.dart';
 

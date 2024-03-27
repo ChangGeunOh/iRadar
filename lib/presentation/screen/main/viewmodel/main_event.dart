@@ -9,5 +9,8 @@ enum MainEvent {
   onTapItem,
   isLoading,
   onTapRefresh,
-  onMoreLoading, onTapMenu, onTapItemWithShift, onTapUpload,
+  onTapMenu,
+  onTapItemWithShift,
+  onTapUpload,
+  onTapShiftKey,
 }
