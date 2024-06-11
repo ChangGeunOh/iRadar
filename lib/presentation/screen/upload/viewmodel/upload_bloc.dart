@@ -52,6 +52,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
           areaIdx: areaIdx,
           areaCode: userData?.areaCode ?? 'test',
         );
+        print(uploadData.toJson());
         final responseData = await repository.uploadMeasureData(uploadData);
         print(responseData.meta.toJson());
         if (responseData.meta.code == 200) {

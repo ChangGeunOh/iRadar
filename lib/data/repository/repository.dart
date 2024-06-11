@@ -1,11 +1,13 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/map/map_data.dart';
+import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
@@ -95,8 +97,28 @@ class Repository {
     return mapBaseData;
   }
 
+  Future<ResponseData> loadMeasureList(
+    AreaData areaData,
+  ) async {
+    // final List<MeasureData> measureDataList =
+    //    await _dataStoreSource.getMeasureList(areaData.idx, areaData.type);
+    // if (measureDataList.isNotEmpty) {
+    //   return ResponseData(data: measureDataList);
+    // }
+    final response = await _networkSource.getMeasureList(
+      idx: areaData.idx,
+      type: areaData.type.name,
+    );
+    if (response.meta.code == 200) {
+      await _dataStoreSource.setMeasureList(
+          areaData.idx, areaData.type, response.data!);
+    }
+    return response;
+  }
+
   Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
     var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
+    chartTableData = null;
     if (chartTableData == null) {
       final responseData = await _networkSource.loadChartTableData(
         group: placeData.group,
@@ -248,5 +270,9 @@ class Repository {
     } else {
       return ResponseData();
     }
+  }
+
+  Future<ResponseData> postMergeData(MergeData mergeData) async {
+    return await _networkSource.postMergeData(mergeData);
   }
 }

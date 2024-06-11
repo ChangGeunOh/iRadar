@@ -10,7 +10,7 @@ import 'upload/measure_upload_data.dart';
 
 class ExcelFile {
   final Uint8List bytes;
-  final MeasureUploadData measureUploadData;
+  late final MeasureUploadData measureUploadData;
   late final Excel excel;
   late final Sheet sheet;
 
@@ -21,7 +21,7 @@ class ExcelFile {
 
   ExcelFile({
     required this.bytes,
-  }) : measureUploadData = MeasureUploadData() {
+  }) {
     _init();
   }
 
@@ -33,19 +33,31 @@ class ExcelFile {
     getMeasureData();
   }
 
-  MeasureUploadData getMeasureData() {
+  void getMeasureData() {
     // MeasureUploadData measureUploadData = MeasureUploadData();
+    DateTime? dt;
+    List<IntfTtData> intfTTList = [];
+    List<IntfData> intf5GList = [];
+    List<IntfData> intfLteList = [];
+
     sheet.rows.forEachIndexed((index, row) {
       if (row.first != null &&
           row.first!.value.runtimeType == DateTimeCellValue) {
         final rowData = _makeData(row, isNoLocation, isLteOnly);
-        measureUploadData.intf5GList.addAll(rowData.intf5GList);
-        measureUploadData.intfLteList.addAll(rowData.intfLteList);
-        measureUploadData.intfTTList.addAll(rowData.intfTTList);
+        intf5GList.addAll(rowData.intf5GList);
+        intfLteList.addAll(rowData.intfLteList);
+        intfTTList.addAll(rowData.intfTTList);
+        if (rowData.intfTTList.first.dt != null) {
+          dt = rowData.intfTTList.first.dt;
+        }
       }
     });
-
-    return measureUploadData;
+    measureUploadData = MeasureUploadData(
+      dt: dt,
+      intf5GList: intf5GList,
+      intfLteList: intfLteList,
+      intfTTList: intfTTList,
+    );
   }
 
   MeasureUploadData getUploadData({
@@ -85,16 +97,17 @@ class ExcelFile {
     for (var match in regex5g.allMatches(list[3].toString())) {
       final rp = double.parse(match.group(2)!);
       final intf5GData = IntfData(
-          idx: 0,
-          area: 'area',
-          pci: match.group(1)!,
-          dt: dateTime,
-          lat: double.parse(list[2].toString()),
-          lng: double.parse(list[1].toString()),
-          rp: rp,
-          rpmw: pow(10, rp / 10.0).toDouble(),
-          spci: list[4].toString(),
-          srp: (list[5] as DoubleCellValue).value);
+        idx: 0,
+        area: 'area',
+        pci: match.group(1)!,
+        dt: dateTime,
+        lat: double.parse(list[2].toString()),
+        lng: double.parse(list[1].toString()),
+        rp: rp,
+        rpmw: pow(10, rp / 10.0).toDouble(),
+        spci: list[4].toString(),
+        srp: (list[5] as DoubleCellValue).value,
+      );
       measureUploadData.intf5GList.add(intf5GData);
     }
 
@@ -118,7 +131,7 @@ class ExcelFile {
       measureUploadData.intfLteList.add(intfData);
     }
 
-    list[16] = list[16].toString().replaceAll(RegExp(r'[^0-9]'), '');
+    // list[16] = list[16].toString().replaceAll(RegExp(r'[^0-9]'), '');
     list[18] = list[18].toString().replaceAll(RegExp(r'[^0-9]'), '');
     final intfTtData = IntfTtData(
       idx: 0,
@@ -136,16 +149,18 @@ class ExcelFile {
       dlmcs5: _toDouble(list[11]),
       dll5: _toDouble(list[12]),
       dlrb5: _toDouble(list[13]),
-      dl5: _toDouble(list[14]),
-      ear: _toDouble(list[15]),
-      ca: _toDouble(list[16]),
+      dltp5: _toDouble(list[14]),
+      ear: _toInt(list[15]),
+      ca: _caToInt(list[16]),
       cqi: _toDouble(list[17]),
       ri: _toDouble(list[18]),
-      mcs: _toDouble(list[19]),
-      rb: _toDouble(list[20]),
-      dl: _toDouble(list[21]),
+      dlmcs: _toDouble(list[19]),
+      dlrb: _toDouble(list[20]),
+      dltp: _toDouble(list[21]),
       dt: dateTime,
     );
+
+    print('ear: ${intfTtData.ear} ::: ca: ${intfTtData.ca}');
     measureUploadData.intfTTList.add(intfTtData);
 
     return measureUploadData;
@@ -161,6 +176,34 @@ class ExcelFile {
         return value;
       default:
         return value.toString().isEmpty ? null : double.parse(value.toString());
+    }
+  }
+
+  int? _toInt(dynamic value) {
+    switch (value.runtimeType) {
+      case const (IntCellValue):
+        return (value as IntCellValue).value;
+      case const (String):
+        return int.tryParse(value);
+      case const (int):
+        return value;
+      default:
+        return value.toString().isEmpty ? null : int.parse(value.toString());
+    }
+  }
+
+  int? _caToInt(dynamic value) {
+    switch (value.toString()) {
+      case 'NonCA':
+        return 1;
+      case 'CA2':
+        return 2;
+      case 'CA3':
+        return 3;
+      case 'CA4':
+        return 4;
+      default:
+        return 0;
     }
   }
 }

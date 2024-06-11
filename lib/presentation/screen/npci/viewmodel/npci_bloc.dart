@@ -60,28 +60,28 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
         );
         break;
       case NpciEvent.onTapExcel:
-        final excelRequestData = ExcelRequestData(
-          placeData: state.placeData!,
-          tableList: state.tableList!,
-        );
-        final excelResponseData =
-            await repository.loadExcelResponseData(excelRequestData);
-        if (excelResponseData != null) {
-          ExcelMaker(
-            placeData: state.placeData!,
-            excelResponseList: excelResponseData,
-          ).makeExcel();
-        }
+        // final excelRequestData = ExcelRequestData(
+        //   areaData: state.placeData!,
+        //   tableList: state.tableList!,
+        // );
+        // final excelResponseData =
+        //     await repository.loadExcelResponseData(excelRequestData);
+        // if (excelResponseData != null) {
+        //   ExcelMaker(
+        //     placeData: state.placeData!,
+        //     excelResponseList: excelResponseData,
+        //   ).makeExcel();
+        // }
         break;
       case NpciEvent.onTapWeb:
-        final excelRequestData = ExcelRequestData(
-          placeData: state.placeData!,
-          tableList: state.tableList!,
-        );
-        context.pushNamed(
-          WebScreen.routeName,
-          extra: excelRequestData,
-        );
+        // final excelRequestData = ExcelRequestData(
+        //   placeData: state.placeData!,
+        //   tableList: state.tableList!,
+        // );
+        // context.pushNamed(
+        //   WebScreen.routeName,
+        //   extra: excelRequestData,
+        // );
         break;
     }
   }

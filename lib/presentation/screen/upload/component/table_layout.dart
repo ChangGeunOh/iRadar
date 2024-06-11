@@ -55,16 +55,16 @@ class TableLayout extends StatelessWidget {
       DataCell(Text(e.dlmcs5.toString())),
       DataCell(Text(e.dll5.toString())),
       DataCell(Text(e.dlrb5.toString())),
-      DataCell(Text(e.dl5.toString())),
+      DataCell(Text(e.dltp5.toString())),
 
       DataCell(Text(e.ear.toString())),
       DataCell(Text(e.ca.toString())),
       DataCell(Text(e.cqi.toString())),
 
       DataCell(Text(e.ri.toString())),
-      DataCell(Text(e.mcs.toString())),
-      DataCell(Text(e.rb.toString())),
-      DataCell(Text(e.dl.toString())),
+      DataCell(Text(e.dlmcs.toString())),
+      DataCell(Text(e.dlrb.toString())),
+      DataCell(Text(e.dltp.toString())),
     ]))
         .toList();
   }

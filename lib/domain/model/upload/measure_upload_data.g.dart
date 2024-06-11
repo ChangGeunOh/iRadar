@@ -13,6 +13,7 @@ MeasureUploadData _$MeasureUploadDataFromJson(Map<String, dynamic> json) =>
       areaIdx: json['area_idx'] as int? ?? 0,
       isWideArea: json['is_wide_area'] as bool? ?? false,
       areaCode: json['area_code'] as String? ?? '',
+      dt: json['dt'] == null ? null : DateTime.parse(json['dt'] as String),
       intf5GList: (json['intf_5g_list'] as List<dynamic>?)
               ?.map((e) => IntfData.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -34,6 +35,7 @@ Map<String, dynamic> _$MeasureUploadDataToJson(MeasureUploadData instance) =>
       'area_idx': instance.areaIdx,
       'is_wide_area': instance.isWideArea,
       'area_code': instance.areaCode,
+      'dt': instance.dt?.toIso8601String(),
       'intf_5g_list': instance.intf5GList.map((e) => e.toJson()).toList(),
       'intf_lte_list': instance.intfLteList.map((e) => e.toJson()).toList(),
       'intf_tt_list': instance.intfTTList.map((e) => e.toJson()).toList(),

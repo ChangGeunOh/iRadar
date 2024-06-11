@@ -267,58 +267,52 @@ void _showMergeDialog({
   required BuildContext context,
   required MapBloc bloc,
   required Set<AreaData> areaDataSet,
-  required Function(AreaData) onMergeData,
+  required Function(Map<String, dynamic>) onMergeData,
 }) {
   var name = '[Merge] ${areaDataSet.map((e) => e.name).join(', ')}';
   var locationType = areaDataSet.first.division;
-  var password = '';
 
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text("병합하기"),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        titlePadding: const EdgeInsets.all(0),
+        title: Container(
+          color: Colors.red,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(
+              child: Text(
+                "병합하기",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ),
         content: SizedBox(
           height: 200,
           width: 500,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // SizedBox(
-                  //   width: 150,
-                  //   child: EditText(
-                  //     onChanged: (value) {},
-                  //     label: '지역',
-                  //     value: areaDataSet.first.group,
-                  //     enabled: false,
-                  //   ),
-                  // ),
-                  // const SizedBox(width: 16),
-                  SizedBox(
-                    width: 200,
-                    child: DropdownBox(
-                      value: locationType.name,
-                      onChanged: (value) {
-                        locationType = LocationType.values
-                            .firstWhere((element) => element.name == value);
-                      },
-                      hint: '구분선택',
-                      label: '구분',
-                      items: divisionList,
-                    ),
-                  ),
-                  // const SizedBox(width: 16),
-                  // SizedBox(
-                  //   width: 200,
-                  //   child: PasswordField(
-                  //     onChanged: (value) {
-                  //       password = value;
-                  //     },
-                  //   ),
-                  // ),
-                ],
+              SizedBox(
+                width: 200,
+                child: DropdownBox(
+                  value: locationType.name,
+                  onChanged: (value) {
+                    locationType = LocationType.values
+                        .firstWhere((element) => element.name == value);
+                  },
+                  hint: '구분선택',
+                  label: '구분',
+                  items: divisionList,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -342,22 +336,14 @@ void _showMergeDialog({
           ),
           TextButton(
             onPressed: () {
-              print('병합하기 :: ${locationType.name} : $name} : $password');
-              if (name.isEmpty || name.length < 5) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('측정장소나 비밀번호를 입력해주세요.'),
-                  ),
-                );
+              if (name.isEmpty) {
                 return;
               }
-              _onMergeData(
-                locationType: locationType,
-                name: name,
-                placeDataList: areaDataSet,
-                onMergeData: onMergeData,
-                password: password,
-              );
+              onMergeData({
+                'name': name,
+                'locationType': locationType,
+              });
+              // Navigator.of(context).pop();
             },
             child: const Text("병합"),
           ),
@@ -393,11 +379,11 @@ AppBar? _appBar(context, bloc, state) {
                 context: context,
                 bloc: bloc,
                 areaDataSet: state.areaDataSet,
-                onMergeData: (AreaData areaData) {
+                onMergeData: (value) {
                   bloc.add(
                     BlocEvent(
                       MapEvent.onMergeData,
-                      extra: areaData,
+                      extra: value,
                     ),
                   );
                 },
@@ -408,31 +394,4 @@ AppBar? _appBar(context, bloc, state) {
       ),
     ],
   );
-}
-
-void _onMergeData({
-  required LocationType locationType,
-  required String name,
-  required Set<AreaData> placeDataList,
-  required Function(AreaData) onMergeData,
-  required String password,
-}) {
-  print('병합하기 :: ${locationType.name} : $name}');
-  final latitude = placeDataList
-          .map((e) => e.latitude)
-          .reduce((value, element) => value + element) /
-      placeDataList.length;
-  final longitude = placeDataList
-          .map((e) => e.longitude)
-          .reduce((value, element) => value + element) /
-      placeDataList.length;
-  final placeData = AreaData(
-      idx: -1,
-      type: placeDataList.first.type,
-      name: name,
-      division: locationType,
-      latitude: latitude,
-      longitude: longitude,
-      date: DateTime.now());
-  onMergeData(placeData);
 }

@@ -62,6 +62,8 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
           showToast(state.message);
           bloc.add(BlocEvent(UploadEvent.onClearMessage));
         }
+
+        print('----------------------------');
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 48.0,

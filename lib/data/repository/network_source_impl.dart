@@ -6,9 +6,11 @@ import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/excel_response_data.dart';
 import '../../domain/model/map/area_data.dart';
 import '../../domain/model/map/map_data.dart';
+import '../../domain/model/map/merge_data.dart';
 import '../../domain/model/place_data.dart';
 import '../../domain/model/response/response_data.dart';
 import '../../domain/model/token_data.dart';
@@ -115,4 +117,16 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Path('idx') required int idx,
   });
 
+  @override
+  @POST(kPostMergeDataPath)
+  Future<ResponseData> postMergeData(
+    @Body() MergeData mergeData,
+  );
+
+  @override
+  @GET(kGetMeasureListPath)
+  Future<ResponseData<List<MeasureData>>> getMeasureList({
+    @Path('idx') required int idx,
+    @Path('type') required String type,
+  });
 }

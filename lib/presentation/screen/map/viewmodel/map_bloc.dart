@@ -7,8 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/enum/location_type.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/map/map_measured_data.dart';
+import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 
@@ -54,13 +56,15 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         await _changedAreaData(emit, state.areaDataSet);
         break;
       case MapEvent.onMergeData:
-        // final placeDataList = state.placeDataList;
-        // final mergedPlaceData = event.extra as AreaData;
-        //
-        // // Transfer Data to Merged Data
-        // emit(state.copyWith(isLoading: true));
-        // await repository.saveMergedData(mergedPlaceData, placeDataList);
-        // emit(state.copyWith(isLoading: false));
+        Map<String, dynamic> data = event.extra as Map<String, dynamic>;
+        final name = data['name'] as String;
+        final locationType = data['locationType'] as LocationType;
+        await _onMergeData(
+          emit,
+          wirelessType: state.wirelessType,
+          name: name,
+          locationType: locationType,
+        );
         break;
       case MapEvent.onTapMap:
         if (state.isRectangleMode) {
@@ -314,5 +318,42 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         fillColor: const Color(0x80ff0000),
       ),
     );
+  }
+
+  Future<void> _onMergeData(
+    Emitter<MapState> emit, {
+    required WirelessType wirelessType,
+    required String name,
+    required LocationType locationType,
+  }) async {
+    final selectedMarkers = state.measureMarkerSet
+        .where((element) => element.icon != mapPins![11])
+        .toList();
+
+    // 단일 반복을 사용하여 모든 계산 수행
+    double sumLat = 0.0;
+    double sumLong = 0.0;
+    List<int> data = [];
+    for (var marker in selectedMarkers) {
+      sumLat += marker.position.latitude;
+      sumLong += marker.position.longitude;
+      data.add(int.parse(marker.markerId.value.split('M').last));
+    }
+
+    final latitude = sumLat / selectedMarkers.length;
+    final longitude = sumLong / selectedMarkers.length;
+
+    final mergeData = MergeData(
+      name: name,
+      wirelessType: wirelessType,
+      locationType: locationType,
+      latitude: latitude,
+      longitude: longitude,
+      data: data,
+    );
+
+    emit(state.copyWith(isLoading: true));
+    final response = await repository.postMergeData(mergeData);
+    emit(state.copyWith(isLoading: false, message: response.meta.message));
   }
 }

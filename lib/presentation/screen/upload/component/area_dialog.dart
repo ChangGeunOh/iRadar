@@ -92,17 +92,21 @@ class _AreaDialogState extends State<AreaDialog> {
                         children: [
                           Text(areaData.name),
                           const Spacer(),
+                          if (areaData.type != WirelessType.w5G)
+                            SvgPicture.asset(
+                              'assets/icons/ic_lte.svg',
+                            ),
+                          if (areaData.type == WirelessType.w5G)
+                            const SizedBox(width:32),
+                          const SizedBox(width: 4),
                           if (areaData.type != WirelessType.wLte)
                             SvgPicture.asset(
                               'assets/icons/ic_5g.svg',
+                              width: 32,
                             ),
-                          if (areaData.type != WirelessType.w5G)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4.0),
-                              child: SvgPicture.asset(
-                                'assets/icons/ic_lte.svg',
-                              ),
-                            ),
+                          if (areaData.type == WirelessType.wLte)
+                            const SizedBox(width:32),
+
                         ],
                       ),
                       onTap: () {

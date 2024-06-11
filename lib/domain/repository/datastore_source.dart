@@ -1,4 +1,6 @@
 
+import 'package:googlemap/domain/model/chart/measure_data.dart';
+
 import '../model/enum/wireless_type.dart';
 import '../model/map/map_data.dart';
 import '../model/place_data.dart';
@@ -13,4 +15,8 @@ abstract class DataStoreSource {
   Future<List<MapData>> loadMapDataList(int idx);
 
   Future<void> saveMapDataList(int idx, List<MapData> mapDataList);
+
+  Future<List<MeasureData>> getMeasureList(int idx, WirelessType type);
+
+  Future<void> setMeasureList(int idx, WirelessType type, List<MeasureData> list);
 }

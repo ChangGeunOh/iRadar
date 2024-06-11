@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_layout.dart';
-import 'package:googlemap/domain/model/place_data.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/presentation/screen/chart/components/expanded_search.dart';
 
 import '../../../domain/bloc/bloc_event.dart';
-import 'components/chart_view.dart';
+import '../../../domain/model/enum/wireless_type.dart';
 import 'components/table_view.dart';
 import 'viewmodel/chart_bloc.dart';
 import 'viewmodel/chart_event.dart';
 import 'viewmodel/chart_state.dart';
 
 class ChartScreen extends StatelessWidget {
-  final PlaceData? placeData;
+  final AreaData areaData;
 
   const ChartScreen({
-    required this.placeData,
+    required this.areaData,
     super.key,
   });
 
@@ -24,70 +25,88 @@ class ChartScreen extends StatelessWidget {
     return BlocLayout<ChartBloc, ChartState>(
         create: (context) => ChartBloc(
               context,
-              ChartState(),
+              ChartState(areaData: areaData),
             ),
         builder: (context, bloc, state) {
-          if (placeData != null && placeData != state.placeData) {
-            bloc.add(BlocEvent(ChartEvent.onPlaceData, extra: placeData));
-          }
-          if (state.isLoading) {
-            bloc.add(BlocEvent(ChartEvent.onDataLoading));
+          if (areaData != state.areaData) {
+            bloc.add(BlocEvent(
+              ChartEvent.onChangedAreaData,
+              extra: areaData,
+            ));
           }
           return Stack(
             children: [
               ListView(
                 children: [
-                  if (state.placeData != null)
-                    AppBar(
-                      centerTitle: true,
-                      title: Text(placeData!.name),
-                      actions: [
-                        ExpandedSearch(
-                          onSearchValue: (value) {
-                            print("value>$value");
-                          },
-                        ),
-                        IconButton(
-                          onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapWeb)),
-                          icon: const Icon(
-                            Icons.web,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: ()=> bloc.add(BlocEvent(ChartEvent.onTapExcel)),
-                          icon: const Icon(
-                            Icons.file_download,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(width: 20),
+                  AppBar(
+                    centerTitle: true,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(areaData.type == WirelessType.wLte
+                            ? 'assets/icons/ic_lte.svg'
+                            : 'assets/icons/ic_5g.svg'),
+                        const SizedBox(width: 16),
+                        Text(areaData.name),
                       ],
                     ),
-                  const SizedBox(height: 24),
-                  if (state.chartTableData != null)
-                    SizedBox(
-                      height: 350,
-                      child: ChartView(
-                        charList: state.chartTableData!.chartList,
+                    actions: [
+                      ExpandedSearch(
+                        onSearchValue: (value) {
+                          print("value>$value");
+                        },
                       ),
-                    ),
-                  const SizedBox(height: 24),
-                  if (state.chartTableData != null)
+                      IconButton(
+                        onPressed: () =>
+                            bloc.add(BlocEvent(ChartEvent.onTapWeb)),
+                        icon: const Icon(
+                          Icons.web,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () =>
+                            bloc.add(BlocEvent(ChartEvent.onTapExcel)),
+                        icon: const Icon(
+                          Icons.file_download,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ),
+                  // const SizedBox(height: 24),
+                  // if (state.chartTableData != null)
+                  //   SizedBox(
+                  //     height: 350,
+                  //     child: ChartView(
+                  //       charList: state.chartTableData!.chartList,
+                  //     ),
+                  //   ),
+                  // const SizedBox(height: 24),
+                  if (state.measureDataList.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Center(
                         child: TableView(
+                          type: state.areaData.type,
                           isCheck: state.isCheck,
-                          tableData: state.chartTableData!.tableList,
+                          measureDataList: state.measureDataList,
+                          onChangedMeasureList: (measureDataList) =>
+                              bloc.add(BlocEvent(
+                            ChartEvent.onChangedMeasureList,
+                            extra: measureDataList,
+                          )),
                           onTapNId: (tableData) => bloc.add(
                               BlocEvent(ChartEvent.onTapNId, extra: tableData)),
-                          onTapToggle: () =>
-                              bloc.add(BlocEvent(ChartEvent.onTapToggle)),
+                          onTapToggle: (value) => bloc.add(
+                              BlocEvent(ChartEvent.onTapToggle, extra: value)),
                           onTapPci: (tableData) => bloc.add(
                               BlocEvent(ChartEvent.onTapPci, extra: tableData)),
-                          onTapNPci: (tableData) => bloc.add(
-                              BlocEvent(ChartEvent.onTapNPci, extra: tableData)),
+                          onTapNPci: (tableData) => bloc.add(BlocEvent(
+                              ChartEvent.onTapNPci,
+                              extra: tableData)),
                         ),
                       ),
                     ),

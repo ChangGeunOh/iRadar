@@ -24,15 +24,16 @@ class IntfTtData {
   final double? dlmcs5;
   final double? dll5;
   final double? dlrb5;
-  final double? dl5;
+  final double? dltp5;
 
-  final double? ear;
-  final double? ca;
+  final int? ear;
+  final int? ca;
   final double? cqi;
   final double? ri;
-  final double? mcs;
-  final double? rb;
-  final double? dl;
+  final double? dlmcs;
+  final double? dlrb;
+  final double? dltp;
+
   final DateTime? dt;
 
 
@@ -56,15 +57,15 @@ class IntfTtData {
     required this.dlmcs5,
     required this.dll5,
     required this.dlrb5,
-    required this.dl5,
+    required this.dltp5,
 
     required this.ear,
     required this.ca,
     required this.cqi,
     required this.ri,
-    required this.mcs,
-    required this.rb,
-    required this.dl,
+    required this.dlmcs,
+    required this.dlrb,
+    required this.dltp,
     required this.dt,
   });
 

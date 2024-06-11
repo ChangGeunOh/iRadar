@@ -17,7 +17,7 @@ class LocalNetwork {
       PrettyDioLogger(
         requestHeader: true,
         requestBody: true,
-        responseBody: false,
+        responseBody: true,
         responseHeader: true,
         error: true,
         compact: true,

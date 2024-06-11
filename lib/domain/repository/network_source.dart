@@ -1,10 +1,12 @@
 import 'package:googlemap/domain/model/excel_response_data.dart';
+import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/table_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 
+import '../model/chart/measure_data.dart';
 import '../model/chart_table_data.dart';
 import '../model/map/area_data.dart';
 import '../model/map/map_base_data.dart';
@@ -73,5 +75,9 @@ abstract class NetworkSource {
     required String areaCode,
     required int idx,
   });
+
+  Future<ResponseData> postMergeData(MergeData mergeData);
+
+  Future<ResponseData<List<MeasureData>>> getMeasureList({required int idx, required String type});
 
 }

@@ -10,3 +10,6 @@ const kPostUploadDataPath = 'upload/';
 const kGetMapDataPath = 'map/{idx}';
 
 const kGetBaseDataPath = 'map/base/{type}';
+
+const kPostMergeDataPath = 'map/merge/';
+const kGetMeasureListPath = 'chart/{type}/{idx}';

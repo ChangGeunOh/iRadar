@@ -29,6 +29,11 @@ class AreaData {
     fromJson: Convert.dynamicToDateTime,
   )
   final DateTime date;
+  @JsonKey(
+    name: 'dt',
+    fromJson: Convert.dynamicToDateTime,
+  )
+  final DateTime measuredAt;
 
   AreaData({
     required this.idx,
@@ -38,7 +43,30 @@ class AreaData {
     required this.type,
     required this.latitude,
     required this.longitude,
+    required this.measuredAt,
   });
+
+  AreaData copyWith({
+    int? idx,
+    String? name,
+    DateTime? date,
+    LocationType? division,
+    WirelessType? type,
+    double? latitude,
+    double? longitude,
+    DateTime? measuredAt,
+  }) {
+    return AreaData(
+      idx: idx ?? this.idx,
+      name: name ?? this.name,
+      date: date ?? this.date,
+      division: division ?? this.division,
+      type: type ?? this.type,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      measuredAt: measuredAt ?? this.measuredAt,
+    );
+  }
 
   factory AreaData.fromJson(Map<String, dynamic> json) =>
       _$AreaDataFromJson(json);

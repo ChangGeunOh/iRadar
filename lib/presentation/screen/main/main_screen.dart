@@ -32,8 +32,8 @@ class MainScreen extends StatelessWidget {
       ),
       builder: (context, bloc, state) {
         return DefaultTabController(
-          initialIndex: 1,
-          length: 2,
+          initialIndex: 0,
+          length: state.selectedAreaDataSet.length == 1 ? 1 : 2,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -44,14 +44,15 @@ class MainScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   controller: bloc.pageController,
                   children: [
-                    ChartScreen(
-                      placeData: state.placeData,
-                    ),
                     MapScreen(
                       areaDataSet: state.selectedAreaDataSet,
                       isRemove: state.isRemove,
                       wirelessType: state.type,
                     ),
+                    if (state.selectedAreaDataSet.length == 1)
+                      ChartScreen(
+                        areaData: state.selectedAreaDataSet.first,
+                      ),
                   ],
                 ),
               ),
@@ -62,7 +63,7 @@ class MainScreen extends StatelessWidget {
                 child: Center(
                   child: SmoothPageIndicator(
                     controller: bloc.pageController,
-                    count: 2,
+                    count: state.selectedAreaDataSet.length == 1 ? 2 : 1,
                     onDotClicked: (index) {
                       bloc.pageController.animateToPage(
                         index,

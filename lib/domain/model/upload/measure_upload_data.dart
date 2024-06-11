@@ -22,6 +22,8 @@ class MeasureUploadData {
     name: 'area_code',
   )
   final String areaCode;
+  final DateTime? dt;
+
   @JsonKey(
     defaultValue: [],
     name: 'intf_5g_list',
@@ -44,6 +46,7 @@ class MeasureUploadData {
     this.areaIdx = 0,
     this.isWideArea = false,
     this.areaCode = '',
+    this.dt,
     List<IntfData>? intf5GList,
     List<IntfData>? intfLteList,
     List<IntfTtData>? intfTTList,
@@ -58,6 +61,7 @@ class MeasureUploadData {
     String? division,
     bool? isWideArea,
     String? areaCode,
+    DateTime? dt,
     List<IntfData>? intf5GList,
     List<IntfData>? intfLteList,
     List<IntfTtData>? intfTTList,
@@ -68,6 +72,7 @@ class MeasureUploadData {
       division: division ?? this.division,
       areaCode: areaCode ?? this.areaCode,
       isWideArea: isWideArea ?? this.isWideArea,
+      dt: dt ?? this.dt,
       intf5GList: intf5GList ?? this.intf5GList,
       intfLteList: intfLteList ?? this.intfLteList,
       intfTTList: intfTTList ?? this.intfTTList,
