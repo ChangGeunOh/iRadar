@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
+import 'package:googlemap/presentation/screen/main/component/remove_dialog.dart';
 import 'package:googlemap/presentation/screen/main/component/side_header.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_bloc.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_event.dart';
@@ -10,16 +11,16 @@ import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 
 import 'side_body.dart';
 
-
-
 class MainDrawer extends StatelessWidget {
   final MainBloc bloc;
   final MainState state;
+  final VoidCallback onTapMenu;
 
   const MainDrawer({
     super.key,
     required this.bloc,
     required this.state,
+    required this.onTapMenu,
   });
 
   @override
@@ -46,7 +47,8 @@ class MainDrawer extends StatelessWidget {
                 onTapRefresh: () => bloc.add(BlocEvent(
                   MainEvent.onTapRefresh,
                 )),
-                onTapMenu: () => bloc.add(BlocEvent(MainEvent.onTapMenu)),
+                onTapMenu:
+                    onTapMenu, // () => bloc.add(BlocEvent(MainEvent.onTapMenu)),
               ),
               Expanded(
                 child: KeyboardListener(
@@ -94,33 +96,14 @@ class MainDrawer extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (context) {
-                          return AlertDialog(
-                            title: const Text(
-                              '자료삭제를 하시겠습니까?',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                              ),
-                            ),
-                            content: Text(
-                              '"${value.name}" 자료가 삭제 됩니다.',
-                              style: const TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('취소'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  bloc.add(BlocEvent(MainEvent.onDelete,
-                                      extra: value));
-                                },
-                                child: const Text('삭제'),
-                              ),
-                            ],
+                          return RemoveDialog(
+                            onRemove: () {
+                              bloc.add(BlocEvent(
+                                MainEvent.onDelete,
+                                extra: value,
+                              ));
+                            },
+                            description: '"${value.name}" 자료를 삭제 하시겠습니까?',
                           );
                         },
                       );
@@ -151,3 +134,34 @@ class MainDrawer extends StatelessWidget {
     );
   }
 }
+
+// AlertDialog(
+//                             title: const Text(
+//                               '자료삭제를 하시겠습니까?',
+//                               style: TextStyle(
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 22,
+//                               ),
+//                             ),
+//                             content: Text(
+//                               '"${value.name}" 자료가 삭제 됩니다.',
+//                               style: const TextStyle(
+//                                 fontSize: 16,
+//                               ),
+//                             ),
+//                             actions: [
+//                               TextButton(
+//                                 onPressed: () => Navigator.of(context).pop(),
+//                                 child: const Text('취소'),
+//                               ),
+//                               TextButton(
+//                                 onPressed: () {
+//                                   bloc.add(BlocEvent(
+//                                     MainEvent.onDelete,
+//                                     extra: value,
+//                                   ));
+//                                 },
+//                                 child: const Text('삭제'),
+//                               ),
+//                             ],
+//                           );

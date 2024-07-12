@@ -23,7 +23,7 @@ const kWebHeaders = [
   'I-Radar\n기준일자',
 ];
 
-// x 1.35
+const kSecreteKey = '1649aef524be871f5ba53d5790d4e6aa462fa518aa568bc27bf0e37a546d0aa1';
 
 const initCameraPosition = CameraPosition(
   target: LatLng(35.16861, 129.05091),

@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
@@ -56,14 +59,10 @@ class MapScreen extends StatelessWidget {
         );
       },
       builder: (context, bloc, state) {
-        print('MapScreen> build> state: ${state.areaDataSet.toString()}');
-        print('MapScreen> build> state: ${state.wirelessType}');
         if (wirelessType != state.wirelessType) {
           bloc.add(
               BlocEvent(MapEvent.onChangeWirelessType, extra: wirelessType));
         }
-        print(
-            '---> ${state.areaDataSet.toString()} : ${areaDataSet.toString()} :: ${state.areaDataSet == areaDataSet}');
         if (areaDataSet != state.areaDataSet) {
           bloc.add(BlocEvent(MapEvent.onChangeAreaDataSet, extra: areaDataSet));
         }
@@ -123,17 +122,17 @@ class MapScreen extends StatelessWidget {
                     bloc.controller = controller;
                   },
                   onTap: (value) {
-                    print('google map> onTap');
+                    // print('google map> onTap');
                     bloc.add(BlocEvent(MapEvent.onTapMap, extra: value));
                   },
                   polygons: state.polygonSet,
                   circles: state.circleSet,
                   onCameraMove: (cameraPosition) {
-                    print(cameraPosition.toString());
+                    // print(cameraPosition.toString());
                     bloc.setCameraPosition(cameraPosition);
                   },
                   onCameraIdle: () {
-                    print('google map> onCameraIdle');
+                    // print('google map> onCameraIdle');
                     bloc.add(BlocEvent(MapEvent.onCameraIdle));
                   },
                 ),
@@ -269,9 +268,13 @@ void _showMergeDialog({
   required Set<AreaData> areaDataSet,
   required Function(Map<String, dynamic>) onMergeData,
 }) {
-  var name = '[Merge] ${areaDataSet.map((e) => e.name).join(', ')}';
+  final prefix = areaDataSet.length > 1 ? '[병합] ' : '[수정]';
+  var name = '$prefix ${areaDataSet.map((e) => e.name).join(', ')}';
   var locationType = areaDataSet.first.division;
-
+  AreaData mostRecent = areaDataSet.reduce((current, next) {
+    return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
+  });
+  
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -304,7 +307,7 @@ void _showMergeDialog({
               SizedBox(
                 width: 200,
                 child: DropdownBox(
-                  value: locationType.name,
+                  value: locationType!.name,
                   onChanged: (value) {
                     locationType = LocationType.values
                         .firstWhere((element) => element.name == value);
@@ -342,6 +345,7 @@ void _showMergeDialog({
               onMergeData({
                 'name': name,
                 'locationType': locationType,
+                'measuredAt': mostRecent.measuredAt,
               });
               // Navigator.of(context).pop();
             },
@@ -353,13 +357,27 @@ void _showMergeDialog({
   );
 }
 
+
+
 AppBar? _appBar(context, bloc, state) {
   if (state.areaDataSet.isEmpty) {
     return null;
   }
+  final title = state.areaDataSet.map((e) => e.name).join(', ');
+  final type = state.areaDataSet.first.type;
   return AppBar(
     backgroundColor: Colors.white.withOpacity(0.7),
-    title: Text(state.areaDataSet.map((e) => e.name).join(', ')),
+    title: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SvgPicture.asset(type == WirelessType.wLte
+            ? 'assets/icons/ic_lte.svg'
+            : 'assets/icons/ic_5g.svg'),
+        const SizedBox(width: 16),
+        Text(title),
+      ],
+    ),
     actions: [
       Padding(
         padding: const EdgeInsets.only(right: 8.0),
@@ -371,7 +389,7 @@ AppBar? _appBar(context, bloc, state) {
           child: IconButton(
             iconSize: 32,
             icon: const Icon(
-              Icons.merge_outlined,
+              Icons.upload,
               color: Colors.white,
             ),
             onPressed: () {

@@ -12,70 +12,30 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   _NetworkSourceImpl(
     this._dio, {
     this.baseUrl,
-  });
+  }) {
+    baseUrl ??= 'http://paran.ddns.net:5600/iradar/';
+  }
 
   final Dio _dio;
 
   String? baseUrl;
 
   @override
-  Future<ResponseData<UserData?>> login(String body) async {
+  Future<ResponseData<TokenData?>> loadLogin(String basicAuth) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{r'Content-Type': 'application/json'};
+    final _headers = <String, dynamic>{r'Authorization': basicAuth};
     _headers.removeWhere((k, v) => v == null);
-    final _data = body;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<UserData>>(Options(
-      method: 'POST',
-      headers: _headers,
-      extra: _extra,
-      contentType: 'application/json',
-    )
-            .compose(
-              _dio.options,
-              'user/',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<UserData?>.fromJson(
-      _result.data!,
-      (json) =>
-          json == null ? null : UserData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
-  }
-
-  @override
-  Future<ResponseData<List<PlaceData>>> loadPlaceList({
-    required String group,
-    required String type,
-    int page = 1,
-    int count = 30,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'group': group,
-      r'type': type,
-      r'page': page,
-      r'count': count,
-    };
-    final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<PlaceData>>>(Options(
+        _setStreamType<ResponseData<TokenData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              'iradar_area_list.php',
+              'auth/login',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -84,175 +44,11 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = ResponseData<List<PlaceData>>.fromJson(
+    final value = ResponseData<TokenData?>.fromJson(
       _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<PlaceData>(
-                  (i) => PlaceData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
-  }
-
-  @override
-  Future<ResponseData<MapBaseData>> loadMapBaseData({
-    required String group,
-    required int idx,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'group': group,
-      r'idx': idx,
-    };
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<MapBaseData>>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              'iradar_map_base.php',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<MapBaseData>.fromJson(
-      _result.data!,
-      (json) => MapBaseData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
-  }
-
-  @override
-  Future<ResponseData<ChartTableData>> loadChartTableData({
-    required String group,
-    required int idx,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'group': group,
-      r'idx': idx,
-    };
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<ChartTableData>>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              'iradar_chart_table.php',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<ChartTableData>.fromJson(
-      _result.data!,
-      (json) => ChartTableData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
-  }
-
-  @override
-  Future<ResponseData<List<ExcelResponseData>>> loadExcelResponseData({
-    required String group,
-    required String type,
-    required int idx,
-    required List<String> bts,
-    required String cmd,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    final _data = {
-      'group': group,
-      'type': type,
-      'idx': idx,
-      'bts[]': bts,
-      'cmd': cmd,
-    };
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<ExcelResponseData>>>(Options(
-      method: 'POST',
-      headers: _headers,
-      extra: _extra,
-      contentType: 'application/x-www-form-urlencoded',
-    )
-            .compose(
-              _dio.options,
-              'iradar_excel_data.php',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<ExcelResponseData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<ExcelResponseData>(
-                  (i) => ExcelResponseData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
-  }
-
-  @override
-  Future<ResponseData<List<TableData>>> loadNpciTableList(
-    String link,
-    String npci,
-  ) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'a': link,
-      r'pci': npci,
-    };
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<TableData>>>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              'dtl_pci.php',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<TableData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<TableData>(
-                  (i) => TableData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
+      (json) => json == null
+          ? null
+          : TokenData.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }
@@ -262,7 +58,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       MeasureUploadData measureUploadData) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(measureUploadData.toJson());
     final _result = await _dio.fetch<Map<String, dynamic>>(
@@ -273,7 +70,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'upload/',
+              'upload',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -290,83 +87,6 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
-  Future<ResponseData<String>> getCountArea({
-    required String group,
-    required String area,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'group': group,
-      r'area': area,
-    };
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<String>>(Options(
-      method: 'GET',
-      headers: _headers,
-      extra: _extra,
-    )
-            .compose(
-              _dio.options,
-              'api/get_area.php',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<String>.fromJson(
-      _result.data!,
-      (json) => json as String,
-    );
-    return value;
-  }
-
-  @override
-  Future<void> saveMergedData({
-    required String name,
-    required String division,
-    required double latitude,
-    required double longitude,
-    required String password,
-    required String type,
-    required List<int> mergedIdxList,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    final _data = {
-      'name': name,
-      'division': division,
-      'latitude': latitude,
-      'longitude': longitude,
-      'password': password,
-      'type': type,
-      'merged_idx[]': mergedIdxList,
-    };
-    await _dio.fetch<void>(_setStreamType<void>(Options(
-      method: 'POST',
-      headers: _headers,
-      extra: _extra,
-      contentType: 'application/x-www-form-urlencoded',
-    )
-        .compose(
-          _dio.options,
-          'api/save_merged_data.php',
-          queryParameters: queryParameters,
-          data: _data,
-        )
-        .copyWith(
-            baseUrl: _combineBaseUrls(
-          _dio.options.baseUrl,
-          baseUrl,
-        ))));
-  }
-
-  @override
   Future<ResponseData<TokenData?>> postTokenData(String jsonString) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -380,7 +100,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'token/',
+              'auth/login',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -402,7 +122,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   Future<ResponseData<List<AreaData>>> getAreaList(String areaCode) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<List<AreaData>>>(Options(
@@ -412,7 +133,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'area/',
+              'area',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -440,7 +161,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'code': areaCode};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<MapData>>(Options(
@@ -470,7 +192,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   Future<ResponseData<dynamic>> postMergeData(MergeData mergeData) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(mergeData.toJson());
     final _result = await _dio.fetch<Map<String, dynamic>>(
@@ -481,7 +204,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'map/merge/',
+              'map/merge',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -504,7 +227,8 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<List<MeasureData>>>(Options(
@@ -531,6 +255,237 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
                   (i) => MeasureData.fromJson(i as Map<String, dynamic>))
               .toList()
           : List.empty(),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<dynamic>> uploadBaseData(
+      List<BaseData> uploadData) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = uploadData.map((e) => e.toJson()).toList();
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'base/',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<dynamic>.fromJson(
+      _result.data!,
+      (json) => json as dynamic,
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<dynamic>> postPassword(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {
+      'old_password': oldPassword,
+      'new_password': newPassword,
+    };
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'auth/change',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<dynamic>.fromJson(
+      _result.data!,
+      (json) => json as dynamic,
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<dynamic>> postAreaData(AreaData data) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    _data.addAll(data.toJson());
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'area',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<dynamic>.fromJson(
+      _result.data!,
+      (json) => json as dynamic,
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<UserData?>> getUserData() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<UserData>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'auth/user',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<UserData?>.fromJson(
+      _result.data!,
+      (json) =>
+          json == null ? null : UserData.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<List<NoticeData>>> getNoticeList(int page) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<List<NoticeData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'notice',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<List<NoticeData>>.fromJson(
+      _result.data!,
+      (json) => json is List<dynamic>
+          ? json
+              .map<NoticeData>(
+                  (i) => NoticeData.fromJson(i as Map<String, dynamic>))
+              .toList()
+          : List.empty(),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<NoticeData>> getNoticeDetail(int id) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<NoticeData>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'notice/${id}',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<NoticeData>.fromJson(
+      _result.data!,
+      (json) => NoticeData.fromJson(json as Map<String, dynamic>),
+    );
+    return value;
+  }
+
+  @override
+  Future<ResponseData<NoticeData>> postNoticeData(NoticeData data) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ResponseData<NoticeData>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'notice',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = ResponseData<NoticeData>.fromJson(
+      _result.data!,
+      (json) => NoticeData.fromJson(json as Map<String, dynamic>),
     );
     return value;
   }

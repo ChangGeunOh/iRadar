@@ -41,5 +41,4 @@ abstract class DataCacheSource {
 
   void setUserData(UserData userData);
   UserData? getUserData();
-
 }

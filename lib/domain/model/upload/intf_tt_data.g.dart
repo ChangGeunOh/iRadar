@@ -7,7 +7,7 @@ part of 'intf_tt_data.dart';
 // **************************************************************************
 
 IntfTtData _$IntfTtDataFromJson(Map<String, dynamic> json) => IntfTtData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       area: json['area'] as String,
       lat: (json['lat'] as num?)?.toDouble(),
       lng: (json['lng'] as num?)?.toDouble(),
@@ -23,8 +23,8 @@ IntfTtData _$IntfTtDataFromJson(Map<String, dynamic> json) => IntfTtData(
       dll5: (json['dll5'] as num?)?.toDouble(),
       dlrb5: (json['dlrb5'] as num?)?.toDouble(),
       dltp5: (json['dltp5'] as num?)?.toDouble(),
-      ear: json['ear'] as int?,
-      ca: json['ca'] as int?,
+      ear: (json['ear'] as num?)?.toInt(),
+      ca: (json['ca'] as num?)?.toInt(),
       cqi: (json['cqi'] as num?)?.toDouble(),
       ri: (json['ri'] as num?)?.toDouble(),
       dlmcs: (json['dlmcs'] as num?)?.toDouble(),

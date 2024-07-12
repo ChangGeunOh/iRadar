@@ -61,17 +61,15 @@ class ExcelFile {
   }
 
   MeasureUploadData getUploadData({
-    required String areaCode,
     required String area,
     required String division,
     required bool isWideArea,
-    int? areaIdx = 0,
+    int? areaIdx = -1,
   }) {
     return measureUploadData.copyWith(
       area: area,
       division: division,
       areaIdx: areaIdx,
-      areaCode: areaCode,
       isWideArea: isWideArea,
     );
   }
@@ -94,6 +92,7 @@ class ExcelFile {
     final dateTime = (list.first as DateTimeCellValue).asDateTimeLocal();
 
     final regex5g = RegExp(r'(\d+)\(([^)]+)\)\(([^)]+)\)');
+    print("${list[5]} ::: ${list.join(':')}");
     for (var match in regex5g.allMatches(list[3].toString())) {
       final rp = double.parse(match.group(2)!);
       final intf5GData = IntfData(
@@ -106,7 +105,8 @@ class ExcelFile {
         rp: rp,
         rpmw: pow(10, rp / 10.0).toDouble(),
         spci: list[4].toString(),
-        srp: (list[5] as DoubleCellValue).value,
+        srp: double.parse(list[5].toString()),
+        // srp: (list[5] as DoubleCellValue).value,
       );
       measureUploadData.intf5GList.add(intf5GData);
     }

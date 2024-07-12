@@ -30,13 +30,13 @@ class WebBloc extends BlocBloc<BlocEvent<WebEvent>, WebState> {
             print('base: ${base.toJson()}');
             if (base.isChecked) {
               excelResponseData.add(ExcelResponseData(
-                area: "${state.excelRequestData.areaData.division.name} ${state.excelRequestData.areaData.name}",
-                year: state.excelRequestData.areaData.measuredAt.toDateString(format: "yyyy년"),
+                area: "${state.excelRequestData.areaData.division!.name} ${state.excelRequestData.areaData.name}",
+                year: state.excelRequestData.areaData.measuredAt!.toDateString(format: "yyyy년"),
                 id: base.code,
                 rnm: base.name,
                 pci: element.pci,
-                type: state.excelRequestData.areaData.type.name,
-                regDate: state.excelRequestData!.areaData.measuredAt.toDateString(format: 'yyyy-MM-dd'),
+                type: state.excelRequestData.areaData.type!.name,
+                regDate: state.excelRequestData!.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
                 hasColor: element.nPci.isNotEmpty
               ));
             }

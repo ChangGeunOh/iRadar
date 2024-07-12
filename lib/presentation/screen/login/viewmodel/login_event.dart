@@ -8,5 +8,5 @@ enum LoginEvent {
   onTapHide,
   onTapPolicy,
   onTapTerms,
-  onTapPassword, onNextScreen,
+  onTapPassword, onMessage,
 }

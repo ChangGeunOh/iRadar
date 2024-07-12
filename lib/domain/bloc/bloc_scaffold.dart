@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'bloc_layout.dart';
+
 
 class BlocScaffold<B extends StateStreamableSource<S>, S>
     extends StatelessWidget {
@@ -12,12 +12,16 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
   final Color? backgroundColor;
   final Widget? bottomSheet;
   final Widget? floatingActionButton;
+  final bool? extendBodyBehindAppBar;
+  final bool? drawerEnableOpenDragGesture;
   final Widget Function(BuildContext context, B bloc, S state)? floatingBuilder;
   final Widget Function(BuildContext context, B bloc, S state)? bottomBuilder;
+  final Widget Function(BuildContext context, B bloc, S state)? drawerBuilder;
   final AppBar? Function(BuildContext context, B bloc, S state)? appBarBuilder;
-  final bool? extendBodyBehindAppBar;
 
-  const BlocScaffold({
+  final GlobalKey<ScaffoldState>? scaffoldKey;
+
+  BlocScaffold({
     super.key,
     required this.create,
     required this.builder,
@@ -28,8 +32,12 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
     this.floatingActionButton,
     this.floatingBuilder,
     this.bottomBuilder,
+    this.drawerBuilder,
     this.extendBodyBehindAppBar,
+    this.drawerEnableOpenDragGesture,
+    this.scaffoldKey
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +47,38 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
         builder: (context, state) {
           final bloc = context.read<B>();
           return Scaffold(
-            extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
+            key: scaffoldKey,
             appBar: appBar ??
                 (appBarBuilder == null ? null : appBarBuilder!(context, bloc, state)),
+            backgroundColor: backgroundColor,
+            drawer: drawerBuilder == null ? null : drawerBuilder!(context, bloc, state),
+            body: builder(context, bloc, state),
+            bottomSheet: bottomBuilder == null
+                ? bottomSheet
+                : bottomBuilder!(context, bloc, state),
+            floatingActionButton: floatingBuilder == null
+                ? floatingActionButton
+                : floatingBuilder!(context, bloc, state),
+            extendBodyBehindAppBar: extendBodyBehindAppBar ?? false,
+            drawerEnableOpenDragGesture: drawerEnableOpenDragGesture ?? true,
+          );
+        },
+      ),
+    );
+  }
+
+}
+
+/*
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: create,
+      child: BlocBuilder<B, S>(
+        builder: (context, state) {
+          final bloc = context.read<B>();
+          return Scaffold(
+            appBar: appBar,
             backgroundColor: backgroundColor,
             body: builder(context, bloc, state),
             bottomSheet: bottomBuilder == null
@@ -55,4 +92,4 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
       ),
     );
   }
-}
+ */

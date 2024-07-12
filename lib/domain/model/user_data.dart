@@ -15,9 +15,6 @@ class UserData {
   final String group3;
   final String group4;
   final String group5;
-  @JsonKey(name: 'area_code')
-  final String areaCode;
-
 
   UserData({
     required this.userId,
@@ -28,14 +25,24 @@ class UserData {
     required this.group3,
     required this.group4,
     required this.group5,
-    required this.areaCode,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) =>
       _$UserDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserDataToJson(this);
+
+  String getSimpleGroup() {
+    final groups = [group1, group2, group3, group4, group5]
+        .where((group) => group.isNotEmpty)
+        .toList();
+    if (groups.length < 2) {
+      return groups.join(' ');
+    }
+    return "${groups[groups.length - 2]} ${groups[groups.length - 1]}";
+  }
 }
+
 //║             userid: "12345678",
 // ║             username: "오창근",
 // ║             phone: "01066552842",
@@ -45,7 +52,6 @@ class UserData {
 // ║             group4: "동진주운용부",
 // ║             group5: "",
 // ║             area_code: "test"
-
 
 // class UserCreate(UserLogin):
 // username: str

@@ -4,13 +4,15 @@ class LoginState {
   final String password;
   final String userId;
   final bool isEnableLogin;
+  final String message;
 
   LoginState({
     bool? isHide,
-    this.userId = '12345678',
+    this.userId = '',
     this.location,
-    this.password = '00000000',
+    this.password = '',
     bool? isEnableLogin,
+    this.message = '',
   })  : isHide = isHide ?? true,
         isEnableLogin = isEnableLogin ?? false;
 
@@ -20,6 +22,7 @@ class LoginState {
     String? location,
     String? password,
     bool? isEnableLogin,
+    String? message,
   }) {
     return LoginState(
       userId: userId ?? this.userId,
@@ -27,6 +30,7 @@ class LoginState {
       location: location ?? this.location,
       password: password ?? this.password,
       isEnableLogin: isEnableLogin ?? this.isEnableLogin,
+      message: message ?? this.message,
     );
   }
 

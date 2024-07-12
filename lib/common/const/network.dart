@@ -1,15 +1,22 @@
-const kNetworkBaseUrl = 'http://localhost:5600/iradar/';
+const kNetworkBaseUrl = 'http://paran.ddns.net:5600/iradar/';
 
 
-const kPostUserPath = 'user/';
-const kPostTokenDataPath = 'token/';
+const kUserPath = 'auth/user';
+const kLoginPath = 'auth/login';
+const kTokenPath = 'auth/token';
+const kAuthChangePath = 'auth/change';
 
-const kGetAreaDataPath = 'area/';
-const kPostUploadDataPath = 'upload/';
+const kAreaDataPath = 'area';
+const kUploadDataPath = 'upload';
 
 const kGetMapDataPath = 'map/{idx}';
 
-const kGetBaseDataPath = 'map/base/{type}';
+const kBaseDataPath = 'map/base/{type}';
 
-const kPostMergeDataPath = 'map/merge/';
+const kPostMergeDataPath = 'map/merge';
 const kGetMeasureListPath = 'chart/{type}/{idx}';
+
+const kPostBaseDatListPath = 'base/';
+
+const kNoticePath = 'notice';
+const kNoticeDetailPath = 'notice/{idx}';

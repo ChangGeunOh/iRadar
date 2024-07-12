@@ -21,7 +21,6 @@ class MeasureUploadData {
   @JsonKey(
     name: 'area_code',
   )
-  final String areaCode;
   final DateTime? dt;
 
   @JsonKey(
@@ -43,9 +42,8 @@ class MeasureUploadData {
   MeasureUploadData({
     this.area = '',
     this.division = '',
-    this.areaIdx = 0,
+    this.areaIdx = -1,
     this.isWideArea = false,
-    this.areaCode = '',
     this.dt,
     List<IntfData>? intf5GList,
     List<IntfData>? intfLteList,
@@ -57,10 +55,9 @@ class MeasureUploadData {
   MeasureUploadData copyWith({
     String? area,
     String? type,
-    int? areaIdx,
     String? division,
     bool? isWideArea,
-    String? areaCode,
+    int? areaIdx,
     DateTime? dt,
     List<IntfData>? intf5GList,
     List<IntfData>? intfLteList,
@@ -70,7 +67,6 @@ class MeasureUploadData {
       area: area ?? this.area,
       areaIdx: areaIdx ?? this.areaIdx,
       division: division ?? this.division,
-      areaCode: areaCode ?? this.areaCode,
       isWideArea: isWideArea ?? this.isWideArea,
       dt: dt ?? this.dt,
       intf5GList: intf5GList ?? this.intf5GList,

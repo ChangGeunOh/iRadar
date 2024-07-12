@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:googlemap/common/utils/extension.dart';
-import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
-import '../../../../domain/bloc/bloc_event.dart';
+import '../../../../data/repository/repository.dart';
+import '../../../../domain/model/enum/wireless_type.dart';
 import '../../../../domain/model/map/area_data.dart';
-import '../../../component/edit_text.dart';
-import '../viewmodel/upload_event.dart';
 
 class AreaDialog extends StatefulWidget {
-  final List<AreaData> areaList;
-  final Function(AreaData) onTapArea;
 
   const AreaDialog({
     super.key,
-    required this.areaList,
-    required this.onTapArea,
   });
 
   @override
@@ -24,12 +20,24 @@ class AreaDialog extends StatefulWidget {
 
 class _AreaDialogState extends State<AreaDialog> {
   final textController = TextEditingController();
-  late List<AreaData> filteredAreaList;
+
+  List<AreaData> areaList = [];
+  List<AreaData> filteredAreaList = [];
 
   @override
-  void initState() {
-    filteredAreaList = widget.areaList;
+  Future<void> initState() async {
+    _init();
     super.initState();
+  }
+
+  Future<void> _init() async {
+    final Repository repository = context.read();
+    final response = await repository.getAreaList();
+    if (response.meta.code == 200) {
+      areaList = response.data!;
+      filteredAreaList = areaList;
+    }
+    setState(() {});
   }
 
   @override
@@ -64,7 +72,7 @@ class _AreaDialogState extends State<AreaDialog> {
                           onPressed: () {
                             textController.clear();
                             setState(() {
-                              filteredAreaList = widget.areaList;
+                              filteredAreaList = areaList;
                             });
                           },
                         )
@@ -73,7 +81,7 @@ class _AreaDialogState extends State<AreaDialog> {
                 ),
                 onChanged: (text) {
                   setState(() {
-                    filteredAreaList = widget.areaList
+                    filteredAreaList = areaList
                         .where((element) => element.name.contains(text))
                         .toList();
                   });
@@ -106,18 +114,16 @@ class _AreaDialogState extends State<AreaDialog> {
                             ),
                           if (areaData.type == WirelessType.wLte)
                             const SizedBox(width:32),
-
                         ],
                       ),
                       onTap: () {
-                        widget.onTapArea(areaData);
-                        Navigator.of(context).pop();
+                        context.pop(areaData);
                       },
                       subtitle: Row(
                         children: [
-                          Text(areaData.division.name),
+                          Text(areaData.division!.name),
                           const Spacer(),
-                          Text(filteredAreaList[index].date.toDateString()),
+                          Text(filteredAreaList[index].createdAt!.toDateString()),
                         ],
                       ),
                     );

@@ -15,7 +15,6 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
       group3: json['group3'] as String,
       group4: json['group4'] as String,
       group5: json['group5'] as String,
-      areaCode: json['area_code'] as String,
     );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
@@ -27,5 +26,4 @@ Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{
       'group3': instance.group3,
       'group4': instance.group4,
       'group5': instance.group5,
-      'area_code': instance.areaCode,
     };

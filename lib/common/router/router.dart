@@ -1,6 +1,7 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:googlemap/data/repository/repository.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
-import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/place_table_data.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
 import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
@@ -20,12 +21,12 @@ final routerConfig = GoRouter(
     GoRoute(
       path: '/upload2',
       name: 'upload2',
-      builder: (_, __) => UploadScreen(),
+      builder: (_, __) => const UploadScreen(),
     ),
     GoRoute(
       path: '/main',
       name: MainScreen.routeName,
-      builder: (_, __) => const MainScreen(),
+      builder: (_, __) => MainScreen(),
       routes: [
         GoRoute(
           path: 'web',
@@ -44,9 +45,18 @@ final routerConfig = GoRouter(
         GoRoute(
           path: 'upload',
           name: UploadScreen.routeName,
-          builder: (_, __) => UploadScreen(),
+          builder: (_, __) => const UploadScreen(),
         ),
       ],
     ),
   ],
+  redirect: (context, state) async {
+    final Repository repository = context.read();
+    final tokenData =await  repository.getTokenData();
+    print('go_router tokenData: $tokenData');
+    if (tokenData == null && state.name != LoginScreen.routeName) {
+      return '/login';
+    }
+    return null;
+  },
 );

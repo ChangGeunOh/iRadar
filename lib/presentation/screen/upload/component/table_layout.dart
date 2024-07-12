@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/model/upload/intf_tt_data.dart';
 
-class TableLayout extends StatelessWidget {
+class TableLayout extends StatefulWidget {
   final List<IntfTtData> intfTtList;
 
   const TableLayout({
@@ -12,62 +13,37 @@ class TableLayout extends StatelessWidget {
   });
 
   @override
+  State<TableLayout> createState() => _TableLayoutState();
+}
+
+class _TableLayoutState extends State<TableLayout> {
+  @override
   Widget build(BuildContext context) {
-    return DataTable(
+    print('widget.intfTtList.length>${widget.intfTtList.length}');
+    return PaginatedDataTable(
+      source: _DataSource(intfTtList: widget.intfTtList),
       columnSpacing: 62,
       dataRowMaxHeight: 30,
       dataRowMinHeight: 20,
       columns: _getColumns(),
-      rows: _getRows(intfTtList),
-      headingTextStyle: const TextStyle(
-        fontSize: 12,
-        height: 1.1,
-      ),
-      dataTextStyle: const TextStyle(
-        fontSize: 12,
-        height: 1.1,
-      ),
-      headingRowColor: MaterialStateProperty.resolveWith<Color?>(
+      rowsPerPage: 30,
+      // rows: _getRows(widget.intfTtList),
+      // headingTextStyle: const TextStyle(
+      //   fontSize: 12,
+      //   height: 1.1,
+      // ),
+      // dataTextStyle: const TextStyle(
+      //   fontSize: 12,
+      //   height: 1.1,
+      // ),
+      headingRowColor: WidgetStateProperty.resolveWith<Color?>(
             (states) => const Color(0x10000000),
       ),
-      showBottomBorder: true,
+      // showBottomBorder: true,
     );
   }
 
-  List<DataRow> _getRows(List<IntfTtData> intfTtList) {
 
-    return intfTtList
-        .mapIndexed((index, e) => DataRow(cells: [
-      DataCell(Text((index + 1).toString())),
-      DataCell(Text(e.lat.toString())),
-      DataCell(Text(e.lng.toString())),
-
-      DataCell(Text(e.cells5 ?? '')),
-      DataCell(Text(e.pci5 ?? '')),
-      DataCell(Text(e.rp5.toString())),
-
-      DataCell(Text(e.cells ?? '')),
-      DataCell(Text(e.pci ?? '')),
-      DataCell(Text(e.rp.toString())),
-
-      DataCell(Text(e.cqi5.toString())),
-      DataCell(Text(e.ri5.toString())),
-      DataCell(Text(e.dlmcs5.toString())),
-      DataCell(Text(e.dll5.toString())),
-      DataCell(Text(e.dlrb5.toString())),
-      DataCell(Text(e.dltp5.toString())),
-
-      DataCell(Text(e.ear.toString())),
-      DataCell(Text(e.ca.toString())),
-      DataCell(Text(e.cqi.toString())),
-
-      DataCell(Text(e.ri.toString())),
-      DataCell(Text(e.dlmcs.toString())),
-      DataCell(Text(e.dlrb.toString())),
-      DataCell(Text(e.dltp.toString())),
-    ]))
-        .toList();
-  }
 
   List<DataColumn> _getColumns() {
     final headers = [
@@ -110,4 +86,65 @@ class TableLayout extends StatelessWidget {
     )
         .toList();
   }
+
+}
+
+
+class _DataSource extends DataTableSource {
+  final List<IntfTtData> intfTtList;
+
+  _DataSource({
+    required this.intfTtList,
+  });
+
+  @override
+  DataRow? getRow(int index) {
+    final data = intfTtList[index];
+    return DataRow(cells: [
+      DataCell(Text(_toText(index + 1))),
+      DataCell(Text(_toText(data.lat))),
+      DataCell(Text(_toText(data.lng))),
+
+      DataCell(Text(_toText(data.cells5))),
+      DataCell(Text(_toText(data.pci5))),
+      DataCell(Text(_toText(data.rp5))),
+
+      DataCell(Text(_toText(data.cells))),
+      DataCell(Text(_toText(data.pci))),
+      DataCell(Text(_toText(data.rp))),
+
+      DataCell(Text(_toText(data.cqi5))),
+      DataCell(Text(_toText(data.ri5))),
+      DataCell(Text(_toText(data.dlmcs5))),
+      DataCell(Text(_toText(data.dll5))),
+      DataCell(Text(_toText(data.dlrb5))),
+      DataCell(Text(_toText(data.dltp5))),
+
+      DataCell(Text(_toText(data.ear))),
+      DataCell(Text(_toText(data.ca))),
+      DataCell(Text(_toText(data.cqi))),
+
+      DataCell(Text(_toText(data.ri))),
+      DataCell(Text(_toText(data.dlmcs))),
+      DataCell(Text(_toText(data.dlrb))),
+      DataCell(Text(_toText(data.dltp))),
+    ]);
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => intfTtList.length;
+
+  @override
+  int get selectedRowCount => 0;
+  
+  String _toText(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+    return value.toString();
+  }
+
 }

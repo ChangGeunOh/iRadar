@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
+import 'package:googlemap/common/utils/utils.dart';
+import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
@@ -8,6 +12,8 @@ import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/map/map_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
+import 'package:googlemap/domain/model/notice/notice_data.dart';
+import 'package:googlemap/domain/model/notice/notice_list_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
@@ -43,17 +49,9 @@ class Repository {
     required String userid,
     required String password,
   }) async {
-    final loginData = LoginData(
-      userid: userid,
-      password: password,
-    );
-    final ResponseData<UserData?> response =
-        await _networkSource.login(loginData.toJsonString());
-    if (response.data != null) {
-      _dataCacheSource.setUserData(response.data!);
-    }
-    final ResponseData<TokenData?> tokenResponse =
-        await _networkSource.postTokenData(loginData.toJsonString());
+
+    final basicAuth = 'Basic ${base64Encode(utf8.encode('$userid:$password'))}';
+    final response = await _networkSource.loadLogin(basicAuth);
     return response;
   }
 
@@ -81,21 +79,21 @@ class Repository {
     await _dataStoreSource.remove(type);
   }
 
-  Future<MapBaseData?> loadMapBaseData(PlaceData placeData) async {
-    var mapBaseData = _dataCacheSource.getMapBaseData(placeData.idx);
-
-    if (mapBaseData == null) {
-      final responseData = await _networkSource.loadMapBaseData(
-        group: placeData.group,
-        idx: placeData.idx,
-      );
-      if (responseData.data != null) {
-        mapBaseData = responseData.data!;
-        _dataCacheSource.setMapBaseData(placeData.idx, mapBaseData);
-      }
-    }
-    return mapBaseData;
-  }
+  // Future<MapBaseData?> loadMapBaseData(PlaceData placeData) async {
+  //   var mapBaseData = _dataCacheSource.getMapBaseData(placeData.idx);
+  //
+  //   if (mapBaseData == null) {
+  //     final responseData = await _networkSource.loadMapBaseData(
+  //       group: placeData.group,
+  //       idx: placeData.idx,
+  //     );
+  //     if (responseData.data != null) {
+  //       mapBaseData = responseData.data!;
+  //       _dataCacheSource.setMapBaseData(placeData.idx, mapBaseData);
+  //     }
+  //   }
+  //   return mapBaseData;
+  // }
 
   Future<ResponseData> loadMeasureList(
     AreaData areaData,
@@ -107,30 +105,33 @@ class Repository {
     // }
     final response = await _networkSource.getMeasureList(
       idx: areaData.idx,
-      type: areaData.type.name,
+      type: areaData.type!.name,
     );
     if (response.meta.code == 200) {
       await _dataStoreSource.setMeasureList(
-          areaData.idx, areaData.type, response.data!);
+        areaData.idx,
+        areaData.type!,
+        response.data!,
+      );
     }
     return response;
   }
 
-  Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
-    var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
-    chartTableData = null;
-    if (chartTableData == null) {
-      final responseData = await _networkSource.loadChartTableData(
-        group: placeData.group,
-        idx: placeData.idx,
-      );
-      if (responseData.data != null) {
-        chartTableData = responseData.data!;
-        _dataCacheSource.setChartTableData(placeData.idx, chartTableData);
-      }
-    }
-    return chartTableData;
-  }
+  // Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
+  //   var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
+  //   chartTableData = null;
+  //   if (chartTableData == null) {
+  //     final responseData = await _networkSource.loadChartTableData(
+  //       group: placeData.group,
+  //       idx: placeData.idx,
+  //     );
+  //     if (responseData.data != null) {
+  //       chartTableData = responseData.data!;
+  //       _dataCacheSource.setChartTableData(placeData.idx, chartTableData);
+  //     }
+  //   }
+  //   return chartTableData;
+  // }
 
   void setGoogleMapController(GoogleMapController controller) {
     _dataCacheSource.setGoogleMapController(controller);
@@ -197,13 +198,13 @@ class Repository {
     return _dataCacheSource.getBaseMarkers(idx)?.toSet();
   }
 
-  Future<List<TableData>?> loadNpciTableList(
-    String link,
-    String nPci,
-  ) async {
-    final response = await _networkSource.loadNpciTableList(link, nPci);
-    return response.data;
-  }
+  // Future<List<TableData>?> loadNpciTableList(
+  //   String link,
+  //   String nPci,
+  // ) async {
+  //   final response = await _networkSource.loadNpciTableList(link, nPci);
+  //   return response.data;
+  // }
 
   LoginData getLoginData() {
     // TODO: null 체크 부문 수정 요함
@@ -219,43 +220,35 @@ class Repository {
     return result;
   }
 
-  Future<int> getCountArea({
-    required String group,
-    required String area,
-  }) async {
-    final response = await _networkSource.getCountArea(
-      group: group,
-      area: area,
-    );
-    if (response.data != null) {
-      return int.parse(response.data!);
+  // Future<int> getCountArea({
+  //   required String group,
+  //   required String area,
+  // }) async {
+  //   final response = await _networkSource.getCountArea(
+  //     group: group,
+  //     area: area,
+  //   );
+  //   if (response.data != null) {
+  //     return int.parse(response.data!);
+  //   }
+  //   return 0;
+  // }
+
+  Future<void> loadUserData() async {
+    final response = await _networkSource.getUserData();
+    if (response.meta.code == 200) {
+      // _dataCacheSource.setUserData(response.data!);
+      _dataStoreSource.setUserData(response.data!);
     }
-    return 0;
   }
 
-  Future<void> saveMergedData(
-    PlaceData mergedPlaceData,
-    List<PlaceData> placeDataList,
-  ) async {
-    final mergedIdxList = placeDataList.map((e) => e.idx).toList();
-    await _networkSource.saveMergedData(
-      name: mergedPlaceData.name,
-      division: mergedPlaceData.division.name,
-      latitude: mergedPlaceData.latitude,
-      longitude: mergedPlaceData.longitude,
-      type: mergedPlaceData.type.name,
-      mergedIdxList: mergedIdxList,
-      password: mergedPlaceData.password,
-    );
-  }
-
-  UserData? getUserData() {
-    return _dataCacheSource.getUserData();
+  Future<UserData?> getUserData() {
+    return _dataStoreSource.getUserData();
   }
 
   Future<ResponseData<List<AreaData>>> getAreaList() async {
     final userData = getUserData();
-    return await _networkSource.getAreaList(userData?.areaCode ?? 'test');
+    return await _networkSource.getAreaList('test');
   }
 
   Future<ResponseData<MapData>> getMapDataList(int areaCode) async {
@@ -264,7 +257,7 @@ class Repository {
     final dataList = await _dataStoreSource.loadMapDataList(areaCode);
     if (dataList.isEmpty) {
       return await _networkSource.getMapDataList(
-        areaCode: userData?.areaCode ?? 'test',
+        areaCode: 'test',
         idx: areaCode,
       );
     } else {
@@ -275,4 +268,44 @@ class Repository {
   Future<ResponseData> postMergeData(MergeData mergeData) async {
     return await _networkSource.postMergeData(mergeData);
   }
+
+  Future<ResponseData> getNoticeList(int page) async {
+    return _networkSource.getNoticeList(page);
+  }
+
+  Future<ResponseData> getNoticeData(int id) async {
+    return await _networkSource.getNoticeDetail(id);
+  }
+
+  Future<ResponseData> uploadBaseData(List<BaseData> uploadData) {
+    final updateList = uploadData.map((e) {
+      return e.clearIdx();
+    }).toList();
+    return _networkSource.uploadBaseData(updateList);
+  }
+
+  Future<ResponseData> loadPasswordChange(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    return _networkSource.postPassword(
+      hashPassword(oldPassword, kSecreteKey),
+      hashPassword(newPassword, kSecreteKey),
+    );
+  }
+
+  Future<ResponseData> deleteAreaData(AreaData areaData) {
+    final data = AreaData(idx: areaData.idx, name: '');
+    return _networkSource.postAreaData(data);
+  }
+
+  Future<void> logout()async {
+    await _dataStoreSource.removeTokenData();
+    await _dataStoreSource.removeUserData();
+  }
+
+  Future<TokenData?> getTokenData() async{
+    return _dataStoreSource.getTokenData();
+  }
+
 }

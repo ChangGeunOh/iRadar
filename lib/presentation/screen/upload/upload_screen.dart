@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:googlemap/presentation/screen/upload/component/area_dialog.dart';
 
 import '../../../common/utils/mixin.dart';
 import '../../../domain/bloc/bloc_event.dart';
@@ -29,41 +28,12 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
         ),
       ),
       builder: (context, bloc, state) {
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-          if (state.isSearch) {
-            bloc.add(BlocEvent(
-              UploadEvent.onSearch,
-              extra: false,
-            ));
-            showDialog(
-              context: context,
-              builder: (context) {
-                final areaList = state.division.isEmpty
-                    ? state.areaList
-                    : state.areaList
-                        .where((element) =>
-                            element.division.name == state.division)
-                        .toList();
-                return AreaDialog(
-                  areaList: areaList,
-                  onTapArea: (area) => bloc.add(
-                    BlocEvent(
-                      UploadEvent.onTapArea,
-                      extra: area,
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-        });
 
         if (state.message.isNotEmpty) {
           showToast(state.message);
           bloc.add(BlocEvent(UploadEvent.onClearMessage));
         }
 
-        print('----------------------------');
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 48.0,
@@ -71,93 +41,46 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
           ),
           child: Stack(
             children: [
-              if (state.isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
               Column(
                 children: [
                   TopLayout(
-                      onTapFile: () =>
-                          bloc.add(BlocEvent(UploadEvent.onTapFile)),
-                      group: state.group,
-                      division: state.division,
-                      area: state.area,
-                      fileName: state.fileName,
-                      isDuplicate: state.isDuplicate,
-                      onTapSearch: () {
-                        bloc.add(BlocEvent(
-                          UploadEvent.onSearch,
-                          extra: true,
-                        ));
-                      },
-                      onChangedArea: (value) => bloc.add(
-                            BlocEvent(
-                              UploadEvent.onChangedArea,
-                              extra: value,
-                            ),
-                          ),
-                      onChangedDivision: (value) => bloc.add(
-                            BlocEvent(
-                              UploadEvent.onChangedDivision,
-                              extra: value,
-                            ),
-                          )),
+                    onTapUpload: (data) {
+                      bloc.add(BlocEvent(UploadEvent.onTapSave, extra: data));
+                    },
+                    onChangedData: (data) {
+                      bloc.add(
+                        BlocEvent(
+                          UploadEvent.onChangedData,
+                          extra: data,
+                        ),
+                      );
+                    },
+                    onChangeLoading:(value){
+                      bloc.add(BlocEvent(UploadEvent.onLoading, extra: value));
+                    }
+                  ),
                   const SizedBox(height: 24),
                   if (state.excelFile != null)
                     Expanded(
                       child: SingleChildScrollView(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: TableLayout(
-                            intfTtList:
-                                state.excelFile!.measureUploadData.intfTTList,
-                          ),
+                        child: TableLayout(
+                          intfTtList:
+                              state.excelFile!.measureUploadData.intfTTList,
                         ),
                       ),
                     ),
                   if (state.excelFile == null) const Spacer(),
                   const SizedBox(height: 16),
-                  BottomLayout(
-                      isNoLocation: state.isNoLocation,
-                      isLteOnly: state.isLteOnly,
-                      isAddData: state.isAddData,
-                      isWideArea: state.isWideArea,
-                      onAddData: (value) => bloc.add(
-                            BlocEvent(
-                              UploadEvent.onChangedAddData,
-                              extra: value,
-                            ),
-                          ),
-                      onWideArea: (value) => bloc.add(
-                            BlocEvent(
-                              UploadEvent.onChangedWide,
-                              extra: value,
-                            ),
-                          ),
-                      onChangedPassword: (value) => bloc.add(
-                            BlocEvent(
-                              UploadEvent.onChangedPassword,
-                              extra: value,
-                            ),
-                          ),
-                      enabledSave: state.enabledSave,
-                      onTapSave: () {
-                        bloc.add(BlocEvent(UploadEvent.onLoading, extra: true));
-                        bloc.add(BlocEvent(UploadEvent.onTapSave));
-                      },
-                      enabledAddData: state.enabledAddData),
                 ],
               ),
-              // if (state.message.isNotEmpty)
-              //   _showMessage(state.message, () {
-              //     bloc.add(BlocEvent(UploadEvent.onDoneToast));
-              //   })
+              if (state.isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
             ],
           ),
         );
       },
     );
   }
-
 }

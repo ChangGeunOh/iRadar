@@ -12,7 +12,10 @@ MergeData _$MergeDataFromJson(Map<String, dynamic> json) => MergeData(
       locationType: $enumDecode(_$LocationTypeEnumMap, json['location_type']),
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
-      data: (json['data'] as List<dynamic>).map((e) => e as int).toList(),
+      measuredAt: DateTime.parse(json['dt'] as String),
+      data: (json['data'] as List<dynamic>)
+          .map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$MergeDataToJson(MergeData instance) => <String, dynamic>{
@@ -21,6 +24,7 @@ Map<String, dynamic> _$MergeDataToJson(MergeData instance) => <String, dynamic>{
       'location_type': _$LocationTypeEnumMap[instance.locationType]!,
       'lat': instance.latitude,
       'lng': instance.longitude,
+      'dt': instance.measuredAt.toIso8601String(),
       'data': instance.data,
     };
 

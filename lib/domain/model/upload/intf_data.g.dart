@@ -7,7 +7,7 @@ part of 'intf_data.dart';
 // **************************************************************************
 
 IntfData _$IntfDataFromJson(Map<String, dynamic> json) => IntfData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       area: json['area'] as String,
       pci: json['pci'] as String,
       dt: DateTime.parse(json['dt'] as String),

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 
 // 문자열 중에서 숫자만 추출
@@ -21,4 +24,15 @@ int calculateDaysDifference(String dateString) {
   int daysDifference = difference.inDays;
 
   return daysDifference;
+}
+
+
+String hashPassword(String password, String secretKey) {
+  var key = utf8.encode(secretKey);
+  var bytes = utf8.encode(password);
+
+  var hmacSha256 = Hmac(sha256, key);
+  var digest = hmacSha256.convert(bytes);
+
+  return digest.toString();
 }

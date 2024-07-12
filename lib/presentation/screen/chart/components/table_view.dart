@@ -126,8 +126,17 @@ class _TableViewState extends State<TableView> {
     required MeasureData measureData,
     required ValueChanged<MeasureData> onChangedMeasureData,
   }) {
+
     return DataRow(
-      selected: true,
+      selected: measureData.nPci.isNotEmpty,
+      color: WidgetStateProperty.resolveWith<Color?>(
+            (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.blue.withOpacity(0.14);
+          }
+          return Colors.white;
+        },
+      ),
       cells: [
         DataCell(
           InkWell(

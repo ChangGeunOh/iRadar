@@ -7,10 +7,10 @@ part of 'map_base_data.dart';
 // **************************************************************************
 
 MapBaseData _$MapBaseDataFromJson(Map<String, dynamic> json) => MapBaseData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       code: json['code'] as String,
       name: json['rnm'] as String,
-      pci: json['pci'] as int,
+      pci: (json['pci'] as num).toInt(),
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
       type: Convert.dynamicToWirelessType(json['type']),

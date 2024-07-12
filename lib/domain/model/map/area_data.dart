@@ -13,43 +13,46 @@ class AreaData {
   @JsonKey(
     name: 'type',
     fromJson: Convert.dynamicToWirelessType,
+    toJson: Convert.wirelessTypeToDynamic,
   )
-  final WirelessType type;
-  final LocationType division;
+  final WirelessType? type;
+  final LocationType? division;
   @JsonKey(
     name: 'lat',
   )
-  final double latitude;
+  final double? latitude;
   @JsonKey(
     name: 'lng',
   )
-  final double longitude;
+  final double? longitude;
   @JsonKey(
-    name: 'created_at',
+    name: 'create_at',
     fromJson: Convert.dynamicToDateTime,
+    toJson: Convert.dateTimeToDynamic,
   )
-  final DateTime date;
+  final DateTime? createdAt;
   @JsonKey(
     name: 'dt',
     fromJson: Convert.dynamicToDateTime,
+    toJson: Convert.dateTimeToDynamic,
   )
-  final DateTime measuredAt;
+  final DateTime? measuredAt;
 
   AreaData({
     required this.idx,
     required this.name,
-    required this.date,
-    required this.division,
-    required this.type,
-    required this.latitude,
-    required this.longitude,
-    required this.measuredAt,
+    this.division,
+    this.type,
+    this.latitude,
+    this.longitude,
+    this.createdAt,
+    this.measuredAt,
   });
 
   AreaData copyWith({
     int? idx,
     String? name,
-    DateTime? date,
+    DateTime? createdAt,
     LocationType? division,
     WirelessType? type,
     double? latitude,
@@ -59,7 +62,7 @@ class AreaData {
     return AreaData(
       idx: idx ?? this.idx,
       name: name ?? this.name,
-      date: date ?? this.date,
+      createdAt: createdAt ?? this.createdAt,
       division: division ?? this.division,
       type: type ?? this.type,
       latitude: latitude ?? this.latitude,
@@ -72,4 +75,20 @@ class AreaData {
       _$AreaDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$AreaDataToJson(this);
+
+
 }
+
+
+// class AreaData(BaseModel):
+//     idx: int
+//     lat: float
+//     lng: float
+//     division: str
+//     type: str
+//     name: str
+//     dt: datetime.datetime
+//     create_at: datetime.datetime
+//
+//     class Config:
+//         from_attributes = True

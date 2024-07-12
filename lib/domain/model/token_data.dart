@@ -14,6 +14,16 @@ class TokenData {
     this.accessToken,
   });
 
+  TokenData copyWith({
+    String? refreshToken,
+    String? accessToken,
+  }) {
+    return TokenData(
+      refreshToken: refreshToken ?? this.refreshToken,
+      accessToken: accessToken ?? this.accessToken,
+    );
+  }
+
   factory TokenData.fromJson(Map<String, dynamic> json) => _$TokenDataFromJson(json);
   Map<String, dynamic> toJson() => _$TokenDataToJson(this);
 }

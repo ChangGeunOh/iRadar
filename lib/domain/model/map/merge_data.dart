@@ -25,6 +25,10 @@ class MergeData {
     name: 'lng',
   )
   final double longitude;
+  @JsonKey(
+    name: 'dt',
+  )
+  final DateTime measuredAt;
   final List<int> data;
 
   MergeData({
@@ -33,6 +37,7 @@ class MergeData {
     required this.locationType,
     required this.latitude,
     required this.longitude,
+    required this.measuredAt,
     required this.data,
   });
 

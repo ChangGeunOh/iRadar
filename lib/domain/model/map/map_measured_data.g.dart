@@ -8,7 +8,7 @@ part of 'map_measured_data.dart';
 
 MapMeasuredData _$MapMeasuredDataFromJson(Map<String, dynamic> json) =>
     MapMeasuredData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
       pci: Convert.dynamicToInt(json['pci']),

@@ -65,7 +65,7 @@ class ChartLayout extends StatelessWidget {
         barTouchData: BarTouchData(
           enabled: false,
           touchTooltipData: BarTouchTooltipData(
-            tooltipBgColor: Colors.transparent,
+            // tooltipBgColor: Colors.transparent,
             tooltipPadding: EdgeInsets.zero,
             tooltipMargin: 0.0,
             getTooltipItem: (group, groupIndex, rod, rodIndex) =>

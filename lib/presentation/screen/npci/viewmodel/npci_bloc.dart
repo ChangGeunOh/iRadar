@@ -21,15 +21,15 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
       BlocEvent<NpciEvent> event, Emitter<NpciState> emit) async {
     switch (event.type) {
       case NpciEvent.init:
-        final PlaceTableData placeTableData = event.extra;
-        final tableList = await repository.loadNpciTableList(
-          placeTableData.placeData.link,
-          placeTableData.tableData.pci,
-        );
-        emit(state.copyWith(
-          tableList: tableList,
-          placeData: placeTableData.placeData,
-        ));
+        // final PlaceTableData placeTableData = event.extra;
+        // final tableList = await repository.loadNpciTableList(
+        //   placeTableData.placeData.link,
+        //   placeTableData.tableData.pci,
+        // );
+        // emit(state.copyWith(
+        //   tableList: tableList,
+        //   placeData: placeTableData.placeData,
+        // ));
         break;
       case NpciEvent.onTapNId:
         var tableData = event.extra as TableData;

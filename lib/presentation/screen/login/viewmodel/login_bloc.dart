@@ -10,8 +10,8 @@ import 'package:googlemap/presentation/screen/login/viewmodel/login_state.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
 
 class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
-  final passwordController = TextEditingController(text: "00000000");
-  final useridController = TextEditingController(text: "12345678");
+  final passwordController = TextEditingController(text: "");
+  final usernameController = TextEditingController(text: "");
 
   LoginBloc(super.context, super.initialState) {
     _init();
@@ -30,9 +30,8 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
         emit(
           state.copyWith(
             location: event.extra,
-            isEnableLogin: state.password != null &&
-                state.location != null &&
-                state.password!.length > 4 &&
+            isEnableLogin: state.location != null &&
+                state.password.length > 4 &&
                 state.location!.isNotEmpty,
           ),
         );
@@ -42,39 +41,31 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
         emit(
           state.copyWith(
             password: password,
-            isEnableLogin: state.password != null &&
-                state.location != null &&
-                state.password!.length > 4 &&
+            isEnableLogin: state.location != null &&
+                state.password.length > 4 &&
                 state.location!.isNotEmpty,
           ),
         );
         break;
-      // case LoginEvent.onLogin:
-      //   if (event.extra) {
-      //     context.goNamed(MainScreen.routeName);
-      //   } else {
-      //     passwordController.clear();
-      //   }
-      //   break;
       case LoginEvent.onUserId:
         emit(state.copyWith(userId: event.extra));
         break;
       case LoginEvent.onTapIssue:
         break;
       case LoginEvent.onTapLogin:
-        final userid = useridController.value.text;
+        final userid = usernameController.value.text;
         final password = passwordController.value.text;
         final responseData = await repository.login(
           userid: userid,
           password: password,
         );
         if (responseData.meta.code == 200) {
-          // final tokenData = await repository.loadTokenData(
-          //   userid: userid,
-          //   password: password,
-          // );
-          add(BlocEvent(LoginEvent.onNextScreen, extra: MainScreen.routeName));
+          await repository.loadUserData();
+          if (context.mounted) {
+            context.goNamed(MainScreen.routeName);
+          }
         } else {
+          emit(state.copyWith(message: responseData.meta.message));
           passwordController.clear();
         }
         break;
@@ -88,8 +79,8 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
       // TODO: Handle this case.
       case LoginEvent.onTapPassword:
       // TODO: Handle this case.
-      case LoginEvent.onNextScreen:
-        context.goNamed(event.extra);
+      case LoginEvent.onMessage:
+        emit(state.copyWith(message: event.extra));
         break;
     }
   }
@@ -113,7 +104,7 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
   @override
   Future<void> close() {
     passwordController.dispose();
-    useridController.dispose();
+    usernameController.dispose();
     return super.close();
   }
 }

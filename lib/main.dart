@@ -8,15 +8,26 @@ import 'common/router/router.dart';
 import 'data/database/local_database.dart';
 import 'data/datacache/local_datacache.dart';
 import 'data/datastore/local_datastore.dart';
+import 'data/network/custom_interceptor.dart';
 import 'data/network/local_network.dart';
 import 'data/repository/database_source_impl.dart';
 import 'data/repository/datacache_source_impl.dart';
 import 'data/repository/datastore_source_impl.dart';
 import 'data/repository/network_source_impl.dart';
 import 'data/repository/repository.dart';
+import 'dart:html' as html;
 
 void main() {
   runApp(const MyApp());
+
+  // 뒤로 가기 버튼 제어
+  // html.window.onPopState.listen((event) {
+  //   print(html.window.location.pathname);
+  //
+  //   if (html.window.location.pathname == '/login' || html.window.location.pathname == '/') {
+  //     html.window.history.pushState(null, '', '/login');
+  //   }
+  // });
 }
 
 final rootScaffoldKey = GlobalKey<ScaffoldMessengerState>();
@@ -36,8 +47,14 @@ class MyApp extends StatelessWidget {
         final dataStoreSource = DataStoreSourceImpl(
           dataStore: LocalDataStore(),
         );
+
+        final customInterceptor = CustomInterceptor(
+          dataStoreSource: dataStoreSource,
+          context: context,
+        );
+        final LocalNetwork localNetwork = LocalNetwork(customInterceptor);
         final networkSource = NetworkSourceImpl(
-          LocalNetwork.dio,
+          localNetwork.dio,
           baseUrl: kNetworkBaseUrl,
         );
         final dataCacheSource = DataCacheSourceImpl(

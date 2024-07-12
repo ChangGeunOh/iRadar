@@ -25,9 +25,9 @@ class MetaData {
   MetaData({
     this.code = 200,
     this.message = '',
-    this.timeStamp = 0,
+    int? timeStamp,
     this.pageData,
-  });
+  }) : timeStamp = timeStamp ?? DateTime.now().millisecondsSinceEpoch;
 
   factory MetaData.fromJson(Map<String, dynamic> json) =>
       _$MetaDataFromJson(json);

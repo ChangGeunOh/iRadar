@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/chart/excel_data.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
+import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/map/area_data.dart';
 import '../../web/web_screen.dart';
+import '../components/excel_maker.dart';
 import 'chart_state.dart';
 
 class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
@@ -97,18 +102,10 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         );
         break;
       case ChartEvent.onTapExcel:
-        // final excelRequestData = ExcelRequestData(
-        //   placeData: state.placeData!,
-        //   tableList: state.chartTableData!.tableList,
-        // );
-        // final excelResponseData =
-        //     await repository.loadExcelResponseData(excelRequestData);
-        // if (excelResponseData != null) {
-        //   ExcelMaker(
-        //     placeData: state.placeData!,
-        //     excelResponseList: excelResponseData,
-        //   ).makeExcel();
-        // }
+        ExcelMaker(
+          areaData: state.areaData,
+          excelDataList: _getExcelDataList(),
+        ).makeExcel();
         break;
       case ChartEvent.onChangedAreaData:
         final areaData = event.extra as AreaData;
@@ -142,15 +139,39 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
   }
 
   Future<void> _loadMeasureDataList(
-      AreaData areaData,
+    AreaData areaData,
     Emitter<ChartState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, areaData: areaData));
     final response = await repository.loadMeasureList(areaData);
+    final List<MeasureData> measureDataList = response.data;
+    final sortedMeasureDataList = measureDataList
+      ..sort((a, b) => b.inIndex.compareTo(a.inIndex));
     emit(state.copyWith(
-        isLoading: false,
-        measureDataList: response.data,
-        message: response.meta.message));
-    emit(state.copyWith(areaData: areaData));
+      isLoading: false,
+      measureDataList: sortedMeasureDataList,
+      message: response.meta.message,
+    ));
+  }
+
+  List<ExcelData> _getExcelDataList() {
+    List<ExcelData> excelDataList = [];
+    for (var element in state.measureDataList) {
+      for (var base in element.baseList) {
+        if (base.isChecked) {
+          excelDataList.add(ExcelData(
+            area: "${state.areaData.division!.name} ${state.areaData.name}",
+            year: state.areaData.measuredAt!.toDateString(format: "yyyy년"),
+            id: base.code,
+            rnm: base.name,
+            pci: element.pci,
+            type: state.areaData.type!.name,
+            regDate: state.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
+            hasColor: element.nPci.isNotEmpty,
+          ));
+        }
+      }
+    }
+    return excelDataList;
   }
 }

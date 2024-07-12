@@ -59,10 +59,12 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         Map<String, dynamic> data = event.extra as Map<String, dynamic>;
         final name = data['name'] as String;
         final locationType = data['locationType'] as LocationType;
+        final measuredAt = data['measuredAt'];
         await _onMergeData(
           emit,
           wirelessType: state.wirelessType,
           name: name,
+          measuredAt: measuredAt,
           locationType: locationType,
         );
         break;
@@ -221,10 +223,10 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
   Future<void> _moveCameraToAreaCenter(Set<AreaData> areaDataSet) async {
     var latitude = areaDataSet.fold(
-            0.0, (previousValue, element) => previousValue + element.latitude) /
+            0.0, (previousValue, element) => previousValue + element.latitude!) /
         areaDataSet.length;
     var longitude = areaDataSet.fold(0.0,
-            (previousValue, element) => previousValue + element.longitude) /
+            (previousValue, element) => previousValue + element.longitude!) /
         areaDataSet.length;
     // Move Camera
     if (controller == null && repository.getGoogleMapController() != null) {
@@ -286,7 +288,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
               markerId: MarkerId('BASE${e.idx}'),
               position: LatLng(e.latitude, e.longitude),
               icon: e.type == WirelessType.wLte ? basePinLTE! : basePin5G!,
-              infoWindow: InfoWindow(snippet: e.name),
+              infoWindow: InfoWindow(title: e.name),
             ),
           )
           .toSet();
@@ -324,6 +326,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     Emitter<MapState> emit, {
     required WirelessType wirelessType,
     required String name,
+    required DateTime measuredAt,
     required LocationType locationType,
   }) async {
     final selectedMarkers = state.measureMarkerSet
@@ -350,6 +353,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
       latitude: latitude,
       longitude: longitude,
       data: data,
+      measuredAt: measuredAt,
     );
 
     emit(state.copyWith(isLoading: true));

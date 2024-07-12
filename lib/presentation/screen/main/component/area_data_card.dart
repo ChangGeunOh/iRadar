@@ -71,7 +71,7 @@ class AreaDataCard extends StatelessWidget {
                       children: [
                         const SizedBox(width: 12),
                         Text(
-                          areaData.division.name,
+                          areaData.division!.name,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
@@ -79,7 +79,7 @@ class AreaDataCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          areaData.date.toDateString(),
+                          areaData.createdAt!.toDateString(),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -91,23 +91,24 @@ class AreaDataCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 20),
-              InkWell(
-                onTap: onTapAll,
-                child: SvgPicture.asset(
-                  'assets/icons/ic_list_all.svg',
-                  width: 46,
-                  height: 46,
-                ),
-              ),
-              const SizedBox(width: 8.0),
-              InkWell(
-                onTap: onTapRemove,
-                child: SvgPicture.asset(
-                  'assets/icons/ic_list_remove.svg',
-                  width: 46,
-                  height: 46,
-                ),
-              ),
+              const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              // InkWell(
+              //   onTap: onTapAll,
+              //   child: SvgPicture.asset(
+              //     'assets/icons/ic_list_all.svg',
+              //     width: 46,
+              //     height: 46,
+              //   ),
+              // ),
+              // const SizedBox(width: 8.0),
+              // InkWell(
+              //   onTap: onTapRemove,
+              //   child: SvgPicture.asset(
+              //     'assets/icons/ic_list_remove.svg',
+              //     width: 46,
+              //     height: 46,
+              //   ),
+              // ),
             ],
           ),
         ),
