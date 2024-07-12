@@ -7,7 +7,7 @@ part of 'place_data.dart';
 // **************************************************************************
 
 PlaceData _$PlaceDataFromJson(Map<String, dynamic> json) => PlaceData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       type: $enumDecode(_$WirelessTypeEnumMap, json['type']),
       group: json['group'] as String,
       name: json['name'] as String,

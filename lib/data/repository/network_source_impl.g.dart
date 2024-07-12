@@ -20,10 +20,10 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<List<String>> loadBanners() async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result =
         await _dio.fetch<List<dynamic>>(_setStreamType<List<String>>(Options(
       method: 'GET',
@@ -47,10 +47,10 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<dynamic> loadMovieChart() async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch(_setStreamType<dynamic>(Options(
       method: 'GET',
       headers: _headers,
@@ -76,7 +76,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required String area,
     required String password,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {
@@ -115,7 +115,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     int page = 1,
     int count = 30,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'group': group,
       r'type': type,
@@ -123,7 +123,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       r'count': count,
     };
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<List<PlaceData>>>(Options(
       method: 'GET',
@@ -158,13 +158,13 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required String group,
     required int idx,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'group': group,
       r'idx': idx,
     };
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<MapBaseData>>(Options(
       method: 'GET',
@@ -194,13 +194,13 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required String group,
     required int idx,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'group': group,
       r'idx': idx,
     };
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<ChartTableData>>(Options(
       method: 'GET',
@@ -233,7 +233,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required List<String> bts,
     required String cmd,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {
@@ -278,13 +278,13 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     String link,
     String npci,
   ) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'a': link,
       r'pci': npci,
     };
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<List<TableData>>>(Options(
       method: 'GET',
@@ -317,7 +317,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   @override
   Future<ResponseData<String>> uploadMeasureData(
       MeasureUploadData measureUploadData) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
@@ -351,13 +351,13 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required String group,
     required String area,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'group': group,
       r'area': area,
     };
     final _headers = <String, dynamic>{};
-    final Map<String, dynamic>? _data = null;
+    const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<ResponseData<String>>(Options(
       method: 'GET',
@@ -392,7 +392,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     required String type,
     required List<int> mergedIdxList,
   }) async {
-    const _extra = <String, dynamic>{};
+    final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {

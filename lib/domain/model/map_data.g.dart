@@ -7,11 +7,11 @@ part of 'map_data.dart';
 // **************************************************************************
 
 MapData _$MapDataFromJson(Map<String, dynamic> json) => MapData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
-      pci: json['pci'] as int,
-      pci5: json['pci5'] as int,
+      pci: (json['pci'] as num).toInt(),
+      pci5: (json['pci5'] as num).toInt(),
       rsrp5: (json['rp5'] as num).toDouble(),
     );
 

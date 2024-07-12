@@ -7,7 +7,7 @@ part of 'login_data.dart';
 // **************************************************************************
 
 LoginData _$LoginDataFromJson(Map<String, dynamic> json) => LoginData(
-      idx: json['idx'] as int,
+      idx: (json['idx'] as num).toInt(),
       group: json['group'] as String,
     );
 
