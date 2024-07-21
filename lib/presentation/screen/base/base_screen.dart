@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/presentation/component/custom_elevated_button.dart';
+import 'package:googlemap/presentation/component/iradar_dialog.dart';
 import 'package:googlemap/presentation/screen/base/bloc/base_event.dart';
 
+import '../../../common/utils/mixin.dart';
 import '../../../domain/bloc/bloc_scaffold.dart';
 import '../../../domain/model/base/base_data.dart';
 import 'bloc/base_bloc.dart';
 import 'bloc/base_state.dart';
-import 'widget/base_bottom.dart';
 
-class BaseScreen extends StatelessWidget {
+class BaseScreen extends StatelessWidget with ShowMessageMixin {
   const BaseScreen({super.key});
 
   @override
@@ -19,7 +20,18 @@ class BaseScreen extends StatelessWidget {
     return BlocScaffold<BaseBloc, BaseState>(
         create: (context) => BaseBloc(context, BaseState()),
         builder: (context, bloc, state) {
-          print('state.isLoading: ${state.isLoading}');
+          if (state.message.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              showDialog(
+                context: context,
+                builder: (context) => IradarDialog(
+                  title: state.message,
+                ),
+              );
+              bloc.add(BlocEvent(BaseEvent.onMessage, extra: ''));
+            });
+          }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,

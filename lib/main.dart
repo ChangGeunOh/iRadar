@@ -15,7 +15,6 @@ import 'data/repository/datacache_source_impl.dart';
 import 'data/repository/datastore_source_impl.dart';
 import 'data/repository/network_source_impl.dart';
 import 'data/repository/repository.dart';
-import 'dart:html' as html;
 
 void main() {
   runApp(const MyApp());

@@ -42,7 +42,7 @@ class _TopLayoutState extends State<TopLayout> {
   @override
   Widget build(BuildContext context) {
     final isEnableUpload =
-        division.isNotEmpty && fileName.isNotEmpty && area.length > 4;
+        division.isNotEmpty && fileName.isNotEmpty && area.isNotEmpty;
     return Column(
       children: [
         Row(

@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:googlemap/domain/model/base/base_data.dart';
 
 import '../../../../common/utils/base_csv_file.dart';
 import '../../../../domain/bloc/bloc_bloc.dart';
@@ -35,41 +31,61 @@ class BaseBloc extends BlocBloc<BlocEvent<BaseEvent>, BaseState> {
       case BaseEvent.onTapUpload:
         emit(state.copyWith(isLoading: true));
         final baseDataList = state.baseDataList;
-        if (baseDataList.isNotEmpty) {
-          var end = (baseDataList.length < 5000) ? baseDataList.length : 5000;
-          final targetData = baseDataList.sublist(0, end);
-          final uploadData = targetData.where((e) => !e.isNotValid()).toList();
-          final errorData = targetData.where((e) => e.isNotValid()).toList();
-          final errorDataList = List<BaseData>.from(state.errorDataList);
-          final response = await repository.uploadBaseData(uploadData);
-          if (response.meta.code != 200) {
-            errorDataList.addAll(targetData);
-            emit(state.copyWith(
-              baseDataList: errorDataList,
-              errorDataList: [],
-              isLoading: false,
-            ));
-          } else {
-            baseDataList.removeRange(0, end);
-            errorDataList.addAll(errorData);
-            emit(state.copyWith(
-              baseDataList: baseDataList,
-              errorDataList: errorDataList,
-            ));
-            add(BlocEvent(BaseEvent.onTapUpload));
-          }
+        final uploadData = baseDataList.where((e) => !e.isNotValid()).toList();
+        final errorData = baseDataList.where((e) => e.isNotValid()).toList();
+        final response = await repository.uploadBaseData(uploadData);
+        if (response.meta.code != 200) {
+          emit(state.copyWith(
+            isLoading: false,
+            baseDataList: baseDataList,
+            message: '업로드 중 오류가 발생했습니다.',
+          ));
         } else {
           emit(state.copyWith(
-            baseDataList: state.errorDataList,
             isLoading: false,
+            baseDataList: errorData,
+            message: '업로드를 완료 했습니다.',
           ));
         }
-        break;
+      // if (baseDataList.isNotEmpty) {
+      //   var end = (baseDataList.length < 5000) ? baseDataList.length : 5000;
+      //   final targetData = baseDataList.sublist(0, end);
+      //   final uploadData = targetData.where((e) => !e.isNotValid()).toList();
+      //   final errorData = targetData.where((e) => e.isNotValid()).toList();
+      //   final errorDataList = List<BaseData>.from(state.errorDataList);
+      //   final response = await repository.uploadBaseData(uploadData);
+      //   if (response.meta.code != 200) {
+      //     errorDataList.addAll(targetData);
+      //     emit(state.copyWith(
+      //       baseDataList: errorDataList,
+      //       errorDataList: [],
+      //       isLoading: false,
+      //     ));
+      //   } else {
+      //     baseDataList.removeRange(0, end);
+      //     errorDataList.addAll(errorData);
+      //     emit(state.copyWith(
+      //       baseDataList: baseDataList,
+      //       errorDataList: errorDataList,
+      //     ));
+      //     add(BlocEvent(BaseEvent.onTapUpload));
+      //   }
+      // }
+      // else {
+      // emit(state.copyWith(
+      // baseDataList: state.errorDataList,
+      // isLoading: false,
+      // ));
+      // }
+      break;
       case BaseEvent.onTapRemove:
         emit(state.copyWith(
           baseDataList: [],
           errorDataList: [],
         ));
+        break;
+      case BaseEvent.onMessage:
+        emit(state.copyWith(message: event.extra));
         break;
     }
   }

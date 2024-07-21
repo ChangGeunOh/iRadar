@@ -1,3 +1,3 @@
 enum BaseEvent {
-  init, onTapFinder, onTapUpload, onTapRemove,
+  init, onTapFinder, onTapUpload, onTapRemove, onMessage,
 }

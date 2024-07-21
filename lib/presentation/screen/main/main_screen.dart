@@ -302,7 +302,7 @@ class MainScreen extends StatelessWidget {
 
   Future<void> _downloadExampleFile() async {
       // Load the file as a ByteData
-      ByteData data = await rootBundle.load('files/iradar_upload_example_file.zip');
+      ByteData data = await rootBundle.load('assets/files/iradar_upload_example_file.zip');
       // Convert ByteData to Uint8List
       final buffer = data.buffer;
       final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
