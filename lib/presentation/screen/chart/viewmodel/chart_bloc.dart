@@ -9,6 +9,7 @@ import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
+import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/map/area_data.dart';
@@ -90,6 +91,12 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         //   NpciScreen.routeName,
         //   extra: placeTableData,
         // );
+        print("Wirelesstype>${state.areaData.type!.name}");
+        print("ChartEvent.onTapNPci>${event.extra}");
+        context.push(NpciScreen.routeName, extra: {
+          'areaData': state.areaData,
+          'pci': event.extra as String
+        });
         break;
       case ChartEvent.onTapWeb:
         final excelRequestData = ExcelRequestData(
@@ -132,7 +139,6 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
 
       // emit(state.copyWith(areaDataSet: areaDataSet));
       case ChartEvent.onChangedMeasureList:
-        print("ChartEvent.onChangedMeasureList");
         emit(state.copyWith(measureDataList: event.extra));
         break;
     }
@@ -166,7 +172,8 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
             rnm: base.name,
             pci: element.pci,
             type: state.areaData.type!.name,
-            regDate: state.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
+            regDate:
+                state.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
             hasColor: element.nPci.isNotEmpty,
           ));
         }

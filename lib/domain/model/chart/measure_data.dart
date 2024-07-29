@@ -8,6 +8,7 @@ part 'measure_data.g.dart';
 class MeasureData {
   final String pci;
   final String nPci;
+  final double? mw;
   final int nTime;
   final double nRsrp;
   final int? sTime;
@@ -25,22 +26,23 @@ class MeasureData {
 
   MeasureData({
     required this.pci,
-    required this.nPci,
+    this.nPci = '',
+    this.mw,
     required this.nTime,
     required this.nRsrp,
-    required this.sTime,
-    required this.rp,
+    this.sTime,
+    this.rp,
     this.freq,
     this.ca,
-    required this.cqi,
-    required this.ri,
-    required this.dlMcs,
+    this.cqi,
+    this.ri,
+    this.dlMcs,
     this.dlLayer,
-    required this.dlRb,
-    required this.dlTp,
+    this.dlRb,
+    this.dlTp,
     required this.inIndex,
-    required this.baseList,
-  });
+    List<BaseData>? baseList,
+  }) : baseList = baseList ?? [];
 
   factory MeasureData.fromJson(Map<String, dynamic> json) =>
       _$MeasureDataFromJson(json);
@@ -67,13 +69,13 @@ class MeasureData {
     } else {
       commonValues.insert(8, dlLayer?.toString() ?? '-');
     }
-
     return commonValues;
   }
 
   MeasureData copyWith({
     String? pci,
     String? nPci,
+    double? mw,
     int? nTime,
     double? nRsrp,
     int? sTime,
@@ -88,10 +90,11 @@ class MeasureData {
     double? dlTp,
     double? inIndex,
     List<BaseData>? baseList,
-}) {
+  }) {
     return MeasureData(
       pci: pci ?? this.pci,
       nPci: nPci ?? this.nPci,
+      mw: mw ?? this.mw,
       nTime: nTime ?? this.nTime,
       nRsrp: nRsrp ?? this.nRsrp,
       sTime: sTime ?? this.sTime,
@@ -106,6 +109,8 @@ class MeasureData {
       dlTp: dlTp ?? this.dlTp,
       inIndex: inIndex ?? this.inIndex,
       baseList: baseList ?? this.baseList,
-    );}
-}
+    );
+  }
 
+  bool get hasColor => sTime != null || nPci.isNotEmpty;
+}

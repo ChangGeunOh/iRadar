@@ -49,7 +49,6 @@ class Repository {
     required String userid,
     required String password,
   }) async {
-
     final basicAuth = 'Basic ${base64Encode(utf8.encode('$userid:$password'))}';
     final response = await _networkSource.loadLogin(basicAuth);
     return response;
@@ -299,13 +298,36 @@ class Repository {
     return _networkSource.postAreaData(data);
   }
 
-  Future<void> logout()async {
+  Future<void> logout() async {
     await _dataStoreSource.removeTokenData();
     await _dataStoreSource.removeUserData();
   }
 
-  Future<TokenData?> getTokenData() async{
+  Future<TokenData?> getTokenData() async {
     return _dataStoreSource.getTokenData();
   }
 
+  Future<ResponseData> loadPciData({
+    required String type,
+    required int idx,
+    required String spci,
+  }) {
+    return _networkSource.loadPciData(
+      type: type,
+      idx: idx,
+      spci: spci,
+    );
+  }
+
+  Future<ResponseData> loadNpciList({
+    required String type,
+    required int idx,
+    required String spci,
+  }) {
+    return _networkSource.loadNpciList(
+      type: type,
+      idx: idx,
+      spci: spci,
+    );
+  }
 }

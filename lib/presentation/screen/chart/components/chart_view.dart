@@ -29,7 +29,7 @@ class ChartView extends StatelessWidget {
                   BarChartRodData(
                     toY: e.inIndex,
                     borderRadius: BorderRadius.zero,
-                    color: e.nPci.isNotEmpty ? Colors.red : Colors.blue,
+                    color: e.hasColor ? Colors.red : Colors.blue,
                     width: 50,
                   ),
                 ],

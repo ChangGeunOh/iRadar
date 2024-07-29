@@ -1,66 +1,50 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
 import '../../../../common/const/constants.dart';
+import '../../../../domain/model/chart/measure_data.dart';
 import 'base_list_check_box.dart';
 
-class TableView extends StatefulWidget {
+
+
+class TableLteView extends StatefulWidget {
   final WirelessType type;
   final List<MeasureData> measureDataList;
-  final ValueChanged<int> onTapNId;
-  final ValueChanged<String> onTapPci;
-  final ValueChanged<String> onTapNPci;
-  final ValueChanged<List<MeasureData>> onChange;
-  final bool isNpci;
+  final Function(List<MeasureData>) onChange;
+  final Function(String) onTapPci;
+  final Function(String) onTapNPci;
 
-  const TableView({
+  const TableLteView({
+    super.key,
     required this.type,
     required this.measureDataList,
-    required this.onTapNId,
-    required this.onTapPci,
-    required this.onTapNPci,
     required this.onChange,
-    this.isNpci = false,
-    super.key,
+    required this.onTapNPci,
+    required this.onTapPci,
   });
 
   @override
-  State<TableView> createState() => _TableViewState();
+  State<TableLteView> createState() => _TableLteViewState();
 }
 
-class _TableViewState extends State<TableView> {
+class _TableLteViewState extends State<TableLteView> {
   late List<MeasureData> measureDataList;
+  late bool isNPciData;
   late Map<int, TableColumnWidth> headerWidth;
   late List<String> headerTitle;
 
   @override
   void initState() {
-    init();
-    super.initState();
-  }
-
-  void init() {
     measureDataList = widget.measureDataList;
+    isNPciData = measureDataList.every((element) => element.nPci.isEmpty);
     headerWidth = widget.type == WirelessType.wLte ? headerLteWidth : header5gWidth;
     headerTitle = widget.type == WirelessType.wLte ? headerLteTitle : header5gTitle;
-
-  }
-
-  @override
-  void didUpdateWidget(covariant TableView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.measureDataList != widget.measureDataList) {
-      init();
-    }
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (measureDataList.isEmpty) {
-      return const SizedBox();
-    }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Table(
@@ -74,7 +58,7 @@ class _TableViewState extends State<TableView> {
               color: Colors.grey[300],
             ),
             children: headerTitle.map((e) {
-              final text = widget.isNpci ? 'PCI mW' : e;
+              final text = isNPciData ? 'PCI mW' : e;
               return TableCell(
                 verticalAlignment: TableCellVerticalAlignment.middle,
                 child: Padding(
@@ -85,47 +69,47 @@ class _TableViewState extends State<TableView> {
                   child: Center(
                     child: headerTitle.last == e
                         ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Transform.scale(
-                          scale: 0.7,
-                          child: Checkbox(
-                            value: isNeighborCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                measureDataList =
-                                    measureDataList.map((measureData) {
-                                      return measureData.copyWith(
-                                        baseList: measureData.baseList
-                                            .map((baseData) {
-                                          return baseData.copyWith(
-                                              isChecked: value);
-                                        }).toList(),
-                                      );
-                                    }).toList();
-                                widget.onChange(
-                                    measureDataList);
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '인근장비',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    )
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Transform.scale(
+                                scale: 0.7,
+                                child: Checkbox(
+                                  value: isNeighborCheck,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      measureDataList =
+                                          measureDataList.map((measureData) {
+                                        return measureData.copyWith(
+                                          baseList: measureData.baseList
+                                              .map((baseData) {
+                                            return baseData.copyWith(
+                                                isChecked: value);
+                                          }).toList(),
+                                        );
+                                      }).toList();
+                                      widget.onChange(
+                                          measureDataList);
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                '인근장비',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              )
+                            ],
+                          )
                         : Text(
-                      e == headerLteTitle[1] ? text : e,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
+                            e == headerLteTitle[1] ? text : e,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                   ),
                 ),
               );
@@ -148,7 +132,7 @@ class _TableViewState extends State<TableView> {
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: InkWell(
                 onTap: () => widget.onTapPci(measureData.pci),
                 child: Center(
@@ -166,17 +150,17 @@ class _TableViewState extends State<TableView> {
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Center(
                 child: InkWell(
                   onTap: measureData.nPci.isEmpty
                       ? null
                       : () {
-                    widget.onTapNPci(measureData.pci);
-                  },
+                          widget.onTapNPci(measureData.pci);
+                        },
                   child: Text(
-                    widget.isNpci
-                        ? measureData.mw?.toStringAsFixed(15) ?? ''
+                    isNPciData
+                        ? measureData.mw!.toStringAsFixed(15)
                         : measureData.nPci,
                     style: const TextStyle(
                       decoration: TextDecoration.underline,
@@ -188,19 +172,19 @@ class _TableViewState extends State<TableView> {
           ),
           ...measureData.getValues(widget.type).map(
                 (e) => TableCell(
-              verticalAlignment: TableCellVerticalAlignment.middle,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0, vertical: 4.0),
-                child: Center(child: Text(e.toString())),
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Center(child: Text(e.toString())),
+                  ),
+                ),
               ),
-            ),
-          ),
           TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: SizedBox(
                 height: 20 * measureData.baseList.length.toDouble(),
                 child: BaseListCheckBox(

@@ -53,7 +53,6 @@ class Convert {
   }
 
   static int dynamicToInt(dynamic value) {
-    print('dynamicToInt: $value');
     switch(value.runtimeType) {
       case const (int):
         return value as int;

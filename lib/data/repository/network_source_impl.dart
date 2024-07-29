@@ -9,6 +9,7 @@ import '../../domain/model/map/area_data.dart';
 import '../../domain/model/map/map_data.dart';
 import '../../domain/model/map/merge_data.dart';
 import '../../domain/model/notice/notice_data.dart';
+import '../../domain/model/pci/pci_base_data.dart';
 import '../../domain/model/response/response_data.dart';
 import '../../domain/model/token_data.dart';
 import '../../domain/model/upload/measure_upload_data.dart';
@@ -115,4 +116,22 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @Headers({'access_token': true})
   @POST(kNoticePath)
   Future<ResponseData<NoticeData>> postNoticeData(NoticeData data);
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kPciDataPath)
+  Future<ResponseData<PciBaseData>> loadPciData({
+    @Path('type') required String type,
+    @Path('idx') required int idx,
+    @Query('spci') required String spci,
+  });
+
+  @override
+  @Headers({'access_token': false})
+  @GET(kNpciDataPath)
+  Future<ResponseData<List<MeasureData>>> loadNpciList({
+    @Path('type') required String type,
+    @Path('idx') required int idx,
+    @Query('pci') required String spci,
+  });
 }

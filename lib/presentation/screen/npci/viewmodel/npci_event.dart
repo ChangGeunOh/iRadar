@@ -1,3 +1,3 @@
 enum NpciEvent {
-  init, onTapNId, onTapToggle, onTapExcel, onTapWeb,
+  init, onTapNId, onTapToggle, onTapExcel, onTapWeb, onMessage,
 }

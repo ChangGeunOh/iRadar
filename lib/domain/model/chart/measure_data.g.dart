@@ -8,7 +8,8 @@ part of 'measure_data.dart';
 
 MeasureData _$MeasureDataFromJson(Map<String, dynamic> json) => MeasureData(
       pci: json['pci'] as String,
-      nPci: json['nPci'] as String,
+      nPci: json['nPci'] as String? ?? '',
+      mw: (json['mw'] as num?)?.toDouble(),
       nTime: (json['nTime'] as num).toInt(),
       nRsrp: (json['nRsrp'] as num).toDouble(),
       sTime: (json['sTime'] as num?)?.toInt(),
@@ -22,8 +23,8 @@ MeasureData _$MeasureDataFromJson(Map<String, dynamic> json) => MeasureData(
       dlRb: (json['dlRb'] as num?)?.toDouble(),
       dlTp: (json['dlTp'] as num?)?.toDouble(),
       inIndex: (json['inIndex'] as num).toDouble(),
-      baseList: (json['baseList'] as List<dynamic>)
-          .map((e) => BaseData.fromJson(e as Map<String, dynamic>))
+      baseList: (json['baseList'] as List<dynamic>?)
+          ?.map((e) => BaseData.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
@@ -31,6 +32,7 @@ Map<String, dynamic> _$MeasureDataToJson(MeasureData instance) =>
     <String, dynamic>{
       'pci': instance.pci,
       'nPci': instance.nPci,
+      'mw': instance.mw,
       'nTime': instance.nTime,
       'nRsrp': instance.nRsrp,
       'sTime': instance.sTime,

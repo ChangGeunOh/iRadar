@@ -79,3 +79,75 @@ class Country {
     return '$name ($size)';
   }
 }
+
+
+const List<String> headerLteTitle = [
+  'PCI',
+  'Neighbor\nPCI',
+  'Neighbor\nTime',
+  'Neighbor\nRSRP\nSUM(dBm)',
+  'Interference Index',
+  'Serving\nTime',
+  'FREQ',
+  'CA Type',
+  'RP',
+  'CQI',
+  'RI',
+  'DL\nMCS',
+  'DL\nRB',
+  'DL\nT/P',
+  '인근장비'
+];
+
+const List<String> header5gTitle = [
+  'PCI',
+  'Neighbor\nPCI',
+  'Neighbor\nTime',
+  'Neighbor\nRSRP\nSUM(dBm)',
+  'Interference Index',
+  'Serving\nTime',
+  'RP',
+  'CQI',
+  'RI',
+  'DL\nMCS',
+  'DL\nLayer',
+  'DL\nRB',
+  'DL\nT/P',
+  '인근장비'
+];
+
+
+const headerLteWidth = {
+  0: FixedColumnWidth(60),
+  1: IntrinsicColumnWidth(),
+  2: FixedColumnWidth(80),
+  3: FixedColumnWidth(85),
+  4: FixedColumnWidth(80),
+  5: FixedColumnWidth(70),
+  6: FixedColumnWidth(60),
+  7: FixedColumnWidth(60),
+  8: FixedColumnWidth(60),
+  9: FixedColumnWidth(60),
+  10: FixedColumnWidth(60),
+  11: FixedColumnWidth(60),
+  12: FixedColumnWidth(60),
+  13: FixedColumnWidth(60),
+  14: IntrinsicColumnWidth(),
+};
+
+const header5gWidth = {
+  0: FixedColumnWidth(60),
+  1: IntrinsicColumnWidth(),
+  2: FixedColumnWidth(80),
+  3: FixedColumnWidth(85),
+  4: FixedColumnWidth(80),
+  5: FixedColumnWidth(70),
+  6: FixedColumnWidth(60),
+  7: FixedColumnWidth(60),
+  8: FixedColumnWidth(60),
+  9: FixedColumnWidth(60),
+  10: FixedColumnWidth(60),
+  11: FixedColumnWidth(60),
+  12: FixedColumnWidth(60),
+  13: IntrinsicColumnWidth(),
+};

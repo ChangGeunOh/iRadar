@@ -17,6 +17,11 @@ const kPostMergeDataPath = 'map/merge';
 const kGetMeasureListPath = 'chart/{type}/{idx}';
 
 const kPostBaseDatListPath = 'base/';
+const kPciDataPath = 'pci/{type}/{idx}';
+
+const kNpciDataPath = 'npci/{type}/{idx}';
+
+
 
 const kNoticePath = 'notice';
 const kNoticeDetailPath = 'notice/{idx}';
