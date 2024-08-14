@@ -6,11 +6,13 @@ import '../../common/const/color.dart';
 class IradarDialog extends StatelessWidget {
   final String? title;
   final String? description;
+  final Function()? onConfirm;
 
   const IradarDialog({
     super.key,
     this.title,
     this.description,
+    this.onConfirm,
   });
 
   @override
@@ -57,6 +59,9 @@ class IradarDialog extends StatelessWidget {
                         child: ElevatedButton(
                             onPressed: () {
                               context.pop();
+                              if (onConfirm != null) {
+                                onConfirm!();
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(

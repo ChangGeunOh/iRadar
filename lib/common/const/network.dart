@@ -9,7 +9,7 @@ const kAuthChangePath = 'auth/change';
 const kAreaDataPath = 'area';
 const kUploadDataPath = 'upload';
 
-const kGetMapDataPath = 'map/{idx}';
+const kGetMapDataPath = 'map/{type}/{idx}';
 
 const kBaseDataPath = 'map/base/{type}';
 

@@ -1,7 +1,11 @@
 
+import 'dart:convert';
+
 import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/enum/wireless_type.dart';
+import '../../domain/model/map/map_base_data.dart';
 import '../../domain/model/map/map_data.dart';
+import '../../domain/model/map/map_measured_data.dart';
 import '../../domain/model/place_data.dart';
 import '../../domain/model/token_data.dart';
 import '../../domain/model/user_data.dart';
@@ -46,17 +50,36 @@ class DataStoreSourceImpl extends DataStoreSource {
   }
 
   @override
-  Future<List<MapData>> loadMapDataList(int idx) async {
-    final keyMapData = 'map_data_$idx';
-    final list = await _dataStore.loadListData(keyMapData);
-    return list?.map((e) => MapData.fromJson(e)).toList() ??
-        List<MapData>.empty();
+  Future<MapData?> loadMapData(WirelessType type, int idx) async {
+    final keyMapData = 'map_data_${type}_$idx';
+    try {
+      final data = await _dataStore.loadData(keyMapData);
+      if (data == null) {
+        return null;
+      }
+      print('-------------------> $idx :: ${type.name}');
+      data['measured_data'].forEach((element) {
+        print(element);
+      });
+      print('$idx :: ${type.name} <-------------------');
+      final measuredData = (data['measured_data'] as List).map((e) => MapMeasuredData.fromJson(e as Map<String, dynamic>)).toList();
+      final baseData = (data['base_data'] as List).map((e) => MapBaseData.fromJson(e as Map<String, dynamic>)).toList();
+      print('$idx :: ${type.name} <-------------------> Finished : ${baseData.length}');
+      final mapData = MapData(measuredData: measuredData, baseData: baseData);
+      print('-------------------> $idx :: ${type.name} <-------------------');
+      // return MapData(measuredData: measuredData, baseData: baseData);
+      return mapData;
+    } catch (e, stackTrace) {
+      print('Error loading map data: $e');
+      print('Stack trace: $stackTrace');
+      return null;
+    }
   }
 
   @override
-  Future<void> saveMapDataList(int idx, List<MapData> mapDataList) async {
-    final keyMapData = 'map_data_$idx';
-    await _dataStore.saveListData(keyMapData, mapDataList);
+  Future<void> saveMapData(WirelessType type, int idx, MapData mapData) async {
+    final keyMapData = 'map_data_${type}_$idx';
+    await _dataStore.saveData(keyMapData, mapData);
   }
 
   @override

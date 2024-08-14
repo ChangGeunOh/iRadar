@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
@@ -14,14 +13,16 @@ import 'package:googlemap/presentation/screen/map/viewmodel/map_state.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../common/const/constants.dart';
+import '../../../common/utils/mixin.dart';
 import '../../../domain/model/enum/location_type.dart';
 import '../../../domain/model/enum/wireless_type.dart';
 import '../../component/dropdown_box.dart';
 import '../../component/edit_text.dart';
+import '../../component/iradar_dialog.dart';
 import 'component/statefull_slider.dart';
 import 'viewmodel/map_event.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatelessWidget with ShowMessageMixin {
   final Set<AreaData> areaDataSet;
   final bool isRemove;
   final WirelessType wirelessType;
@@ -66,6 +67,23 @@ class MapScreen extends StatelessWidget {
         if (areaDataSet != state.areaDataSet) {
           bloc.add(BlocEvent(MapEvent.onChangeAreaDataSet, extra: areaDataSet));
         }
+
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          if (state.message.isNotEmpty) {
+            showDialog(
+              context: context,
+              builder: (context) => IradarDialog(
+                title: state.message,
+                onConfirm: () {
+                  if (state.showingDialog) {
+                    context.pop();
+                  }
+                },
+              ),
+            );
+            bloc.add(BlocEvent(MapEvent.onMessage, extra: ''));
+          }
+        });
 
         return Stack(
           children: [
@@ -136,6 +154,14 @@ class MapScreen extends StatelessWidget {
                     bloc.add(BlocEvent(MapEvent.onCameraIdle));
                   },
                 ),
+              ),
+            ),
+            Positioned(
+              left: 16,
+              bottom: 24,
+              child: Image.asset(
+                'assets/images/img_legend.png',
+                scale: 2,
               ),
             ),
             if (state.isLoading)
@@ -227,13 +253,13 @@ class MapScreen extends StatelessWidget {
                 height: 40,
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                     ),
-                    backgroundColor: MaterialStateProperty.resolveWith((state) {
-                      if (!state.contains(MaterialState.disabled)) {
+                    backgroundColor: WidgetStateProperty.resolveWith((state) {
+                      if (!state.contains(WidgetState.disabled)) {
                         return Colors.blue;
                       }
                       return Colors.grey.withAlpha(64);
@@ -274,7 +300,7 @@ void _showMergeDialog({
   AreaData mostRecent = areaDataSet.reduce((current, next) {
     return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
   });
-  
+
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -285,12 +311,12 @@ void _showMergeDialog({
         titlePadding: const EdgeInsets.all(0),
         title: Container(
           color: Colors.red,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Center(
               child: Text(
-                "병합하기",
-                style: TextStyle(
+                areaDataSet.length > 1 ? "병합하기" : '수정하기',
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
@@ -349,15 +375,13 @@ void _showMergeDialog({
               });
               // Navigator.of(context).pop();
             },
-            child: const Text("병합"),
+            child: const Text("저장"),
           ),
         ],
       );
     },
   );
 }
-
-
 
 AppBar? _appBar(context, bloc, state) {
   if (state.areaDataSet.isEmpty) {
@@ -393,6 +417,7 @@ AppBar? _appBar(context, bloc, state) {
               color: Colors.white,
             ),
             onPressed: () {
+              bloc.add(BlocEvent(MapEvent.onShowDialog, extra: true));
               _showMergeDialog(
                 context: context,
                 bloc: bloc,

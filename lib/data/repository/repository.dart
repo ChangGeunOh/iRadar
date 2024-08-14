@@ -250,17 +250,25 @@ class Repository {
     return await _networkSource.getAreaList('test');
   }
 
-  Future<ResponseData<MapData>> getMapDataList(int areaCode) async {
-    final userData = getUserData();
-
-    final dataList = await _dataStoreSource.loadMapDataList(areaCode);
-    if (dataList.isEmpty) {
-      return await _networkSource.getMapDataList(
-        areaCode: 'test',
+  Future<ResponseData<MapData>> getMapData(
+    WirelessType type,
+    int areaCode,
+  ) async {
+    final mapData = await _dataStoreSource.loadMapData(type, areaCode);
+    print('getMapData: $mapData');
+    if (mapData == null) {
+      final responseData = await _networkSource.getMapDataList(
+        type: type.name,
         idx: areaCode,
       );
+      if (responseData.meta.code== 200){
+        _dataStoreSource.saveMapData(type, areaCode, responseData.data!);
+        return responseData;
+      } else {
+        return responseData;
+      }
     } else {
-      return ResponseData();
+      return ResponseData<MapData>(data: mapData);;
     }
   }
 

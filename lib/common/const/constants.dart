@@ -30,6 +30,8 @@ const initCameraPosition = CameraPosition(
   zoom: 14.4746,
 );
 
+const kVersionCode = '1.2.0';
+
 const List<Country> countryOptions = <Country>[
   Country(name: 'Africa', size: 30370000),
   Country(name: 'Asia', size: 44579000),

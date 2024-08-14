@@ -7,5 +7,5 @@ enum MapEvent {
   onMergeData,
   onCameraIdle,
   onChangeWirelessType,
-  onChangeAreaDataSet,
+  onChangeAreaDataSet, onMessage, onShowDialog,
 }

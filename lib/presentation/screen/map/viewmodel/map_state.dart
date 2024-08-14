@@ -30,6 +30,7 @@ class MapState {
   final LatLngBounds? latLngBound;
   final WirelessType wirelessType;
   final String message;
+  final bool showingDialog;
 
   MapState({
     this.areaDataSet = const {},
@@ -52,6 +53,7 @@ class MapState {
     this.latLngBoundsMap = const {},
     this.measureMarkerSet = const {},
     this.message = '',
+    this.showingDialog = false,
   });
 
   MapState copyWith({
@@ -77,6 +79,7 @@ class MapState {
     Map<WirelessType, LatLngBounds>? latLngBoundsMap,
     Set<Marker>? measureMarkerSet,
     String? message,
+    bool? showingDialog,
   }) {
     return MapState(
       areaDataSet: areaDataSet ?? this.areaDataSet,
@@ -99,6 +102,7 @@ class MapState {
       latLngBoundsMap: latLngBoundsMap ?? this.latLngBoundsMap,
       measureMarkerSet: measureMarkerSet ?? this.measureMarkerSet,
       message: message ?? this.message,
+      showingDialog: showingDialog ?? this.showingDialog,
     );
   }
 

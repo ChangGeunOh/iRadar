@@ -1,4 +1,5 @@
 import 'package:googlemap/domain/model/base/base_data.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/pci/pci_base_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
@@ -12,7 +13,6 @@ import '../model/notice/notice_data.dart';
 import '../model/upload/measure_upload_data.dart';
 
 abstract class NetworkSource {
-
   Future<ResponseData<TokenData?>> loadLogin(
     String basicAuth,
   );
@@ -21,14 +21,13 @@ abstract class NetworkSource {
     MeasureUploadData measureUploadData,
   );
 
-
   Future<ResponseData<TokenData?>> postTokenData(String jsonString);
 
   Future<ResponseData<List<AreaData>>> getAreaList(String areaCode);
 
   Future<ResponseData<MapData>> getMapDataList({
-    required String areaCode,
     required int idx,
+    required String type,
   });
 
   Future<ResponseData> postMergeData(MergeData mergeData);

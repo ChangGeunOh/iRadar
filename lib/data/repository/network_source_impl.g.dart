@@ -156,11 +156,11 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<ResponseData<MapData>> getMapDataList({
-    required String areaCode,
+    required String type,
     required int idx,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'code': areaCode};
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
@@ -172,7 +172,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     )
             .compose(
               _dio.options,
-              'map/${idx}',
+              'map/${type}/${idx}',
               queryParameters: queryParameters,
               data: _data,
             )

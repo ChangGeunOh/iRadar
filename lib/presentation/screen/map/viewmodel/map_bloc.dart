@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
@@ -17,7 +18,6 @@ import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/map/area_data.dart';
 import '../../../../domain/model/map/map_base_data.dart';
-import '../../../../domain/model/map/map_data.dart';
 import 'map_state.dart';
 
 class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
@@ -53,13 +53,18 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   ) async {
     switch (event.type) {
       case MapEvent.onInit:
-        await _changedAreaData(emit, state.areaDataSet);
+        await _changedAreaData(
+          emit,
+          state.areaDataSet,
+          state.wirelessType,
+        );
         break;
       case MapEvent.onMergeData:
         Map<String, dynamic> data = event.extra as Map<String, dynamic>;
         final name = data['name'] as String;
         final locationType = data['locationType'] as LocationType;
         final measuredAt = data['measuredAt'];
+        showLoadingDialog();
         await _onMergeData(
           emit,
           wirelessType: state.wirelessType,
@@ -67,12 +72,14 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           measuredAt: measuredAt,
           locationType: locationType,
         );
+        if (context.mounted) {
+          context.pop();
+        }
         break;
       case MapEvent.onTapMap:
         if (state.isRectangleMode) {
           final latLng = event.extra as LatLng;
-          var points = state.polygonSet?.first.points ??
-              List<LatLng>.empty(growable: true);
+          var points = state.polygonSet.first.points;
           points =
               points.length > 2 ? List<LatLng>.empty(growable: true) : points;
           if (points.isEmpty) {
@@ -123,7 +130,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         );
         circleSet.clear();
         circleSet.add(circle);
-
         emit(state.copyWith(cursorState: event.extra, circleSet: circleSet));
         break;
       case MapEvent.onCameraIdle:
@@ -134,7 +140,17 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         break;
       case MapEvent.onChangeAreaDataSet:
         emit(state.copyWith(areaDataSet: event.extra));
-        await _changedAreaData(emit, event.extra);
+        await _changedAreaData(
+          emit,
+          event.extra,
+          state.wirelessType,
+        );
+        break;
+      case MapEvent.onMessage:
+        emit(state.copyWith(message: event.extra));
+        break;
+      case MapEvent.onShowDialog:
+        emit(state.copyWith(showingDialog: event.extra));
         break;
     }
   }
@@ -156,7 +172,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           case MapCursorState.add:
             if (e.icon == removePin) {
               return e.copyWith(
-                iconParam: getRsrp5Marker(
+                iconParam: getRsrpMarker(
                   double.parse(e.infoWindow.snippet!.split("/").last),
                 ),
               );
@@ -177,44 +193,52 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     }
   }
 
+  Future<void> showLoadingDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Dialog(
+          backgroundColor: Colors.transparent,
+          child: Center(child: CircularProgressIndicator()),
+        );
+      },
+    );
+  }
+
   Future<void> _changedAreaData(
     Emitter<MapState> emit,
     Set<AreaData> areaDataSet,
+    WirelessType type,
   ) async {
     await _moveCameraToAreaCenter(areaDataSet);
     if (areaDataSet.isEmpty) {
       return;
     }
-    final Map<int, MapData> mapDataSet = {};
     final Set<Marker> mapBaseMarkerSet = {};
     final Set<Marker> measureMarkerSet = {};
-    String? message;
-
+    String message = '';
     emit(state.copyWith(isLoading: true));
     for (var areaData in areaDataSet) {
-      final responseData = await repository.getMapDataList(areaData.idx);
+      final responseData = await repository.getMapData(type, areaData.idx);
       if (responseData.data != null) {
         final data = responseData.data!;
-        mapDataSet[areaData.idx] = data;
         final mapBaseMarkers = _getMapBaseMarkers(
           areaData.idx,
           data.baseData,
+          state.wirelessType,
         );
         mapBaseMarkerSet.addAll(mapBaseMarkers);
         final measureMarkers = _getMeasureMarkers(
+          state.wirelessType,
           areaData.idx,
           data.measuredData,
         );
         measureMarkerSet.addAll(measureMarkers);
       }
-      message = responseData.meta.message.isNotEmpty
-          ? responseData.meta.message
-          : message;
     }
     emit(state.copyWith(
       isLoading: false,
       areaDataSet: areaDataSet,
-      mapDataSet: mapDataSet,
       mapBaseMarkerSet: mapBaseMarkerSet,
       measureMarkerSet: measureMarkerSet,
       message: message,
@@ -222,8 +246,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   }
 
   Future<void> _moveCameraToAreaCenter(Set<AreaData> areaDataSet) async {
-    var latitude = areaDataSet.fold(
-            0.0, (previousValue, element) => previousValue + element.latitude!) /
+    var latitude = areaDataSet.fold(0.0,
+            (previousValue, element) => previousValue + element.latitude!) /
         areaDataSet.length;
     var longitude = areaDataSet.fold(0.0,
             (previousValue, element) => previousValue + element.longitude!) /
@@ -243,12 +267,12 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     );
   }
 
-  BitmapDescriptor getRsrp5Marker(double rsrp5) {
+  BitmapDescriptor getRsrpMarker(double rsrp) {
     List<double> rsrpThresholds = [-120, -110, -100, -90, -80, -70];
     List<int> pinIndices = [0, 1, 2, 4, 7, 8, 10];
 
     for (int i = 0; i < rsrpThresholds.length; i++) {
-      if (rsrp5 >= rsrpThresholds[i]) {
+      if (rsrp <= rsrpThresholds[i]) {
         return mapPins![pinIndices[i]];
       }
     }
@@ -261,33 +285,39 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   }
 
   Set<Marker> _getMeasureMarkers(
+    WirelessType type,
     int idx,
     List<MapMeasuredData> measureList,
   ) {
     var markers = repository.getMeasureMarkers(idx);
-    markers = measureList
-        .map(
-          (e) => Marker(
-            markerId: MarkerId('M${e.idx}'),
-            icon: getRsrp5Marker(e.rsrp5),
-            position: LatLng(e.latitude, e.longitude),
-            infoWindow: InfoWindow(snippet: "${e.pci5}/${e.rsrp5}"),
-          ),
-        )
-        .toSet();
+    markers = measureList.map(
+      (e) {
+        print(e.hashCode);
+        return Marker(
+          markerId: MarkerId('M${e.idx}'),
+          icon: getRsrpMarker(e.rsrp),
+          position: LatLng(e.latitude, e.longitude),
+          infoWindow: InfoWindow(snippet: "${e.pci}/${e.rsrp}"),
+        );
+      },
+    ).toSet();
 
     return markers;
   }
 
-  Set<Marker> _getMapBaseMarkers(int idx, List<MapBaseData> mapBaseDataSet) {
+  Set<Marker> _getMapBaseMarkers(
+    int idx,
+    List<MapBaseData> mapBaseDataSet,
+    WirelessType type,
+  ) {
     var markers = repository.getBaseMarkers(idx);
     if (markers == null) {
       markers = mapBaseDataSet
           .map(
             (e) => Marker(
-              markerId: MarkerId('BASE${e.idx}'),
+              markerId: MarkerId('BASE${e.code}'),
               position: LatLng(e.latitude, e.longitude),
-              icon: e.type == WirelessType.wLte ? basePinLTE! : basePin5G!,
+              icon: type == WirelessType.wLte ? basePinLTE! : basePin5G!,
               infoWindow: InfoWindow(title: e.name),
             ),
           )
@@ -298,18 +328,18 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   }
 
   Future<void> _makeMapPins() async {
-    final filenames = List.generate(
-        12, (index) => 'assets/icons/pin$index.${index < 2 ? 'png' : 'jpg'}');
+    final filenames = List.generate(12, (index) => 'assets/icons/pin$index.jpg',
+        growable: false);
     mapPins = await Future.wait(filenames.map((e) async {
       final image = await rootBundle.load(e);
       final bytes = image.buffer.asUint8List();
-      return BitmapDescriptor.fromBytes(bytes);
+      return BitmapDescriptor.bytes(bytes);
     }).toList());
 
     var image = await rootBundle.load('assets/icons/pin_base_lte.png');
-    basePinLTE = BitmapDescriptor.fromBytes(image.buffer.asUint8List());
+    basePinLTE = BitmapDescriptor.bytes(image.buffer.asUint8List());
     image = await rootBundle.load('assets/icons/pin_base_5g.png');
-    basePin5G = BitmapDescriptor.fromBytes(image.buffer.asUint8List());
+    basePin5G = BitmapDescriptor.bytes(image.buffer.asUint8List());
 
     circleSet.add(
       Circle(
@@ -333,7 +363,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         .where((element) => element.icon != mapPins![11])
         .toList();
 
-    // 단일 반복을 사용하여 모든 계산 수행
     double sumLat = 0.0;
     double sumLong = 0.0;
     List<int> data = [];

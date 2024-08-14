@@ -7,7 +7,6 @@ part 'map_base_data.g.dart';
 
 @JsonSerializable()
 class MapBaseData {
-  final int idx;
   final String code;
   @JsonKey(name: 'rnm')
   final String name;
@@ -16,18 +15,14 @@ class MapBaseData {
   @JsonKey(name: 'lng')
   final double longitude;
   final int pci;
-  @JsonKey(fromJson: Convert.dynamicToWirelessType)
-  final WirelessType type;
 
 
   MapBaseData({
-    required this.idx,
     required this.code,
     required this.name,
     required this.pci,
     required this.latitude,
     required this.longitude,
-    required this.type,
   });
 
   factory MapBaseData.fromJson(Map<String, dynamic> json) => _$MapBaseDataFromJson(json);

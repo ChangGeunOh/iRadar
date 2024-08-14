@@ -54,7 +54,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @GET(kGetMapDataPath)
   @Headers({'access_token': true})
   Future<ResponseData<MapData>> getMapDataList({
-    @Query('code') required String areaCode,
+    @Path('type') required String type,
     @Path('idx') required int idx,
   });
 

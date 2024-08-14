@@ -7,38 +7,31 @@ part 'map_measured_data.g.dart';
 @JsonSerializable()
 class MapMeasuredData {
   final int idx;
-
   @JsonKey(name: 'lat')
   final double latitude;
   @JsonKey(name: 'lng')
   final double longitude;
   @JsonKey(
-    name: 'pci',
     fromJson: Convert.dynamicToInt,
   )
   final int pci;
   @JsonKey(
-    name: 'pci5',
-    fromJson: Convert.dynamicToInt,
-  )
-  final int pci5;
-  @JsonKey(
-    name: 'rp5',
+    name: 'rp',
     fromJson: Convert.dynamicToDouble,
   )
-  final double rsrp5;
+  final double rsrp;
 
   MapMeasuredData({
     required this.idx,
     required this.latitude,
     required this.longitude,
     required this.pci,
-    required this.pci5,
-    required this.rsrp5,
+    required this.rsrp,
   });
 
-  factory MapMeasuredData.fromJson(Map<String, dynamic> json) =>
-      _$MapMeasuredDataFromJson(json);
+  factory MapMeasuredData.fromJson(Map<String, dynamic> json) {
+    return _$MapMeasuredDataFromJson(json);
+  }
 
   Map<String, dynamic> toJson() => _$MapMeasuredDataToJson(this);
 }

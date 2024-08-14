@@ -14,9 +14,9 @@ abstract class DataStoreSource {
 
   Future<void> remove(WirelessType type);
 
-  Future<List<MapData>> loadMapDataList(int idx);
+  Future<MapData?> loadMapData(WirelessType type, int idx);
 
-  Future<void> saveMapDataList(int idx, List<MapData> mapDataList);
+  Future<void> saveMapData(WirelessType type, int idx, MapData mapData);
 
   Future<List<MeasureData>> getMeasureList(int idx, WirelessType type);
 
