@@ -101,7 +101,6 @@ class WebScreen extends StatelessWidget {
 
   List<TableRow> _getTableRow(List<ExcelResponseData> excelList) {
     return excelList.map((e) {
-      print(e.toJson());
       return TableRow(children: [
         _cell(e.division, e.hasColor),
         _cell(e.sido, e.hasColor),

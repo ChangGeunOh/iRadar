@@ -26,11 +26,13 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
   final Set<AreaData> areaDataSet;
   final bool isRemove;
   final WirelessType wirelessType;
+  final Function onReloadArea;
 
   MapScreen({
     required this.areaDataSet,
     required this.isRemove,
     required this.wirelessType,
+    required this.onReloadArea,
     super.key,
   }) {
     // print('MapScreen> areaDataSet: $areaDataSet');
@@ -40,6 +42,7 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
 
   @override
   Widget build(BuildContext context) {
+    print('MapScreen......');
     var mapLeftMargin = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox box = context.findRenderObject() as RenderBox;
@@ -49,7 +52,8 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
 
     return BlocScaffold<MapBloc, MapState>(
       extendBodyBehindAppBar: true,
-      appBarBuilder: (context, bloc, state) => _appBar(context, bloc, state),
+      appBarBuilder: (context, bloc, state) =>
+          _appBar(context, bloc, state, onReloadArea),
       create: (context) {
         return MapBloc(
           context,
@@ -109,9 +113,14 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                     (value) => bloc.add(
                       BlocEvent(MapEvent.onChangeRadius, extra: value),
                     ),
-                    (value) => bloc.add(
-                      BlocEvent(MapEvent.onChangeCursorState, extra: value),
-                    ),
+                    (value) {
+                      bloc.add(
+                        BlocEvent(
+                          MapEvent.onChangeCursorState,
+                          extra: value,
+                        ),
+                      );
+                    },
                     state.cursorState,
                   );
                 }
@@ -134,23 +143,22 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                   initialCameraPosition: bloc.initCameraPosition(),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
-                  markers: state.mapBaseMarkerSet.union(state.measureMarkerSet),
+                  markers: state.mapBaseMarkerSet
+                      .union(state.measureMarkerSet)
+                      .union(state.otherBaseMarkerSet),
                   onMapCreated: (GoogleMapController controller) {
                     bloc.setGoogleMapController(controller);
                     bloc.controller = controller;
                   },
                   onTap: (value) {
-                    // print('google map> onTap');
                     bloc.add(BlocEvent(MapEvent.onTapMap, extra: value));
                   },
                   polygons: state.polygonSet,
                   circles: state.circleSet,
                   onCameraMove: (cameraPosition) {
-                    // print(cameraPosition.toString());
                     bloc.setCameraPosition(cameraPosition);
                   },
                   onCameraIdle: () {
-                    // print('google map> onCameraIdle');
                     bloc.add(BlocEvent(MapEvent.onCameraIdle));
                   },
                 ),
@@ -175,6 +183,39 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                   ),
                 ),
               ),
+            Positioned(
+              top: 82,
+              right: 8,
+              child: Column(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      bloc.add(BlocEvent(MapEvent.onShowBase));
+                    },
+                    icon: Icon(
+                      Icons.cell_tower_rounded,
+                      size: 32,
+                      color:
+                          state.isShowBase ? Colors.black54 : Colors.grey[300],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () {
+                      // TODO: Show Label
+                      bloc.add(BlocEvent(MapEvent.onShowCaption));
+                    },
+                    icon: Icon(
+                      Icons.closed_caption_outlined,
+                      size: 32,
+                      color: state.isShowCaption
+                          ? Colors.black54
+                          : Colors.grey[300],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -206,15 +247,16 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
           onTap: () => onTapMenuItem(MapCursorState.remove),
           child: const Row(
             children: [
+              SizedBox(width: 16),
               Icon(
-                Icons.remove_circle,
+                Icons.remove_circle_outline,
                 color: Colors.red,
               ),
               SizedBox(
                 width: 16,
               ),
               Text(
-                '데이터 제거하기',
+                '루트 제거 하기',
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -227,6 +269,59 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
           onTap: () => onTapMenuItem(MapCursorState.add),
           child: const Row(
             children: [
+              SizedBox(width: 16),
+              Icon(
+                Icons.add_circle_outline,
+                color: Colors.blue,
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Text(
+                '루트 추가 하기',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          height: 16,
+          child: Divider(
+            indent: 16,
+            endIndent: 16,
+            height: 1,
+          ),
+        ),
+        PopupMenuItem(
+          enabled: true,
+          onTap: () => onTapMenuItem(MapCursorState.removeAll),
+          child: const Row(
+            children: [
+              SizedBox(width: 16),
+              Icon(
+                Icons.remove_circle,
+                color: Colors.red,
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Text(
+                '루트 전체 제거',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          enabled: true,
+          onTap: () => onTapMenuItem(MapCursorState.addAll),
+          child: const Row(
+            children: [
+              SizedBox(width: 16),
               Icon(
                 Icons.add_circle,
                 color: Colors.blue,
@@ -235,7 +330,7 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                 width: 16,
               ),
               Text(
-                '데이터 추가하기',
+                '루트 전체 추가',
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -288,12 +383,12 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
   }
 }
 
-void _showMergeDialog({
+Future<void> _showMergeDialog({
   required BuildContext context,
   required MapBloc bloc,
   required Set<AreaData> areaDataSet,
   required Function(Map<String, dynamic>) onMergeData,
-}) {
+}) async {
   final prefix = areaDataSet.length > 1 ? '[병합] ' : '[수정]';
   var name = '$prefix ${areaDataSet.map((e) => e.name).join(', ')}';
   var locationType = areaDataSet.first.division;
@@ -301,7 +396,7 @@ void _showMergeDialog({
     return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
   });
 
-  showDialog(
+  await showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -383,7 +478,7 @@ void _showMergeDialog({
   );
 }
 
-AppBar? _appBar(context, bloc, state) {
+AppBar? _appBar(context, bloc, state, onReloadArea) {
   if (state.areaDataSet.isEmpty) {
     return null;
   }
@@ -416,9 +511,9 @@ AppBar? _appBar(context, bloc, state) {
               Icons.upload,
               color: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               bloc.add(BlocEvent(MapEvent.onShowDialog, extra: true));
-              _showMergeDialog(
+              await _showMergeDialog(
                 context: context,
                 bloc: bloc,
                 areaDataSet: state.areaDataSet,
@@ -431,6 +526,7 @@ AppBar? _appBar(context, bloc, state) {
                   );
                 },
               );
+              onReloadArea();
             },
           ),
         ),

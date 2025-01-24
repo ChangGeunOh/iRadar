@@ -30,7 +30,8 @@ class ExcelResponseData {
   final String scenario;
   @JsonKey(name: 'reg_date')
   final String regDate;
-  @JsonKey(name: "has_color",
+  @JsonKey(
+    name: "has_color",
     toJson: Convert.boolToDynamic,
     fromJson: Convert.dynamicToBool,
   )
@@ -48,15 +49,21 @@ class ExcelResponseData {
     this.id = '',
     this.rnm = '',
     this.memo = '',
-    this.atten = '200',
+    String? atten, // this.atten = '200',       // relay인 경우 ''로 초기화
     this.cellLock = '',
     this.ruLock = '',
-    this.relayLock = '',
+    String? relayLock, // this.relayLock = '',    // relay인 경우 'O'로 초기화
     this.pci = '',
     this.scenario = 'iRadar',
     this.regDate = '',
     this.hasColor = false,
-});
-  factory ExcelResponseData.fromJson(Map<String, dynamic> json) => _$ExcelResponseDataFromJson(json);
+  })  : atten = atten ?? (type == '5G' ? '200' :  ['RS', 'RB', 'RE'].any((e) => id.startsWith(e)) ? '' : '200'),
+        relayLock = ['RS', 'RB', 'RE'].any((e) => id.startsWith(e)) ? 'O' : '';
+
+  factory ExcelResponseData.fromJson(Map<String, dynamic> json) =>
+      _$ExcelResponseDataFromJson(json);
+
   Map<String, dynamic> toJson() => _$ExcelResponseDataToJson(this);
 }
+
+

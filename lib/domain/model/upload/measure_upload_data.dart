@@ -18,11 +18,7 @@ class MeasureUploadData {
     name: 'is_wide_area',
   )
   final bool isWideArea;
-  @JsonKey(
-    name: 'area_code',
-  )
   final DateTime? dt;
-
   @JsonKey(
     defaultValue: [],
     name: 'intf_5g_list',

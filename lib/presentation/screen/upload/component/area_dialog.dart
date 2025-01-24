@@ -9,7 +9,6 @@ import '../../../../domain/model/enum/wireless_type.dart';
 import '../../../../domain/model/map/area_data.dart';
 
 class AreaDialog extends StatefulWidget {
-
   const AreaDialog({
     super.key,
   });
@@ -25,14 +24,14 @@ class _AreaDialogState extends State<AreaDialog> {
   List<AreaData> filteredAreaList = [];
 
   @override
-  Future<void> initState() async {
-    _init();
+  void initState() {
     super.initState();
+    _init();
   }
 
   Future<void> _init() async {
     final Repository repository = context.read();
-    final response = await repository.getAreaList();
+    final response = await repository.getSearchArea();
     if (response.meta.code == 200) {
       areaList = response.data!;
       filteredAreaList = areaList;
@@ -105,7 +104,7 @@ class _AreaDialogState extends State<AreaDialog> {
                               'assets/icons/ic_lte.svg',
                             ),
                           if (areaData.type == WirelessType.w5G)
-                            const SizedBox(width:32),
+                            const SizedBox(width: 32),
                           const SizedBox(width: 4),
                           if (areaData.type != WirelessType.wLte)
                             SvgPicture.asset(
@@ -113,7 +112,7 @@ class _AreaDialogState extends State<AreaDialog> {
                               width: 32,
                             ),
                           if (areaData.type == WirelessType.wLte)
-                            const SizedBox(width:32),
+                            const SizedBox(width: 32),
                         ],
                       ),
                       onTap: () {
@@ -123,7 +122,9 @@ class _AreaDialogState extends State<AreaDialog> {
                         children: [
                           Text(areaData.division!.name),
                           const Spacer(),
-                          Text(filteredAreaList[index].createdAt!.toDateString()),
+                          Text(filteredAreaList[index]
+                              .createdAt!
+                              .toDateString()),
                         ],
                       ),
                     );

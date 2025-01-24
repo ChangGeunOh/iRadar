@@ -1,16 +1,21 @@
 import 'dart:async';
+import 'dart:html' as html;
 import 'dart:typed_data';
 
+import 'package:excel/excel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/presentation/screen/login/login_screen.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_event.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 
@@ -37,11 +42,11 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     switch (event.type) {
       case MainEvent.init:
         final userData = await repository.getUserData();
-        print('userData>$userData');
         emit(state.copyWith(userData: userData));
         await _getAreaList(emit, state);
         break;
       case MainEvent.onTapRefresh:
+        await repository.clearCacheData();
         await _getAreaList(emit, state);
         break;
       case MainEvent.onTapType:
@@ -72,10 +77,14 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         break;
       case MainEvent.onSearch:
         final filteredAreaDataList = state.areaDataList
-            .where((element) => element.name.contains(event.extra))
+            .where((element) =>
+                element.name.contains(event.extra) &&
+                element.type == state.type)
             .toList();
         emit(state.copyWith(
-            search: event.extra, filteredAreaDataList: filteredAreaDataList));
+          search: event.extra,
+          filteredAreaDataList: filteredAreaDataList,
+        ));
         break;
       case MainEvent.onTapDrawer:
         emit(state.copyWith(isShowSide: !state.isShowSide));
@@ -120,7 +129,6 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         break;
       case MainEvent.onTapUpload:
         final result = await context.pushNamed(UploadScreen.routeName);
-        print('Result>${result.runtimeType}');
         if (result != null && result.runtimeType == bool && result as bool) {
           add(BlocEvent(MainEvent.onTapRefresh));
         }
@@ -132,7 +140,6 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         emit(state.copyWith(isShowDialog: event.extra));
         break;
       case MainEvent.onTapNoticePage:
-        print('onTapNoticePage>${event.extra}');
         emit(state.copyWith(currentPage: event.extra + 1));
         break;
       case MainEvent.onLogout:
@@ -143,10 +150,18 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         break;
       case MainEvent.onPassword:
         break;
+      case MainEvent.onDownloadBaseData:
+        emit(state.copyWith(isLoading: true));
+        await _downloadExcelBaseData();
+        emit(state.copyWith(isLoading: false));
+        break;
     }
   }
 
-  Future<void> _getAreaList(Emitter<MainState> emit, MainState state) async {
+  Future<void> _getAreaList(
+    Emitter<MainState> emit,
+    MainState state,
+  ) async {
     emit(state.copyWith(isLoading: true));
     final responseData = await repository.getAreaList();
     emit(state.copyWith(
@@ -174,5 +189,43 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         .where((element) =>
             element.type == type || element.type == WirelessType.all)
         .toList();
+  }
+
+  Future<void> _downloadExcelBaseData() async {
+    final response = await repository.getBaseDataList();
+    final List<BaseData> baseDataList = await response.data;
+    var excel = Excel.createExcel();
+    Sheet sheet = excel.sheets['Sheet1']!;
+    sheet.appendRow([
+      TextCellValue('No.'),
+      TextCellValue('Type'),
+      TextCellValue('Name'),
+      TextCellValue('PCI'),
+      TextCellValue('Latitude'),
+      TextCellValue('Longitude'),
+    ]);
+    for (var i = 0; i < baseDataList.length; i++) {
+      sheet.appendRow([
+        IntCellValue(i + 1),
+        TextCellValue(baseDataList[i].type),
+        TextCellValue(baseDataList[i].rnm),
+        IntCellValue(baseDataList[i].pci),
+        DoubleCellValue(baseDataList[i].latitude),
+        DoubleCellValue(baseDataList[i].longitude),
+      ]);
+    }
+
+    Uint8List excelBytes = Uint8List.fromList(excel.save()!);
+
+    String formattedDate = DateFormat('yyyyMMdd').format(DateTime.now());
+    String fileName = '($formattedDate) 기지국중계기정보.xlsx';
+
+    final blob = html.Blob([excelBytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..target = 'blank'
+      ..download = fileName
+      ..click();
+    html.Url.revokeObjectUrl(url); // 메모리 해제
   }
 }

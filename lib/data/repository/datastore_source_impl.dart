@@ -83,6 +83,11 @@ class DataStoreSourceImpl extends DataStoreSource {
   }
 
   @override
+  Future<void> clearMapData() async {
+    await _dataStore.clearMapData();
+  }
+
+  @override
   Future<List<MeasureData>> getMeasureList(int idx, WirelessType type) async {
     final keyMeasureList = 'measure_list_${idx}_${type.name} ';
     final list = await _dataStore.loadListData(keyMeasureList);

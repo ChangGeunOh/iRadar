@@ -8,6 +8,8 @@ import '../model/place_data.dart';
 import '../model/token_data.dart';
 
 abstract class DataStoreSource {
+
+
   Future<List<PlaceData>> loadPlaceList(WirelessType type);
 
   Future<void> savePlaceList(WirelessType type, List<PlaceData> placeList);
@@ -17,6 +19,8 @@ abstract class DataStoreSource {
   Future<MapData?> loadMapData(WirelessType type, int idx);
 
   Future<void> saveMapData(WirelessType type, int idx, MapData mapData);
+
+  Future<void> clearMapData();
 
   Future<List<MeasureData>> getMeasureList(int idx, WirelessType type);
 

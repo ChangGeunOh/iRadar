@@ -53,4 +53,13 @@ class LocalDataStore {
     final dataStore = await getSharedPreferences();
     dataStore.remove(key);
   }
+
+  Future<void> clearMapData() async {
+    final dataStore = await getSharedPreferences();
+    dataStore.getKeys().forEach((key) {
+      if (key.startsWith('map_data_')) {
+        dataStore.remove(key);
+      }
+    });
+  }
 }

@@ -56,27 +56,4 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
     }
   }
 
-  Future<void> _onTapFile(Emitter<UploadState> emit) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowedExtensions: ['xls', 'xlsx'],
-      type: FileType.custom,
-      allowMultiple: false,
-    );
-    if (result != null) {
-      final file = result.files.single;
-      emit(state.copyWith(isLoading: true, fileName: file.name));
-      final excelFile = ExcelFile(bytes: file.bytes!);
-      emit(state.copyWith(
-        isLoading: false,
-        excelFile: excelFile,
-        enabledSave: _enabledSave(state.division, state.area, file.name),
-      ));
-    }
-  }
-
-
-  bool _enabledSave(String division, String area, String fileName) {
-    print('division: $division, area: $area, fileName: $fileName');
-    return area.length > 3 && division.isNotEmpty && fileName.isNotEmpty;
-  }
 }

@@ -29,8 +29,8 @@ Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
     };
 
 const _$LocationTypeEnumMap = {
-  LocationType.inBuilding: '인빌딩',
   LocationType.adminBuilding: '행정동',
+  LocationType.inBuilding: '인빌딩',
   LocationType.theme: '테마',
   LocationType.undefined: 'undefined',
 };

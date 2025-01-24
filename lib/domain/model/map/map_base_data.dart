@@ -16,7 +16,6 @@ class MapBaseData {
   final double longitude;
   final int pci;
 
-
   MapBaseData({
     required this.code,
     required this.name,
@@ -25,15 +24,35 @@ class MapBaseData {
     required this.longitude,
   });
 
-  factory MapBaseData.fromJson(Map<String, dynamic> json) => _$MapBaseDataFromJson(json);
+  factory MapBaseData.fromJson(Map<String, dynamic> json) =>
+      _$MapBaseDataFromJson(json);
+
   Map<String, dynamic> toJson() => _$MapBaseDataToJson(this);
+
+  MapBaseData copyWith({
+    String? code,
+    String? name,
+    int? pci,
+    double? latitude,
+    double? longitude,
+  }) {
+    return MapBaseData(
+      code: code ?? this.code,
+      name: name ?? this.name,
+      pci: pci ?? this.pci,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+    );
+  }
+
+  bool get isRelay => ['RS', 'RB', 'RE'].any((e) => code.startsWith(e));
+
+  String iconPath(WirelessType type) {
+    if (type == WirelessType.w5G) {
+      return 'assets/icons/pin_base_5g.png';
+    } else if (isRelay) {
+      return 'assets/icons/pin_base_relay.png';
+    }
+    return 'assets/icons/pin_base_lte.png';
+  }
 }
-
-
-//      "idx": 22052,
-//       "type": "5G",
-//       "code": "NRPS09267S",
-//       "rnm": "초량3동_망양로삼거리주택_N32T_A",
-//       "lat": 35.1230019444,
-//       "lng": 129.036281944,
-//       "pci": 104

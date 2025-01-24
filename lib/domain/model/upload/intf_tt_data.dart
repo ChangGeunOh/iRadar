@@ -29,7 +29,7 @@ class IntfTtData {
   final int? ear;
   final int? ca;
   final double? cqi;
-  final double? ri;
+  final int? ri;
   final double? dlmcs;
   final double? dlrb;
   final double? dltp;

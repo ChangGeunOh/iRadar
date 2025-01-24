@@ -26,7 +26,7 @@ IntfTtData _$IntfTtDataFromJson(Map<String, dynamic> json) => IntfTtData(
       ear: (json['ear'] as num?)?.toInt(),
       ca: (json['ca'] as num?)?.toInt(),
       cqi: (json['cqi'] as num?)?.toDouble(),
-      ri: (json['ri'] as num?)?.toDouble(),
+      ri: (json['ri'] as num?)?.toInt(),
       dlmcs: (json['dlmcs'] as num?)?.toDouble(),
       dlrb: (json['dlrb'] as num?)?.toDouble(),
       dltp: (json['dltp'] as num?)?.toDouble(),

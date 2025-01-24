@@ -39,10 +39,10 @@ class SideBody extends StatelessWidget {
     return ListView.separated(
       itemBuilder: (context, index) {
         final areaData = areaDataList[index];
+        final hasDivision = index > 0 ?  areaDataList[index - 1].division != areaData.division : true;
         return AreaDataCard(
           areaData: areaData,
           onTapItem: () {
-            print('onTapItem>$index');
             onTapItem(areaData);
           },
           onTapAll: () {
@@ -56,6 +56,7 @@ class SideBody extends StatelessWidget {
           },
           isSelected: selectedPlaceSet.contains(areaData),
           type: type,
+          hasDivision: hasDivision,
         );
       },
       separatorBuilder: (context, index) {

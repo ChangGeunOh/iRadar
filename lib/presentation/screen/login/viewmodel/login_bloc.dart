@@ -53,7 +53,7 @@ class LoginBloc extends BlocBloc<BlocEvent<LoginEvent>, LoginState> {
       case LoginEvent.onTapIssue:
         break;
       case LoginEvent.onTapLogin:
-        final userid = usernameController.value.text;
+        final userid = state.userId;
         final password = passwordController.value.text;
         final responseData = await repository.login(
           userid: userid,

@@ -36,7 +36,10 @@ class MainDrawer extends StatelessWidget {
             children: [
               SideHeader(
                 onSearch: (search) {
-                  bloc.add(BlocEvent(MainEvent.onSearch, extra: search));
+                  bloc.add(BlocEvent(
+                    MainEvent.onSearch,
+                    extra: search,
+                  ));
                 },
                 onTapWirelessType: (type) => bloc.add(
                   BlocEvent(

@@ -34,6 +34,7 @@ class _TableViewState extends State<TableView> {
   late List<MeasureData> measureDataList;
   late Map<int, TableColumnWidth> headerWidth;
   late List<String> headerTitle;
+  var servingTime = "6";
 
   @override
   void initState() {
@@ -43,9 +44,10 @@ class _TableViewState extends State<TableView> {
 
   void init() {
     measureDataList = widget.measureDataList;
-    headerWidth = widget.type == WirelessType.wLte ? headerLteWidth : header5gWidth;
-    headerTitle = widget.type == WirelessType.wLte ? headerLteTitle : header5gTitle;
-
+    headerWidth =
+        widget.type == WirelessType.wLte ? headerLteWidth : header5gWidth;
+    headerTitle =
+        widget.type == WirelessType.wLte ? headerLteTitle : header5gTitle;
   }
 
   @override
@@ -69,72 +71,128 @@ class _TableViewState extends State<TableView> {
         ),
         columnWidths: headerWidth,
         children: [
-          TableRow(
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
+          buildTableTitle(),
+          ...getMeasuredRows(),
+        ],
+      ),
+    );
+  }
+
+  TableRow buildTableTitle() {
+    return TableRow(
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+      ),
+      children: headerTitle.map((e) {
+        final text = widget.isNpci ? 'PCI mW' : e;
+        return TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 4.0,
             ),
-            children: headerTitle.map((e) {
-              final text = widget.isNpci ? 'PCI mW' : e;
-              return TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0,
-                    vertical: 4.0,
-                  ),
-                  child: Center(
-                    child: headerTitle.last == e
-                        ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+            child: Center(
+              child: headerTitle.last == e
+                  ? Stack(
                       children: [
-                        Transform.scale(
-                          scale: 0.7,
-                          child: Checkbox(
-                            value: isNeighborCheck,
-                            onChanged: (value) {
-                              setState(() {
-                                measureDataList =
-                                    measureDataList.map((measureData) {
-                                      return measureData.copyWith(
-                                        baseList: measureData.baseList
-                                            .map((baseData) {
-                                          return baseData.copyWith(
-                                              isChecked: value);
-                                        }).toList(),
-                                      );
-                                    }).toList();
-                                widget.onChange(
-                                    measureDataList);
-                              });
-                            },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Transform.scale(
+                              scale: 0.7,
+                              child: Checkbox(
+                                value: isNeighborCheck,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    onChangeSelected(value ? 99999 : -1);
+                                    servingTime = "-";
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '인근장비',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
+                        Positioned(
+                          right: 8,
+                          top: 0,
+                          bottom: 0,
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Serving\nTime',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  color: Colors.black54
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              DropdownButton<String>(
+                                value: servingTime,
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    servingTime = newValue;
+                                    onChangeSelected(int.parse(servingTime));
+                                  }
+                                  setState(() {});
+                                },
+                                items: List.generate(
+                                        11,
+                                        (index) =>
+                                            index == 0 ? "-" : index.toString())
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(
+                                      value,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                                icon: const SizedBox.shrink(),
+                              ),
+                              const Icon(Icons.arrow_drop_down_rounded),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '인근장비',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        )
                       ],
                     )
-                        : Text(
+                  : Text(
                       e == headerLteTitle[1] ? text : e,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+            ),
           ),
-          ...getMeasuredRows(),
-        ],
-      ),
+        );
+      }).toList(),
     );
+  }
+
+  void onChangeSelected(int servingTime) {
+    measureDataList = measureDataList.map((measureData) {
+      return measureData.copyWith(
+        baseList: measureData.baseList.map((baseData) {
+          return baseData.copyWith(
+              isChecked: measureData.sTime == null ||
+                  measureData.sTime! <= servingTime);
+        }).toList(),
+      );
+    }).toList();
+    widget.onChange(measureDataList);
+    setState(() {});
   }
 
   List<TableRow> getMeasuredRows() {
@@ -148,7 +206,7 @@ class _TableViewState extends State<TableView> {
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: InkWell(
                 onTap: () => widget.onTapPci(measureData.pci),
                 child: Center(
@@ -166,14 +224,14 @@ class _TableViewState extends State<TableView> {
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: Center(
                 child: InkWell(
                   onTap: measureData.nPci.isEmpty
                       ? null
                       : () {
-                    widget.onTapNPci(measureData.pci);
-                  },
+                          widget.onTapNPci(measureData.pci);
+                        },
                   child: Text(
                     widget.isNpci
                         ? measureData.mw?.toStringAsFixed(15) ?? ''
@@ -188,19 +246,19 @@ class _TableViewState extends State<TableView> {
           ),
           ...measureData.getValues(widget.type).map(
                 (e) => TableCell(
-              verticalAlignment: TableCellVerticalAlignment.middle,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8.0, vertical: 4.0),
-                child: Center(child: Text(e.toString())),
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Center(child: Text(e.toString())),
+                  ),
+                ),
               ),
-            ),
-          ),
           TableCell(
             verticalAlignment: TableCellVerticalAlignment.middle,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: SizedBox(
                 height: 20 * measureData.baseList.length.toDouble(),
                 child: BaseListCheckBox(

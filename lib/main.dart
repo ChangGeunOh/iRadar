@@ -17,7 +17,9 @@ import 'data/repository/network_source_impl.dart';
 import 'data/repository/repository.dart';
 
 void main() {
-  runApp(const MyApp());
+  const String environment =
+      String.fromEnvironment("FLAVOR", defaultValue: "debug");
+  runApp(const MyApp(environment: environment));
 
   // 뒤로 가기 버튼 제어
   // html.window.onPopState.listen((event) {
@@ -32,11 +34,17 @@ void main() {
 final rootScaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String environment;
+
+  const MyApp({
+    super.key,
+    required this.environment,
+  });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return RepositoryProvider(
       lazy: false,
       create: (context) {
@@ -52,10 +60,7 @@ class MyApp extends StatelessWidget {
           context: context,
         );
         final LocalNetwork localNetwork = LocalNetwork(customInterceptor);
-        final networkSource = NetworkSourceImpl(
-          localNetwork.dio,
-          baseUrl: kNetworkBaseUrl,
-        );
+        final networkSource = NetworkSourceImpl(localNetwork.dio);
         final dataCacheSource = DataCacheSourceImpl(
           dataCache: LocalDataCache(),
         );

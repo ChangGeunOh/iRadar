@@ -1,3 +1,4 @@
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'base_data.g.dart';
@@ -50,6 +51,10 @@ class BaseData {
         latitude == 0.0 ||
         longitude == 0.0;
   }
+
+  bool get isRelay => type == WirelessType.w5G
+      ? false
+      : ['RS', 'RB', 'RE'].any((e) => code.startsWith(e));
 }
 
 // class BaseTable(Base):

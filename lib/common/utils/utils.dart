@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:intl/intl.dart';
 
+import '../const/network.dart';
+
 // 문자열 중에서 숫자만 추출
 String getNumbersFromString(String inputString) {
   RegExp regex = RegExp(r'\d+(\.\d+)?');
@@ -35,4 +37,9 @@ String hashPassword(String password, String secretKey) {
   var digest = hmacSha256.convert(bytes);
 
   return digest.toString();
+}
+
+String get baseUrl {
+  const isDebug = bool.fromEnvironment("dart.vm.product") == false;
+  return isDebug ? kNetworkDebugBaseUrl : kNetworkReleaseBaseUrl;
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
@@ -181,20 +182,30 @@ class Repository {
     // return excelResponseDataList;
   }
 
-  void setMeasureMarkers(PlaceData placeData, Set<Marker> markers) {
-    _dataCacheSource.setMeasureMarkers(placeData.idx, markers);
+  void setMeasureMarkers(
+      PlaceData placeData, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setMeasureMarkers(placeData.idx, markers, wirelessType);
   }
 
-  Set<Marker>? getMeasureMarkers(int idx) {
-    return _dataCacheSource.getMeasureMarkers(idx);
+  Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType) {
+    return _dataCacheSource.getMeasureMarkers(idx, wirelessType);
   }
 
-  void setBaseMarkers(int idx, Set<Marker> markers) {
-    _dataCacheSource.setBaseMarkers(idx, markers);
+  void setBaseMarkers(int idx, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setBaseMarkers(idx, markers, wirelessType);
   }
 
-  Set<Marker>? getBaseMarkers(int idx) {
-    return _dataCacheSource.getBaseMarkers(idx)?.toSet();
+  Set<Marker>? getBaseMarkers(int idx, WirelessType wirelessType) {
+    return _dataCacheSource.getBaseMarkers(idx, wirelessType)?.toSet();
+  }
+
+  Set<Marker>? getNoLabelBaseMarkers(int idx, WirelessType type) {
+    return _dataCacheSource.getNoLabelBaseMarkers(idx, type)?.toSet();
+  }
+
+  void setNoLabelBaseMarkers(
+      int idx, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setNoLabelBaseMarkers(idx, markers, wirelessType);
   }
 
   // Future<List<TableData>?> loadNpciTableList(
@@ -246,7 +257,6 @@ class Repository {
   }
 
   Future<ResponseData<List<AreaData>>> getAreaList() async {
-    final userData = getUserData();
     return await _networkSource.getAreaList('test');
   }
 
@@ -255,20 +265,20 @@ class Repository {
     int areaCode,
   ) async {
     final mapData = await _dataStoreSource.loadMapData(type, areaCode);
-    print('getMapData: $mapData');
     if (mapData == null) {
       final responseData = await _networkSource.getMapDataList(
         type: type.name,
         idx: areaCode,
       );
-      if (responseData.meta.code== 200){
+      if (responseData.meta.code == 200) {
         _dataStoreSource.saveMapData(type, areaCode, responseData.data!);
         return responseData;
       } else {
         return responseData;
       }
     } else {
-      return ResponseData<MapData>(data: mapData);;
+      return ResponseData<MapData>(data: mapData);
+      ;
     }
   }
 
@@ -337,5 +347,42 @@ class Repository {
       idx: idx,
       spci: spci,
     );
+  }
+
+  Future<ResponseData> getBaseList(
+    WirelessType type,
+    LatLngBounds latLngBounds,
+  ) async {
+    return _networkSource.getBaseList(
+      type: type.name,
+      northEastLatitude: latLngBounds.northeast.latitude,
+      northEastLongitude: latLngBounds.northeast.longitude,
+      southWestLatitude: latLngBounds.southwest.latitude,
+      southWestLongitude: latLngBounds.southwest.longitude,
+    );
+  }
+
+  Future<ResponseData> getSearchArea() {
+    return _networkSource.getSearchAreaList();
+  }
+
+  Future<void> clearCacheData() async {
+    _dataStoreSource.clearMapData();
+  }
+
+  Future<ResponseData> getBaseDataList() async {
+    return _networkSource.getBaseDataList();
+  }
+
+  void setCustomMeasureMarker(
+    String pci,
+    String iconPath,
+    BitmapDescriptor bitmapDescriptor,
+  ) {
+    _dataCacheSource.setCustomMeasureMarker(pci, iconPath, bitmapDescriptor);
+  }
+
+  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
+    return _dataCacheSource.getCustomMeasureMarker(pci, iconPath);
   }
 }

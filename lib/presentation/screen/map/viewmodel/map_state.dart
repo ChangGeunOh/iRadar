@@ -27,10 +27,16 @@ class MapState {
   final LoginData? loginData;
   final Map<int, MapData> mapDataSet;
   final Map<WirelessType, LatLngBounds> latLngBoundsMap;
-  final LatLngBounds? latLngBound;
   final WirelessType wirelessType;
   final String message;
   final bool showingDialog;
+
+  final bool isShowBase;
+  final Set<Marker> otherBaseMarkerSet;
+  final Set<Marker> noLabelBaseMarkerSet;
+  final LatLngBounds? latLngBounds;
+
+  final bool isShowCaption;
 
   MapState({
     this.areaDataSet = const {},
@@ -48,12 +54,16 @@ class MapState {
     this.isMergeData = false,
     this.loginData,
     this.mapDataSet = const {},
-    this.latLngBound,
     this.wirelessType = WirelessType.w5G,
     this.latLngBoundsMap = const {},
     this.measureMarkerSet = const {},
     this.message = '',
     this.showingDialog = false,
+    this.isShowBase = false,
+    this.otherBaseMarkerSet = const {},
+    this.latLngBounds,
+    this.isShowCaption = true,
+    this.noLabelBaseMarkerSet = const {},
   });
 
   MapState copyWith({
@@ -74,12 +84,16 @@ class MapState {
     LoginData? loginData,
     List<MapData>? mapDataList,
     Map<int, MapData>? mapDataSet,
-    LatLngBounds? latLngBound,
     WirelessType? wirelessType,
     Map<WirelessType, LatLngBounds>? latLngBoundsMap,
     Set<Marker>? measureMarkerSet,
     String? message,
     bool? showingDialog,
+    bool? isShowBase,
+    Set<Marker>? otherBaseMarkerSet,
+    LatLngBounds? latLngBounds,
+    bool? isShowCaption,
+    Set<Marker>? noLabelBaseMarkerSet,
   }) {
     return MapState(
       areaDataSet: areaDataSet ?? this.areaDataSet,
@@ -97,12 +111,16 @@ class MapState {
       isMergeData: isMergeData ?? this.isMergeData,
       loginData: loginData ?? this.loginData,
       mapDataSet: mapDataSet ?? this.mapDataSet,
-      latLngBound: latLngBound ?? this.latLngBound,
       wirelessType: wirelessType ?? this.wirelessType,
       latLngBoundsMap: latLngBoundsMap ?? this.latLngBoundsMap,
       measureMarkerSet: measureMarkerSet ?? this.measureMarkerSet,
       message: message ?? this.message,
       showingDialog: showingDialog ?? this.showingDialog,
+      isShowBase: isShowBase ?? this.isShowBase,
+      otherBaseMarkerSet: otherBaseMarkerSet ?? this.otherBaseMarkerSet,
+      latLngBounds: latLngBounds ?? this.latLngBounds,
+      isShowCaption: isShowCaption ?? this.isShowCaption,
+      noLabelBaseMarkerSet: noLabelBaseMarkerSet ?? this.noLabelBaseMarkerSet,
     );
   }
 

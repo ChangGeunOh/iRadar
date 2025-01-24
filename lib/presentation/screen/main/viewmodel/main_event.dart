@@ -15,5 +15,5 @@ enum MainEvent {
   onTapShiftKey,
   onShowDialog,
   onTapNoticePage,
-  onLogout, onPassword,
+  onLogout, onPassword, onDownloadBaseData,
 }

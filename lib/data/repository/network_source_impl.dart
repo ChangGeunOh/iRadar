@@ -3,6 +3,7 @@ import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../../common/utils/utils.dart';
 import '../../domain/model/base/base_data.dart';
 import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/map/area_data.dart';
@@ -17,9 +18,11 @@ import '../../domain/repository/network_source.dart';
 
 part 'network_source_impl.g.dart';
 
-@RestApi(baseUrl: kNetworkBaseUrl)
+@RestApi()
 abstract class NetworkSourceImpl extends NetworkSource {
-  factory NetworkSourceImpl(Dio dio, {String baseUrl}) = _NetworkSourceImpl;
+  factory NetworkSourceImpl(Dio dio) {
+    return _NetworkSourceImpl(dio, baseUrl: baseUrl);
+  }
 
   @override
   @GET(kLoginPath)
@@ -74,7 +77,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @POST(kPostBaseDatListPath)
+  @POST(kBaseDataPath)
   @Headers({'access_token': true})
   Future<ResponseData> uploadBaseData(
     @Body() List<BaseData> uploadData,
@@ -134,4 +137,25 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Path('idx') required int idx,
     @Query('pci') required String spci,
   });
+
+  @override
+  @Headers({'access_token': false})
+  @GET(kMapBaseDataPath)
+  Future<ResponseData<List<BaseData>>> getBaseList({
+    @Query('type') required String type,
+    @Query('north_east_longitude') required double northEastLongitude,
+    @Query('north_east_latitude') required double northEastLatitude,
+    @Query('south_west_longitude') required double southWestLongitude,
+    @Query('south_west_latitude') required double southWestLatitude,
+  });
+
+  @override
+  @Headers({'access_token': false})
+  @GET(kSearchAreaDataPath)
+  Future<ResponseData<List<AreaData>>> getSearchAreaList();
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kBaseDataPath)
+  Future<ResponseData<List<BaseData>>> getBaseDataList();
 }

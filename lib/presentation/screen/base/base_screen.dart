@@ -39,7 +39,7 @@ class BaseScreen extends StatelessWidget with ShowMessageMixin {
               Row(
                 children: [
                   const Text(
-                    '기지국 정보 등록',
+                    '기지국/중계기 정보 등록',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 24,

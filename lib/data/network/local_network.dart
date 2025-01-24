@@ -1,15 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:googlemap/common/const/network.dart';
+import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import 'custom_interceptor.dart';
 
 class LocalNetwork {
   final CustomInterceptor customInterceptor;
-
   LocalNetwork(this.customInterceptor,);
 
   Dio get dio {
+
     final dio = Dio();
     dio.interceptors.add(customInterceptor);
     dio.interceptors.add(
@@ -24,7 +25,7 @@ class LocalNetwork {
       ),
     );
     dio.options.responseType = ResponseType.json;
-    dio.options.baseUrl = kNetworkBaseUrl;
+    dio.options.baseUrl = baseUrl;
 
     return dio;
   }

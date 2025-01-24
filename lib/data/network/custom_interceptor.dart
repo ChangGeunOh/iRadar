@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../../common/const/network.dart';
@@ -40,7 +41,7 @@ class CustomInterceptor extends Interceptor {
         final tokenData = await dataStoreSource.getTokenData();
         final refreshToken = tokenData?.refreshToken;
         var response = await dio.get(
-          '$kNetworkBaseUrl$kTokenPath',
+          '$baseUrl$kTokenPath',
           options: Options(
             headers: {
               'authorization': 'Bearer $refreshToken',

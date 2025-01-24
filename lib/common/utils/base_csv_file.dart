@@ -3,13 +3,14 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../../domain/model/base/base_data.dart';
 
 class BaseCsvFile {
-  final ruId = ['ru_id', 'id'];
-  final ruName = ['ru_name', 'name'];
-  final pci = ['pci', 'physicalLayerCellId'];
+  final ruId = ['ru_id', 'id', '장비ID'];
+  final ruName = ['ru_name', 'name', '장비명'];
+  final pci = ['pci', 'physicalLayerCellId', 'LTE모국(1.8)PN'];
   final lat = ['lat', 'latitude', '위도'];
   final lng = ['lng', 'longitude', '경도'];
 
@@ -38,6 +39,8 @@ class BaseCsvFile {
 
     for (var i = 1; i < list.length; i++) {
       final row = list[i];
+      print('row: $row');
+      print('i: $i, ruIdIndex: $ruIdIndex, ruNameIndex: $ruNameIndex, pciIndex: $pciIndex, latIndex: $latIndex, lngIndex: $lngIndex');
       final baseData = _createBaseData(
         i,
         row,
@@ -110,13 +113,14 @@ class BaseCsvFile {
       return doubleLatLng;
     }
 
-    List<String> parts = coordinate.split(RegExp(r"[ :]+"));
-    if (parts.length != 4) {
+    List<String> parts = coordinate.split(RegExp(r"[ -]+"));
+    print('coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}');
+    if (parts.length != 4 && parts.length != 3) {
       return 0.0;
     }
-    double degrees = double.parse(parts[1]);
-    double minutes = double.parse(parts[2]);
-    double seconds = double.parse(parts[3]);
+    double degrees = double.parse(parts[parts.length == 4 ? 1 : 0]);
+    double minutes = double.parse(parts[parts.length == 4 ? 2 : 1]);
+    double seconds = double.parse(parts[parts.length == 4 ? 3 : 2]);
     double decimalDegrees = degrees + (minutes / 60) + (seconds / 3600);
 
     return decimalDegrees;

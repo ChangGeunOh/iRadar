@@ -62,6 +62,9 @@ class MainScreen extends StatelessWidget {
                         areaDataSet: state.selectedAreaDataSet,
                         isRemove: state.isRemove,
                         wirelessType: state.type,
+                        onReloadArea: () {
+                          bloc.add(BlocEvent(MainEvent.onTapRefresh));
+                        },
                       ),
                     if (state.selectedAreaDataSet.length == 1)
                       ChartScreen(
@@ -191,13 +194,13 @@ class MainScreen extends StatelessWidget {
             const SizedBox(height: 32),
             const DrawerListHeader(text: 'UPLOAD BASIC DATA'),
             DrawerListItem(
-                title: "업로드 파일 다운로드",
+                title: "업로드 파일 샘플 다운로드",
                 iconData: Icons.file_copy_outlined,
                 onTap: () {
                   _downloadExampleFile();
                 }),
             DrawerListItem(
-                title: "기지국 정보 업로드",
+                title: "기지국/중계기 정보 업로드",
                 iconData: Icons.cell_tower_rounded,
                 onTap: () {
                   _showDialog(
@@ -206,6 +209,14 @@ class MainScreen extends StatelessWidget {
                     bloc,
                     const BaseScreen(),
                   );
+                }),
+            DrawerListItem(
+                title: "기지국/중계기 정보 다운로드",
+                iconData: Icons.file_download,
+                onTap: () {
+                  bloc.add(BlocEvent(
+                    MainEvent.onDownloadBaseData,
+                  ));
                 }),
             const SizedBox(height: 32),
             const DrawerListHeader(text: 'INFORMATION'),
@@ -217,7 +228,7 @@ class MainScreen extends StatelessWidget {
                   context,
                   '공지사항',
                   bloc,
-                  NoticeScreen(),
+                  const NoticeScreen(),
                 );
               },
             ),
@@ -279,6 +290,7 @@ class MainScreen extends StatelessWidget {
     Widget child,
   ) async {
     bloc.add(BlocEvent(MainEvent.onShowDialog, extra: true));
+    final height = MediaQuery.of(context).size.height;
     await showDialog(
         context: context,
         builder: (context) {
@@ -291,7 +303,7 @@ class MainScreen extends StatelessWidget {
                   left: 32.0, right: 32, top: 32, bottom: 16),
               child: SizedBox(
                 width: 800,
-                height: 798,
+                height: height > 798 ? 798 : height * 0.9,
                 child: child,
               ),
             ),
@@ -301,22 +313,15 @@ class MainScreen extends StatelessWidget {
   }
 
   Future<void> _downloadExampleFile() async {
-      // Load the file as a ByteData
-      ByteData data = await rootBundle.load('assets/files/iradar_upload_example_file.zip');
-      // Convert ByteData to Uint8List
-      final buffer = data.buffer;
-      final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-
-      // Create a Blob from the Uint8List
-      final blob = html.Blob([bytes]);
-      // Create an Object URL for the Blob
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      // Create an AnchorElement
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute("download", "iradar_upload_example_file.zip")
-        ..click();
-      // Revoke the Object URL
-      html.Url.revokeObjectUrl(url);
+    ByteData data =
+        await rootBundle.load('assets/files/iradar_upload_example_file.zip');
+    final buffer = data.buffer;
+    final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    html.AnchorElement(href: url)
+      ..setAttribute("download", "iradar_upload_example_file.zip")
+      ..click();
+    html.Url.revokeObjectUrl(url);
   }
-
 }

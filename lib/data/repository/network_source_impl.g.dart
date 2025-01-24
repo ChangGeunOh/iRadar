@@ -6,19 +6,20 @@ part of 'network_source_impl.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element
 
 class _NetworkSourceImpl implements NetworkSourceImpl {
   _NetworkSourceImpl(
     this._dio, {
     this.baseUrl,
-  }) {
-    baseUrl ??= 'http://paran.ddns.net:5600/iradar/';
-  }
+    this.errorLogger,
+  });
 
   final Dio _dio;
 
   String? baseUrl;
+
+  final ParseErrorLogger? errorLogger;
 
   @override
   Future<ResponseData<TokenData?>> loadLogin(String basicAuth) async {
@@ -27,30 +28,36 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'Authorization': basicAuth};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<TokenData>>(Options(
+    final _options = _setStreamType<ResponseData<TokenData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'auth/login',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<TokenData?>.fromJson(
-      _result.data!,
-      (json) => json == null
-          ? null
-          : TokenData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'auth/login',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<TokenData?> _value;
+    try {
+      _value = ResponseData<TokenData?>.fromJson(
+        _result.data!,
+        (json) => json == null
+            ? null
+            : TokenData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -62,28 +69,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(measureUploadData.toJson());
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<dynamic>>(Options(
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'upload',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<dynamic>.fromJson(
-      _result.data!,
-      (json) => json as dynamic,
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'upload',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -92,30 +105,36 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = jsonString;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<TokenData>>(Options(
+    final _options = _setStreamType<ResponseData<TokenData>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'auth/login',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<TokenData?>.fromJson(
-      _result.data!,
-      (json) => json == null
-          ? null
-          : TokenData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'auth/login',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<TokenData?> _value;
+    try {
+      _value = ResponseData<TokenData?>.fromJson(
+        _result.data!,
+        (json) => json == null
+            ? null
+            : TokenData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -125,33 +144,39 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<AreaData>>>(Options(
+    final _options = _setStreamType<ResponseData<List<AreaData>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'area',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<AreaData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<AreaData>(
-                  (i) => AreaData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'area',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<AreaData>> _value;
+    try {
+      _value = ResponseData<List<AreaData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<AreaData>(
+                    (i) => AreaData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -164,28 +189,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<MapData>>(Options(
+    final _options = _setStreamType<ResponseData<MapData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'map/${type}/${idx}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<MapData>.fromJson(
-      _result.data!,
-      (json) => MapData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'map/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<MapData> _value;
+    try {
+      _value = ResponseData<MapData>.fromJson(
+        _result.data!,
+        (json) => MapData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -196,28 +227,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(mergeData.toJson());
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<dynamic>>(Options(
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'map/merge',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<dynamic>.fromJson(
-      _result.data!,
-      (json) => json as dynamic,
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'map/merge',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -230,33 +267,39 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<MeasureData>>>(Options(
+    final _options = _setStreamType<ResponseData<List<MeasureData>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'chart/${type}/${idx}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<MeasureData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<MeasureData>(
-                  (i) => MeasureData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'chart/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<MeasureData>> _value;
+    try {
+      _value = ResponseData<List<MeasureData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<MeasureData>(
+                    (i) => MeasureData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -267,28 +310,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     final _data = uploadData.map((e) => e.toJson()).toList();
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<dynamic>>(Options(
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'base/',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<dynamic>.fromJson(
-      _result.data!,
-      (json) => json as dynamic,
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'base/',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -304,28 +353,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       'old_password': oldPassword,
       'new_password': newPassword,
     };
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<dynamic>>(Options(
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'auth/change',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<dynamic>.fromJson(
-      _result.data!,
-      (json) => json as dynamic,
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'auth/change',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -336,28 +391,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
     _data.addAll(data.toJson());
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<dynamic>>(Options(
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'area',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<dynamic>.fromJson(
-      _result.data!,
-      (json) => json as dynamic,
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'area',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -367,29 +428,36 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<UserData>>(Options(
+    final _options = _setStreamType<ResponseData<UserData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'auth/user',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<UserData?>.fromJson(
-      _result.data!,
-      (json) =>
-          json == null ? null : UserData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'auth/user',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<UserData?> _value;
+    try {
+      _value = ResponseData<UserData?>.fromJson(
+        _result.data!,
+        (json) => json == null
+            ? null
+            : UserData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -399,33 +467,39 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<NoticeData>>>(Options(
+    final _options = _setStreamType<ResponseData<List<NoticeData>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'notice',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<NoticeData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<NoticeData>(
-                  (i) => NoticeData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'notice',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<NoticeData>> _value;
+    try {
+      _value = ResponseData<List<NoticeData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<NoticeData>(
+                    (i) => NoticeData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -435,28 +509,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<NoticeData>>(Options(
+    final _options = _setStreamType<ResponseData<NoticeData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'notice/${id}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<NoticeData>.fromJson(
-      _result.data!,
-      (json) => NoticeData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'notice/${id}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<NoticeData> _value;
+    try {
+      _value = ResponseData<NoticeData>.fromJson(
+        _result.data!,
+        (json) => NoticeData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -466,28 +546,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<NoticeData>>(Options(
+    final _options = _setStreamType<ResponseData<NoticeData>>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'notice',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<NoticeData>.fromJson(
-      _result.data!,
-      (json) => NoticeData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'notice',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<NoticeData> _value;
+    try {
+      _value = ResponseData<NoticeData>.fromJson(
+        _result.data!,
+        (json) => NoticeData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -501,28 +587,34 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<PciBaseData>>(Options(
+    final _options = _setStreamType<ResponseData<PciBaseData>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'pci/${type}/${idx}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<PciBaseData>.fromJson(
-      _result.data!,
-      (json) => PciBaseData.fromJson(json as Map<String, dynamic>),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'pci/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<PciBaseData> _value;
+    try {
+      _value = ResponseData<PciBaseData>.fromJson(
+        _result.data!,
+        (json) => PciBaseData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -536,33 +628,177 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     final _headers = <String, dynamic>{r'access_token': false};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<ResponseData<List<MeasureData>>>(Options(
+    final _options = _setStreamType<ResponseData<List<MeasureData>>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
-            .compose(
-              _dio.options,
-              'npci/${type}/${idx}',
-              queryParameters: queryParameters,
-              data: _data,
-            )
-            .copyWith(
-                baseUrl: _combineBaseUrls(
-              _dio.options.baseUrl,
-              baseUrl,
-            ))));
-    final value = ResponseData<List<MeasureData>>.fromJson(
-      _result.data!,
-      (json) => json is List<dynamic>
-          ? json
-              .map<MeasureData>(
-                  (i) => MeasureData.fromJson(i as Map<String, dynamic>))
-              .toList()
-          : List.empty(),
-    );
-    return value;
+        .compose(
+          _dio.options,
+          'npci/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<MeasureData>> _value;
+    try {
+      _value = ResponseData<List<MeasureData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<MeasureData>(
+                    (i) => MeasureData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<List<BaseData>>> getBaseList({
+    required String type,
+    required double northEastLongitude,
+    required double northEastLatitude,
+    required double southWestLongitude,
+    required double southWestLatitude,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'type': type,
+      r'north_east_longitude': northEastLongitude,
+      r'north_east_latitude': northEastLatitude,
+      r'south_west_longitude': southWestLongitude,
+      r'south_west_latitude': southWestLatitude,
+    };
+    final _headers = <String, dynamic>{r'access_token': false};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<List<BaseData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'map/base',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<BaseData>> _value;
+    try {
+      _value = ResponseData<List<BaseData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<BaseData>(
+                    (i) => BaseData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<List<AreaData>>> getSearchAreaList() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': false};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<List<AreaData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'area/search',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<AreaData>> _value;
+    try {
+      _value = ResponseData<List<AreaData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<AreaData>(
+                    (i) => AreaData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<List<BaseData>>> getBaseDataList() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<List<BaseData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'base/',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<BaseData>> _value;
+    try {
+      _value = ResponseData<List<BaseData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<BaseData>(
+                    (i) => BaseData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

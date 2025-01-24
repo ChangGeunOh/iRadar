@@ -64,7 +64,7 @@ class _TopLayoutState extends State<TopLayout> {
             SizedBox(
               width: 400,
               child: EditText(
-                label: '파일명',
+                label: '측정 DB 선택',
                 value: fileName,
                 onChanged: (value) {},
                 suffixIcon: IconButton(
@@ -79,31 +79,15 @@ class _TopLayoutState extends State<TopLayout> {
             Expanded(
               child: MeasureEditText(
                 onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      area = value;
-                    });
-                  }
+                  area = value;
+                  setState(() {});
                 },
-                label: '측정장소',
-                value: area,
-                suffixIcon: IconButton(
-                  onPressed: () async {
-                    final areaData = await showDialog(
-                      context: context,
-                      builder: (context) => const AreaDialog(),
-                    );
-                    if (areaData != null) {
-                      setState(() {
-                        this.areaData = areaData;
-                        area = areaData.name ?? '';
-                      });
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.search_rounded,
-                  ),
-                ),
+                label: 'NI-Radar 파일명',
+                onChangedArea: (value) {
+                  areaData = value;
+                  division = areaData?.division?.name ?? '';
+                  setState(() {});
+                },
               ),
             ),
           ],
@@ -127,6 +111,7 @@ class _TopLayoutState extends State<TopLayout> {
             CheckTextBox(
               onChanged: (value) {
                 isWideArea = value;
+                setState(() {});
               },
               text: '넓은 지역 (고속도로 등)',
               value: isWideArea,
@@ -137,6 +122,7 @@ class _TopLayoutState extends State<TopLayout> {
                   ? null
                   : (value) {
                       isAddData = value;
+                      setState(() {});
                     },
               text: '기존자료에 추가',
               checkColor: Colors.red,
@@ -191,13 +177,12 @@ class _TopLayoutState extends State<TopLayout> {
     );
     if (result != null) {
       final file = result.files.single;
-      setState(() {
-        fileName = file.name;
-        excelFile = ExcelFile(bytes: file.bytes!);
-        isLteOnly = excelFile!.isLteOnly;
-        isNoLocation = excelFile!.isNoLocation;
-        widget.onChangedData(excelFile!);
-      });
+      fileName = file.name;
+      excelFile = await ExcelFile.fromBytes(file.bytes!);
+      isLteOnly = excelFile!.isLteOnly;
+      isNoLocation = excelFile!.isNoLocation;
+      widget.onChangedData(excelFile!);
+      setState(() {});
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:googlemap/common/utils/mixin.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
+import 'package:googlemap/presentation/screen/login/component/web_version.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_bloc.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_event.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_state.dart';
@@ -62,41 +63,70 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                     ),
                     const SizedBox(height: 38),
                     Text(
-                      'Employee Number',
+                      'N/W O&M HQ',
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     const SizedBox(height: 6),
-                    TextField(
-                      controller: bloc.usernameController,
+                    // TextField(
+                    //   controller: bloc.usernameController,
+                    //   style: Theme.of(context).textTheme.bodySmall,
+                    //   onSubmitted: (value) {
+                    //     bloc.add(
+                    //       BlocEvent(
+                    //         LoginEvent.onTapLogin,
+                    //       ),
+                    //     );
+                    //   },
+                    //   onChanged: (value) {
+                    //     bloc.add(
+                    //         BlocEvent(LoginEvent.onUserId, extra: value));
+                    //   },
+                    //   decoration: InputDecoration(
+                    //     contentPadding:
+                    //     const EdgeInsets.symmetric(horizontal: 16),
+                    //     suffixIcon: state.userId.isNotEmpty
+                    //         ? IconButton(
+                    //       onPressed: ()=>bloc.usernameController.clear(),
+                    //       icon: const Icon(
+                    //         Icons.clear,
+                    //         size: 20,
+                    //       ),
+                    //     )
+                    //         : null,
+                    //     enabledBorder: const OutlineInputBorder(
+                    //       borderSide: BorderSide(color: Color(0x59666666)),
+                    //       borderRadius: BorderRadius.all(Radius.circular(8)),
+                    //     ),
+                    //     focusedBorder: const OutlineInputBorder(
+                    //       borderSide: BorderSide(
+                    //         color: Color(0x59666666),
+                    //         width: 2,
+                    //       ),
+                    //       borderRadius: BorderRadius.all(Radius.circular(8)),
+                    //     ),
+                    //   ),
+                    //   autofillHints: const [AutofillHints.name],
+                    // ),
+                    DropdownButtonFormField<String>(
+                      value: state.userId.isNotEmpty ? state.userId : null,
+                      // 선택된 값
                       style: Theme.of(context).textTheme.bodySmall,
-                      onSubmitted: (value) {
-                        bloc.add(
-                          BlocEvent(
-                            LoginEvent.onTapLogin,
-                          ),
-                        );
-                      },
                       onChanged: (value) {
-                        bloc.add(
-                            BlocEvent(LoginEvent.onUserId, extra: value));
+                        // 선택된 값을 bloc에 전달
+                        print("UserId> $value");
+                        if (value != null) {
+                          bloc.add(
+                            BlocEvent(LoginEvent.onUserId, extra: value),
+                          );
+                        }
                       },
-                      decoration: InputDecoration(
-                        contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16),
-                        suffixIcon: state.userId.isNotEmpty
-                            ? IconButton(
-                          onPressed: ()=>bloc.usernameController.clear(),
-                          icon: const Icon(
-                            Icons.clear,
-                            size: 20,
-                          ),
-                        )
-                            : null,
-                        enabledBorder: const OutlineInputBorder(
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Color(0x59666666)),
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
-                        focusedBorder: const OutlineInputBorder(
+                        focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                             color: Color(0x59666666),
                             width: 2,
@@ -104,6 +134,23 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                       ),
+                      items: const [
+                        DropdownMenuItem(value: "강북", child: Text("강북")),
+                        DropdownMenuItem(value: "강원", child: Text("강원")),
+                        DropdownMenuItem(value: "강남", child: Text("강남")),
+                        DropdownMenuItem(value: "서부", child: Text("서부")),
+                        DropdownMenuItem(value: "부산", child: Text("부산")),
+                        DropdownMenuItem(value: "울산", child: Text("울산")),
+                        DropdownMenuItem(value: "경남", child: Text("경남")),
+                        DropdownMenuItem(value: "대구", child: Text("대구")),
+                        DropdownMenuItem(value: "경북", child: Text("경북")),
+                        DropdownMenuItem(value: "전남", child: Text("전남")),
+                        DropdownMenuItem(value: "전북", child: Text("전북")),
+                        DropdownMenuItem(value: "제주", child: Text("제주")),
+                        DropdownMenuItem(value: "충남", child: Text("충남")),
+                        DropdownMenuItem(value: "충북", child: Text("충북")),
+                      ],
+                      hint: const Text("지역을 선택하세요"), // 초기 상태의 힌트 텍스트
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -171,17 +218,18 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                       ),
+                      autofillHints: const [AutofillHints.password],
                     ),
                     const SizedBox(height: 22),
                     ElevatedButton(
                       onPressed: state.isEnableLoginButton
                           ? () {
-                        bloc.add(
-                          BlocEvent(
-                            LoginEvent.onTapLogin,
-                          ),
-                        );
-                      }
+                              bloc.add(
+                                BlocEvent(
+                                  LoginEvent.onTapLogin,
+                                ),
+                              );
+                            }
                           : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 22),
@@ -210,10 +258,9 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                       overflow: TextOverflow.ellipsis,
                       TextSpan(
                         text: 'By continuing, you agree to the ',
-                        style:
-                        Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w300,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w300,
+                            ),
                         children: [
                           TextSpan(
                             text: 'Terms of use',
@@ -264,8 +311,8 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(
-                              decoration: TextDecoration.underline,
-                            ),
+                                  decoration: TextDecoration.underline,
+                                ),
                           ),
                         ),
                         const Spacer(),
@@ -281,8 +328,8 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                                 .textTheme
                                 .titleSmall
                                 ?.copyWith(
-                              decoration: TextDecoration.underline,
-                            ),
+                                  decoration: TextDecoration.underline,
+                                ),
                           ),
                         ),
                       ],
@@ -290,6 +337,11 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                   ],
                 ),
               ),
+            ),
+            const Positioned(
+              left: 24,
+              bottom: 24,
+              child: WebVersion(),
             ),
             const Positioned(
               right: 24,

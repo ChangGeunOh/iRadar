@@ -1,10 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
 enum LocationType {
-  @JsonValue('인빌딩')
-  inBuilding('인빌딩'),
   @JsonValue('행정동')
   adminBuilding('행정동'),
+  @JsonValue('인빌딩')
+  inBuilding('인빌딩'),
   @JsonValue('테마')
   theme('테마'),
   undefined('undefined');

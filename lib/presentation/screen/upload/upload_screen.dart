@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../common/utils/mixin.dart';
 import '../../../domain/bloc/bloc_event.dart';
 import '../../../domain/bloc/bloc_scaffold.dart';
-import 'component/bottom_layout.dart';
 import 'component/table_layout.dart';
 import 'component/top_layout.dart';
 import 'viewmodel/upload_bloc.dart';
@@ -28,7 +27,6 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
         ),
       ),
       builder: (context, bloc, state) {
-
         if (state.message.isNotEmpty) {
           showToast(state.message);
           bloc.add(BlocEvent(UploadEvent.onClearMessage));
@@ -55,9 +53,12 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
                         ),
                       );
                     },
-                    onChangeLoading:(value){
-                      bloc.add(BlocEvent(UploadEvent.onLoading, extra: value));
-                    }
+                    onChangeLoading: (value) {
+                      bloc.add(BlocEvent(
+                        UploadEvent.onLoading,
+                        extra: value,
+                      ));
+                    },
                   ),
                   const SizedBox(height: 24),
                   if (state.excelFile != null)

@@ -28,6 +28,14 @@ class _EditTextState extends State<EditText> {
   late TextEditingController controller;
 
   @override
+  void didUpdateWidget(covariant EditText oldWidget) {
+    if (oldWidget.value != widget.value) {
+      controller.text = widget.value!;
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
     controller = TextEditingController(text: widget.value);
     super.initState();

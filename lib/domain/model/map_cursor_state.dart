@@ -1,5 +1,5 @@
 enum MapCursorState {
   none,
   add,
-  remove,
+  remove, removeAll, addAll,
 }

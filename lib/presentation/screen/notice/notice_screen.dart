@@ -9,10 +9,22 @@ import 'bloc/notice_state.dart';
 import 'widget/notice_detail.dart';
 import 'widget/notice_list.dart';
 
-class NoticeScreen extends StatelessWidget {
-  QuillController _controller = QuillController.basic();
+class NoticeScreen extends StatefulWidget {
 
-  NoticeScreen({super.key});
+  const NoticeScreen({super.key});
+
+  @override
+  State<NoticeScreen> createState() => _NoticeScreenState();
+}
+
+class _NoticeScreenState extends State<NoticeScreen> {
+  final QuillController _controller = QuillController.basic();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -31,13 +31,20 @@ class ExcelData {
     this.id = '',
     this.rnm = '',
     this.memo = '',
-    this.atten = '200',
+    String? atten,
     this.cellLock = '',
     this.ruLock = '',
-    this.relayLock = '',
+    String? relayLock,
     this.pci = '',
     this.scenario = 'i-Radar',
     this.regDate = '',
     required this.hasColor,
-  });
+  })  : atten = atten ??
+            (type == '5G'
+                ? '200'
+                : ['RS', 'RB', 'RE'].any((e) => id.startsWith(e))
+                    ? ''
+                    : '200'),
+        relayLock = ['RS', 'RB', 'RE'].any((e) => id.startsWith(e)) ? 'O' : '';
 }
+

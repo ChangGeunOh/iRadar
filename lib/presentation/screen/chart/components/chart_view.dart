@@ -15,13 +15,22 @@ class ChartView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var maxIndex = measureDataList.reduce((value, element) => value.inIndex > element.inIndex ? value : element).inIndex;
+    var maxIndex = measureDataList
+        .reduce((value, element) =>
+            value.inIndex > element.inIndex ? value : element)
+        .inIndex;
     maxIndex = (maxIndex / 100).ceil() * 100;
+
+    // measureDataList에서 inIndex 기준으로 가장 큰 값 25개를 추출
+    List<MeasureData> top25MeasureData = measureDataList
+      ..sort((a, b) => b.inIndex.compareTo(a.inIndex)); // inIndex 기준 내림차순 정렬
+    // 상위 25개 데이터 가져오기
+    top25MeasureData = top25MeasureData.take(25).toList();
 
     return BarChart(
       BarChartData(
         maxY: maxIndex,
-        barGroups: measureDataList
+        barGroups: top25MeasureData
             .mapIndexed(
               (index, e) => BarChartGroupData(
                 x: index,
@@ -43,7 +52,7 @@ class ChartView extends StatelessWidget {
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) => Text(
-                measureDataList[value.toInt()].pci.toString(),
+                top25MeasureData[value.toInt()].pci.toString(),
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -57,7 +66,7 @@ class ChartView extends StatelessWidget {
         barTouchData: BarTouchData(
           enabled: false,
           touchTooltipData: BarTouchTooltipData(
-            getTooltipColor: (groupData){
+            getTooltipColor: (groupData) {
               return Colors.transparent;
             },
             tooltipPadding: EdgeInsets.zero,

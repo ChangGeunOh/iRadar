@@ -10,7 +10,7 @@ import 'upload/measure_upload_data.dart';
 
 class ExcelFile {
   final Uint8List bytes;
-  late final MeasureUploadData measureUploadData;
+  late MeasureUploadData measureUploadData = MeasureUploadData();
   late final Excel excel;
   late final Sheet sheet;
 
@@ -19,10 +19,10 @@ class ExcelFile {
 
   final defaultLocation = ['129.150552778', '35.1604083333'];
 
-  ExcelFile({
-    required this.bytes,
-  }) {
-    _init();
+  ExcelFile._(this.bytes);
+
+  static Future<ExcelFile> fromBytes(Uint8List bytes) async {
+    return ExcelFile._(bytes).._init();
   }
 
   Future<void> _init() async {
@@ -30,6 +30,8 @@ class ExcelFile {
     sheet = excel.sheets.values.first;
     isNoLocation = sheet.maxColumns == 20 || sheet.maxColumns == 10;
     isLteOnly = sheet.maxColumns == 11 || sheet.maxColumns == 13;
+    print('sheet.maxColumns: ${sheet.maxColumns}');
+    print('isNoLocation: $isNoLocation :: isLteOnly: $isLteOnly');
     getMeasureData();
   }
 
@@ -41,8 +43,9 @@ class ExcelFile {
     List<IntfData> intfLteList = [];
 
     sheet.rows.forEachIndexed((index, row) {
-      if (row.first != null &&
-          row.first!.value.runtimeType == DateTimeCellValue) {
+      print(
+          'row.first: ${row.first?.value} :: ${row.first?.value.runtimeType} :: ${_isDateTimeParsable(row.first!.value)} :: ${row.first?.value is String}');
+      if (_isDateTimeParsable(row.first?.value)) {
         final rowData = _makeData(row, isNoLocation, isLteOnly);
         intf5GList.addAll(rowData.intf5GList);
         intfLteList.addAll(rowData.intfLteList);
@@ -52,12 +55,27 @@ class ExcelFile {
         }
       }
     });
+
     measureUploadData = MeasureUploadData(
       dt: dt,
       intf5GList: intf5GList,
       intfLteList: intfLteList,
       intfTTList: intfTTList,
     );
+  }
+
+  bool _isDateTimeParsable(dynamic value) {
+    if (value == null) return false;
+
+    if (value is DateTimeCellValue) {
+      return true; // 이미 DateTimeCellValue 타입인 경우
+    }
+
+    if (value is TextCellValue) {
+      return DateTime.tryParse(value.toString()) != null; // 파싱 가능 여부 확인
+    }
+
+    return false; // 다른 모든 경우 false
   }
 
   MeasureUploadData getUploadData({
@@ -89,10 +107,11 @@ class ExcelFile {
       list.insertAll(3, ['', '', '']);
       list.insertAll(9, ['', '', '', '', '', '']);
     }
-    final dateTime = (list.first as DateTimeCellValue).asDateTimeLocal();
+
+    final dateTime = list.first.runtimeType is DateTimeCellValue ?  (list.first as DateTimeCellValue).asDateTimeLocal() : DateTime.parse(list.first.toString());
 
     final regex5g = RegExp(r'(\d+)\(([^)]+)\)\(([^)]+)\)');
-    print("${list[5]} ::: ${list.join(':')}");
+    print("${double.parse(list[1].toString())} ::: ${list.join(':')}");
     for (var match in regex5g.allMatches(list[3].toString())) {
       final rp = double.parse(match.group(2)!);
       final intf5GData = IntfData(
@@ -108,6 +127,7 @@ class ExcelFile {
         srp: double.parse(list[5].toString()),
         // srp: (list[5] as DoubleCellValue).value,
       );
+      print('intf5GData: ${intf5GData.lat} ::: ${intf5GData.lng}');
       measureUploadData.intf5GList.add(intf5GData);
     }
 
@@ -128,11 +148,13 @@ class ExcelFile {
         // int
         srp: _toDouble(list[8]) ?? 0, // double
       );
+      print('intf5GData: ${intfData.lat} ::: ${intfData.lng}');
       measureUploadData.intfLteList.add(intfData);
     }
 
     // list[16] = list[16].toString().replaceAll(RegExp(r'[^0-9]'), '');
     list[18] = list[18].toString().replaceAll(RegExp(r'[^0-9]'), '');
+    print('Lat: ${_toDouble(list[2])} :: Lng: ${_toDouble(list[1])}');
     final intfTtData = IntfTtData(
       idx: 0,
       area: 'area',
@@ -152,24 +174,30 @@ class ExcelFile {
       dltp5: _toDouble(list[14]),
       ear: _toInt(list[15]),
       ca: _caToInt(list[16]),
+      // CA Type
       cqi: _toDouble(list[17]),
-      ri: _toDouble(list[18]),
+      ri: _toRankIndex(list[18]),
+      // RI
       dlmcs: _toDouble(list[19]),
       dlrb: _toDouble(list[20]),
       dltp: _toDouble(list[21]),
       dt: dateTime,
     );
 
-    print('ear: ${intfTtData.ear} ::: ca: ${intfTtData.ca}');
+    // print('ear: ${intfTtData.ear} ::: ca: ${intfTtData.ca}');
     measureUploadData.intfTTList.add(intfTtData);
 
     return measureUploadData;
   }
 
   double? _toDouble(dynamic value) {
+    print('toDouble: $value :::: ${value.runtimeType}');
     switch (value.runtimeType) {
       case const (DoubleCellValue):
         return (value as DoubleCellValue).value;
+      case const (TextCellValue):
+        final text = (value).value.text;
+        return double.tryParse(text ?? '');
       case const (String):
         return double.tryParse(value);
       case const (double):
@@ -183,6 +211,9 @@ class ExcelFile {
     switch (value.runtimeType) {
       case const (IntCellValue):
         return (value as IntCellValue).value;
+      case const (TextCellValue):
+        final text = (value).value.text;
+        return int.tryParse(text ?? '');
       case const (String):
         return int.tryParse(value);
       case const (int):
@@ -193,6 +224,15 @@ class ExcelFile {
   }
 
   int? _caToInt(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is String) {
+      final intValue = int.tryParse(value);
+      if (intValue != null) {
+        return intValue;
+      }
+    }
     switch (value.toString()) {
       case 'NonCA':
         return 1;
@@ -204,6 +244,17 @@ class ExcelFile {
         return 4;
       default:
         return 0;
+    }
+  }
+
+  int? _toRankIndex(dynamic value) {
+    final RegExp numberRegExp = RegExp(r'\d+');
+    final Match? match = numberRegExp.firstMatch(value..toString());
+
+    if (match != null) {
+      return int.tryParse(match.group(0)!) ?? 0;
+    } else {
+      return 0; // 숫자를 찾지 못하면 원래 문자열을 반환
     }
   }
 }

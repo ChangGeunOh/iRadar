@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
+
+import 'area_dialog.dart';
 
 class MeasureEditText extends StatefulWidget {
-  final ValueChanged onChanged;
+  final ValueChanged<String> onChanged;
   final String? label;
   final double? labelFontSize;
   final String? value;
   final double? valueFontSize;
   final bool? enabled;
   final Widget? suffixIcon;
+  final Function(AreaData?) onChangedArea;
 
   const MeasureEditText({
     required this.onChanged,
@@ -17,6 +21,7 @@ class MeasureEditText extends StatefulWidget {
     this.valueFontSize,
     this.enabled,
     this.suffixIcon,
+    required this.onChangedArea,
     super.key,
   });
 
@@ -26,6 +31,7 @@ class MeasureEditText extends StatefulWidget {
 
 class _MeasureEditTextState extends State<MeasureEditText> {
   late TextEditingController controller;
+  AreaData? areaData;
 
   @override
   void initState() {
@@ -34,13 +40,18 @@ class _MeasureEditTextState extends State<MeasureEditText> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (widget.value != null && controller.text.isEmpty) {
+  void didUpdateWidget(MeasureEditText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('didUpdateWidget>${widget.value} :: ${oldWidget.value}');
+    if (widget.value != oldWidget.value) {
       setState(() {
         controller.text = widget.value!;
       });
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -64,7 +75,7 @@ class _MeasureEditTextState extends State<MeasureEditText> {
               borderRadius: BorderRadius.circular(
                   4.0), // Adjust the radius to your liking
             ),
-            suffixIcon: widget.suffixIcon,
+            suffixIcon: _suffixIcon(),
             contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
           ),
           onChanged: widget.onChanged,
@@ -72,6 +83,48 @@ class _MeasureEditTextState extends State<MeasureEditText> {
             fontSize: widget.valueFontSize ?? 16.0,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _suffixIcon() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (areaData != null)
+          IconButton(
+            onPressed: () {
+              controller.clear();
+              areaData = null;
+              widget.onChanged('');
+              setState(() {});
+            },
+            icon: const Icon(Icons.clear),
+          ),
+        const SizedBox(width: 4),
+        IconButton(
+          onPressed: () async {
+            final areaData = await showDialog(
+                context: context,
+                builder: (context) {
+                  return const AreaDialog();
+                });
+            if (areaData != null) {
+              widget.onChangedArea(areaData);
+              widget.onChanged(areaData.name);
+              setState(() {
+                // controller.text = areaData.name;
+                controller.value = controller.value.copyWith(
+                  text: areaData.name,
+                  selection: TextSelection.collapsed(offset: areaData.name.length),
+                );
+                this.areaData = areaData;
+              });
+            }
+          },
+          icon: const Icon(Icons.search),
+        ),
+        const SizedBox(width: 8),
       ],
     );
   }
