@@ -1,3 +1,4 @@
+import 'package:flutter/animation.dart';
 import 'package:googlemap/domain/model/chart/base_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -52,24 +53,32 @@ class MeasureData {
   List<String> getValues(WirelessType type) {
     List<String> commonValues = [
       nTime.toString(),
-      nRsrp.toString(),
-      inIndex.toString(),
+      nRsrp.toStringAsFixed(1),
+      inIndex.toStringAsFixed(1),
       sTime?.toString() ?? '-',
-      rp?.toString() ?? '-',
-      cqi?.toString() ?? '-',
-      ri?.toString() ?? '-',
-      dlMcs?.toString() ?? '-',
-      dlRb?.toString() ?? '-',
-      dlTp?.toString() ?? '-',
+      rp?.toStringAsFixed(1) ?? '-',
+      cqi?.toStringAsFixed(1) ?? '-',
+      ri?.toStringAsFixed(1) ?? '-',
+      dlMcs?.toStringAsFixed(1) ?? '-',
+      dlRb?.toStringAsFixed(1) ?? '-',
+      dlTp?.toStringAsFixed(1) ?? '-',
     ];
 
     if (type == WirelessType.wLte) {
       commonValues.insert(4, freq?.toString() ?? '-');
       commonValues.insert(5, ca?.toString() ?? '-');
     } else {
-      commonValues.insert(8, dlLayer?.toString() ?? '-');
+      commonValues.insert(8, dlLayer?.toStringAsFixed(1) ?? '-');
     }
     return commonValues;
+  }
+
+  List<String> getRowValues(WirelessType type) {
+    var values = getValues(type)..insertAll(0, [pci, nPci]);
+    var distances = baseList.map((e) => e.distance.toStringAsFixed(2)).toList();
+    var names = baseList.map((e) => e.name).toList();
+    var codes = baseList.map((e) => e.code).toList();
+    return [...values, distances.join('\n'), names.join('\n'), codes.join('\n')];
   }
 
   MeasureData copyWith({

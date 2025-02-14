@@ -42,7 +42,6 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('MapScreen......');
     var mapLeftMargin = 0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox box = context.findRenderObject() as RenderBox;
@@ -145,7 +144,8 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                   myLocationButtonEnabled: true,
                   markers: state.mapBaseMarkerSet
                       .union(state.measureMarkerSet)
-                      .union(state.otherBaseMarkerSet),
+                      .union(state.otherBaseMarkerSet)
+                      .union(state.isShowBestPoint ? state.bestPointMarkerSet : {}),
                   onMapCreated: (GoogleMapController controller) {
                     bloc.setGoogleMapController(controller);
                     bloc.controller = controller;
@@ -192,25 +192,79 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                     onPressed: () {
                       bloc.add(BlocEvent(MapEvent.onShowBase));
                     },
-                    icon: Icon(
-                      Icons.cell_tower_rounded,
-                      size: 32,
-                      color:
-                          state.isShowBase ? Colors.black54 : Colors.grey[300],
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.cell_tower_rounded,
+                          size: 32,
+                          color:
+                              state.isShowBase ? Colors.black : Colors.black38,
+                        ),
+                        Text(
+                          'ALL',
+                          style: TextStyle(
+                            color: state.isShowBase
+                                ? Colors.black
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 8),
                   IconButton(
                     onPressed: () {
-                      // TODO: Show Label
                       bloc.add(BlocEvent(MapEvent.onShowCaption));
                     },
-                    icon: Icon(
-                      Icons.closed_caption_outlined,
-                      size: 32,
-                      color: state.isShowCaption
-                          ? Colors.black54
-                          : Colors.grey[300],
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.cell_tower_rounded,
+                          size: 32,
+                          color: state.isShowCaption
+                              ? Colors.black
+                              : Colors.black38,
+                        ),
+                        Text(
+                          'Label',
+                          style: TextStyle(
+                            color: state.isShowCaption
+                                ? Colors.black
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () {
+                      bloc.add(BlocEvent(MapEvent.onShowBestPoint));
+                    },
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.recommend_outlined,
+                          size: 32,
+                          color: state.isShowBestPoint
+                              ? Colors.red
+                              : Colors.black38,
+                        ),
+                        Text(
+                          'Best Point',
+                          style: TextStyle(
+                            color: state.isShowBestPoint
+                                ? Colors.red
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

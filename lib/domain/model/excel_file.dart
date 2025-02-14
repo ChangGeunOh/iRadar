@@ -43,8 +43,6 @@ class ExcelFile {
     List<IntfData> intfLteList = [];
 
     sheet.rows.forEachIndexed((index, row) {
-      print(
-          'row.first: ${row.first?.value} :: ${row.first?.value.runtimeType} :: ${_isDateTimeParsable(row.first!.value)} :: ${row.first?.value is String}');
       if (_isDateTimeParsable(row.first?.value)) {
         final rowData = _makeData(row, isNoLocation, isLteOnly);
         intf5GList.addAll(rowData.intf5GList);
@@ -62,6 +60,8 @@ class ExcelFile {
       intfLteList: intfLteList,
       intfTTList: intfTTList,
     );
+
+    print('intfTTList.length: ${measureUploadData.intfTTList.length}, intf5GList.length: ${measureUploadData.intf5GList.length}, intfLteList.length: ${measureUploadData.intfLteList.length}');
   }
 
   bool _isDateTimeParsable(dynamic value) {
@@ -108,53 +108,63 @@ class ExcelFile {
       list.insertAll(9, ['', '', '', '', '', '']);
     }
 
-    final dateTime = list.first.runtimeType is DateTimeCellValue ?  (list.first as DateTimeCellValue).asDateTimeLocal() : DateTime.parse(list.first.toString());
+    final dateTime = list.first.runtimeType is DateTimeCellValue
+        ? (list.first as DateTimeCellValue).asDateTimeLocal()
+        : DateTime.parse(list.first.toString());
 
-    final regex5g = RegExp(r'(\d+)\(([^)]+)\)\(([^)]+)\)');
-    print("${double.parse(list[1].toString())} ::: ${list.join(':')}");
+    final regex5g = RegExp(r'(\d+)(?:\(([^)]+)\))?(?:\(([^)]+)\))?');
     for (var match in regex5g.allMatches(list[3].toString())) {
-      final rp = double.parse(match.group(2)!);
-      final intf5GData = IntfData(
-        idx: 0,
-        area: 'area',
-        pci: match.group(1)!,
-        dt: dateTime,
-        lat: double.parse(list[2].toString()),
-        lng: double.parse(list[1].toString()),
-        rp: rp,
-        rpmw: pow(10, rp / 10.0).toDouble(),
-        spci: list[4].toString(),
-        srp: double.parse(list[5].toString()),
-        // srp: (list[5] as DoubleCellValue).value,
-      );
-      print('intf5GData: ${intf5GData.lat} ::: ${intf5GData.lng}');
-      measureUploadData.intf5GList.add(intf5GData);
+
+      try {
+        final rp = double.parse(match.group(2)!);
+        final intf5GData = IntfData(
+          idx: 0,
+          area: 'area',
+          pci: match.group(1)!,
+          dt: dateTime,
+          lat: double.parse(list[2].toString()),
+          lng: double.parse(list[1].toString()),
+          rp: rp,
+          rpmw: pow(10, rp / 10.0).toDouble(),
+          spci: list[4].toString(),
+          srp: double.parse(list[5].toString()),
+          // srp: (list[5] as DoubleCellValue).value,
+        );
+        measureUploadData.intf5GList.add(intf5GData);
+      } catch (e) {
+        print('Error: $e');
+      }
     }
 
-    final regexLte = RegExp(r"(\d+)\[(-?\d+\.\d+)\]\[(-?\d+\.\d+)\]");
+    // final regexLte = RegExp(r'(\d+)\(([^)]+)\)\(([^)]+)\)');
+    final regexLte = RegExp(r'(\d+)[\[\(]([^)\]]+)[\)\]][\[\(]([^)\]]+)[\)\]]');
+
     for (var match in regexLte.allMatches(list[6].toString())) {
+      print('match: ${match.group(1)} ::: ${match.group(2)}');
       final rp = double.parse(match.group(2)!);
-      final intfData = IntfData(
-        idx: 0,
-        area: 'area',
-        pci: match.group(1)!,
-        dt: dateTime,
-        lat: double.parse(list[2].toString()),
-        lng: double.parse(list[1].toString()),
-        rp: rp,
-        rpmw: pow(10, rp / 10.0).toDouble(),
-        // $rpmw = pow( 10 , ($spci[1]/10));
-        spci: list[7].toString(),
-        // int
-        srp: _toDouble(list[8]) ?? 0, // double
-      );
-      print('intf5GData: ${intfData.lat} ::: ${intfData.lng}');
-      measureUploadData.intfLteList.add(intfData);
+      try {
+        final intfData = IntfData(
+          idx: 0,
+          area: 'area',
+          pci: match.group(1)!,
+          dt: dateTime,
+          lat: double.parse(list[2].toString()),
+          lng: double.parse(list[1].toString()),
+          rp: rp,
+          rpmw: pow(10, rp / 10.0).toDouble(),
+          // $rpmw = pow( 10 , ($spci[1]/10));
+          spci: list[7].toString(),
+          // int
+          srp: _toDouble(list[8]) ?? 0, // double
+        );
+        measureUploadData.intfLteList.add(intfData);
+      } catch (e) {
+        print('Error: $e ::: $rp');
+      }
     }
 
     // list[16] = list[16].toString().replaceAll(RegExp(r'[^0-9]'), '');
     list[18] = list[18].toString().replaceAll(RegExp(r'[^0-9]'), '');
-    print('Lat: ${_toDouble(list[2])} :: Lng: ${_toDouble(list[1])}');
     final intfTtData = IntfTtData(
       idx: 0,
       area: 'area',
@@ -191,7 +201,6 @@ class ExcelFile {
   }
 
   double? _toDouble(dynamic value) {
-    print('toDouble: $value :::: ${value.runtimeType}');
     switch (value.runtimeType) {
       case const (DoubleCellValue):
         return (value as DoubleCellValue).value;

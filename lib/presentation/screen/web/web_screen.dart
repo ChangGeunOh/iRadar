@@ -3,8 +3,10 @@ import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 
 import '../../../common/const/constants.dart';
+import '../../../domain/bloc/bloc_event.dart';
 import '../../../domain/model/excel_response_data.dart';
 import 'viewmodel/web_bloc.dart';
+import 'viewmodel/web_event.dart';
 import 'viewmodel/web_state.dart';
 
 class WebScreen extends StatelessWidget {
@@ -21,16 +23,33 @@ class WebScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     print(excelRequestData.toJson());
     return BlocScaffold<WebBloc, WebState>(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          excelRequestData.areaData.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
+      appBarBuilder: (context, bloc, state) {
+        return AppBar(
+          centerTitle: true,
+          title: Text(
+            excelRequestData.areaData.name,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-      ),
-      create: (context) => WebBloc(context, WebState(excelRequestData: excelRequestData)),
+          actions: [
+            IconButton(
+              onPressed: () => bloc.add(
+                BlocEvent(
+                  WebEvent.onTapDownload,
+                ),
+              ),
+              icon: const Icon(
+                Icons.file_download,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(width: 20),
+          ],
+        );
+      },
+      create: (context) =>
+          WebBloc(context, WebState(excelRequestData: excelRequestData)),
       builder: (context, bloc, state) {
         return Stack(
           children: [

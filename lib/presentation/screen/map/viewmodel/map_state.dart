@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:googlemap/domain/model/map/best_point_data.dart';
 
 import '../../../../domain/model/map/area_data.dart';
 import '../../../../domain/model/enum/wireless_type.dart';
@@ -37,6 +38,10 @@ class MapState {
   final LatLngBounds? latLngBounds;
 
   final bool isShowCaption;
+  final bool isShowBestPoint;
+
+  final List<BestPointData> bestPointList;
+  final Set<Marker> bestPointMarkerSet;
 
   MapState({
     this.areaDataSet = const {},
@@ -64,6 +69,9 @@ class MapState {
     this.latLngBounds,
     this.isShowCaption = true,
     this.noLabelBaseMarkerSet = const {},
+    this.isShowBestPoint = false,
+    this.bestPointList = const [],
+    this.bestPointMarkerSet = const {},
   });
 
   MapState copyWith({
@@ -94,6 +102,9 @@ class MapState {
     LatLngBounds? latLngBounds,
     bool? isShowCaption,
     Set<Marker>? noLabelBaseMarkerSet,
+    bool? isShowBestPoint,
+    List<BestPointData>? bestPointList,
+    Set<Marker>? bestPointMarkerSet,
   }) {
     return MapState(
       areaDataSet: areaDataSet ?? this.areaDataSet,
@@ -121,6 +132,8 @@ class MapState {
       latLngBounds: latLngBounds ?? this.latLngBounds,
       isShowCaption: isShowCaption ?? this.isShowCaption,
       noLabelBaseMarkerSet: noLabelBaseMarkerSet ?? this.noLabelBaseMarkerSet,
+      isShowBestPoint: isShowBestPoint ?? this.isShowBestPoint,
+      bestPointMarkerSet: bestPointMarkerSet ?? this.bestPointMarkerSet,
     );
   }
 

@@ -1,26 +1,17 @@
-import 'dart:html' as html;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
-import 'package:googlemap/presentation/screen/app_info/app_info_screen.dart';
-import 'package:googlemap/presentation/screen/base/base_screen.dart';
 import 'package:googlemap/presentation/screen/chart/chart_screen.dart';
+import 'package:googlemap/presentation/screen/main/component/drawer_view.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_bloc.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_event.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 import 'package:googlemap/presentation/screen/map/map_screen.dart';
-import 'package:googlemap/presentation/screen/notice/notice_screen.dart';
-import 'package:googlemap/presentation/screen/open_source/open_source_screen.dart';
-import 'package:googlemap/presentation/screen/password/password_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import 'component/drawer_list_bottom_item.dart';
-import 'component/drawer_list_header.dart';
-import 'component/drawer_list_item.dart';
-import 'component/main_drawer.dart';
+import 'component/side_menu_view.dart';
 
 class MainScreen extends StatelessWidget {
   static String get routeName => 'main';
@@ -40,7 +31,10 @@ class MainScreen extends StatelessWidget {
         MainState(),
       ),
       drawerBuilder: (context, bloc, state) {
-        return _buildDrawer(context, bloc, state);
+        return DrawerView(
+          bloc: bloc,
+          state: state,
+        );
       },
       builder: (context, bloc, state) {
         return DefaultTabController(
@@ -104,7 +98,7 @@ class MainScreen extends StatelessWidget {
                   top: 0,
                   bottom: 0,
                   left: 0,
-                  child: MainDrawer(
+                  child: SideMenuView(
                     bloc: bloc,
                     state: state,
                     onTapMenu: () async {
@@ -140,188 +134,5 @@ class MainScreen extends StatelessWidget {
         );
       },
     );
-  }
-
-  Widget _buildDrawer(BuildContext context, MainBloc bloc, MainState state) {
-    final height = MediaQuery.of(context).size.height;
-    return Drawer(
-      width: 350,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: primaryColor,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircleAvatar(
-                      radius: 72,
-                      backgroundColor: Colors.white,
-                      // backgroundImage: AssetImage(
-                      //     "assets/images/img_avatar_${Random().nextInt(11).toString().padLeft(2, '0')}.jpg"),
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Text(
-                      state.userData?.userName ?? "투덜이TM",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.userData?.getSimpleGroup() ?? "경남액세스운용센터 동진주운용부",
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            const DrawerListHeader(text: 'UPLOAD BASIC DATA'),
-            DrawerListItem(
-                title: "업로드 파일 샘플 다운로드",
-                iconData: Icons.file_copy_outlined,
-                onTap: () {
-                  _downloadExampleFile();
-                }),
-            DrawerListItem(
-                title: "기지국/중계기 정보 업로드",
-                iconData: Icons.cell_tower_rounded,
-                onTap: () {
-                  _showDialog(
-                    context,
-                    '기지국 정보 업로드',
-                    bloc,
-                    const BaseScreen(),
-                  );
-                }),
-            DrawerListItem(
-                title: "기지국/중계기 정보 다운로드",
-                iconData: Icons.file_download,
-                onTap: () {
-                  bloc.add(BlocEvent(
-                    MainEvent.onDownloadBaseData,
-                  ));
-                }),
-            const SizedBox(height: 32),
-            const DrawerListHeader(text: 'INFORMATION'),
-            DrawerListItem(
-              title: "공지사항",
-              iconData: Icons.notifications_outlined,
-              onTap: () async {
-                _showDialog(
-                  context,
-                  '공지사항',
-                  bloc,
-                  const NoticeScreen(),
-                );
-              },
-            ),
-            DrawerListItem(
-              title: "오픈소스 라이선스",
-              iconData: Icons.code_outlined,
-              onTap: () {
-                _showDialog(
-                  context,
-                  '오픈소스 라이센스',
-                  bloc,
-                  OpenSourceScreen(),
-                );
-              },
-            ),
-            DrawerListItem(
-              title: "App 정보",
-              iconData: Icons.info_outline,
-              onTap: () {
-                _showDialog(
-                  context,
-                  'App 정보',
-                  bloc,
-                  const AppInfoScreen(),
-                );
-              },
-            ),
-            const SizedBox(height: 32),
-            const DrawerListHeader(text: 'AUTHENTICATION'),
-            DrawerListItem(
-              title: "비밀번호 변경",
-              iconData: Icons.lock_outline,
-              onTap: () {
-                _showDialog(
-                  context,
-                  '비밀번호 변경',
-                  bloc,
-                  const PasswordScreen(),
-                );
-              },
-            ),
-            const SizedBox(height: 64),
-            DrawerListBottomItem(
-              title: 'Logout',
-              onTap: () {
-                bloc.add(BlocEvent(MainEvent.onLogout));
-              },
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showDialog(
-    BuildContext context,
-    String title,
-    MainBloc bloc,
-    Widget child,
-  ) async {
-    bloc.add(BlocEvent(MainEvent.onShowDialog, extra: true));
-    final height = MediaQuery.of(context).size.height;
-    await showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 32.0, right: 32, top: 32, bottom: 16),
-              child: SizedBox(
-                width: 800,
-                height: height > 798 ? 798 : height * 0.9,
-                child: child,
-              ),
-            ),
-          );
-        });
-    bloc.add(BlocEvent(MainEvent.onShowDialog, extra: false));
-  }
-
-  Future<void> _downloadExampleFile() async {
-    ByteData data =
-        await rootBundle.load('assets/files/iradar_upload_example_file.zip');
-    final buffer = data.buffer;
-    final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute("download", "iradar_upload_example_file.zip")
-      ..click();
-    html.Url.revokeObjectUrl(url);
   }
 }

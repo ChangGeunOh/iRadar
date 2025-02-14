@@ -82,7 +82,7 @@ class _TopLayoutState extends State<TopLayout> {
                   area = value;
                   setState(() {});
                 },
-                label: 'NI-Radar 파일명',
+                label: 'i-Radar Pro 파일명',
                 onChangedArea: (value) {
                   areaData = value;
                   division = areaData?.division?.name ?? '';
@@ -107,15 +107,15 @@ class _TopLayoutState extends State<TopLayout> {
               text: 'LTE Only',
               value: isLteOnly,
             ),
-            const SizedBox(width: 24),
-            CheckTextBox(
-              onChanged: (value) {
-                isWideArea = value;
-                setState(() {});
-              },
-              text: '넓은 지역 (고속도로 등)',
-              value: isWideArea,
-            ),
+            // const SizedBox(width: 24),
+            // CheckTextBox(
+            //   onChanged: (value) {
+            //     isWideArea = value;
+            //     setState(() {});
+            //   },
+            //   text: '넓은 지역 (고속도로 등)',
+            //   value: isWideArea,
+            // ),
             const SizedBox(width: 24),
             CheckTextBox(
               onChanged: areaData == null

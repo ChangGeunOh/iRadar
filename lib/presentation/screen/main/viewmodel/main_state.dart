@@ -26,6 +26,7 @@ class MainState {
   final int totalPage;
   final int currentPage;
   final String? noticeData;
+  final String baseLastDate;
 
   MainState({
     this.mapBaseData,
@@ -46,6 +47,7 @@ class MainState {
     this.totalPage = 35,
     this.currentPage = 1,
     this.noticeData,
+    this.baseLastDate = "",
   });
 
   MainState copyWith({
@@ -69,6 +71,7 @@ class MainState {
     int? totalPage,
     int? currentPage,
     String? noticeData,
+    String? baseLastDate,
   }) {
     return MainState(
       userData: userData ?? this.userData,
@@ -89,6 +92,7 @@ class MainState {
       totalPage: totalPage ?? this.totalPage,
       currentPage: currentPage ?? this.currentPage,
       noticeData: noticeData ?? this.noticeData,
+      baseLastDate: baseLastDate ?? this.baseLastDate,
     );
   }
 
@@ -112,6 +116,7 @@ class MainState {
       totalPage: totalPage,
       currentPage: currentPage,
       noticeData: null,
+      baseLastDate: '',
     );
   }
 

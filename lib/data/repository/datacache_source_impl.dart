@@ -163,11 +163,11 @@ class DataCacheSourceImpl extends DataCacheSource {
     String iconPath,
     BitmapDescriptor bitmapDescriptor,
   ) {
-    _dataCache.cacheMeasureMarkerIcon['pci:$iconPath'] = bitmapDescriptor;
+    _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'] = bitmapDescriptor;
   }
 
   @override
   BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
-    return _dataCache.cacheMeasureMarkerIcon['pci:$iconPath'];
+    return _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'];
   }
 }

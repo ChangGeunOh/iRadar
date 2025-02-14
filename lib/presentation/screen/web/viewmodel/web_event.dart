@@ -1,3 +1,3 @@
 enum WebEvent {
-  onInit
+  onInit, onTapDownload
 }

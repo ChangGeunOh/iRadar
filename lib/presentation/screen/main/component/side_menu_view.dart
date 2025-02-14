@@ -11,12 +11,12 @@ import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 
 import 'side_body.dart';
 
-class MainDrawer extends StatelessWidget {
+class SideMenuView extends StatelessWidget {
   final MainBloc bloc;
   final MainState state;
   final VoidCallback onTapMenu;
 
-  const MainDrawer({
+  const SideMenuView({
     super.key,
     required this.bloc,
     required this.state,
@@ -52,6 +52,7 @@ class MainDrawer extends StatelessWidget {
                 )),
                 onTapMenu:
                     onTapMenu, // () => bloc.add(BlocEvent(MainEvent.onTapMenu)),
+                group: state.userData?.userId ?? '',
               ),
               Expanded(
                 child: KeyboardListener(

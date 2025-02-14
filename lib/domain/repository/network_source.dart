@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter_platform_interface/src/types/location.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
+import 'package:googlemap/domain/model/map/best_point_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/pci/pci_base_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
@@ -73,4 +74,11 @@ abstract class NetworkSource {
   Future<ResponseData<List<AreaData>>> getSearchAreaList();
 
   Future<ResponseData<List<BaseData>>> getBaseDataList();
+
+  Future<ResponseData<String>> getBaseLastDate();
+
+  Future<ResponseData<List<BestPointData>>> getBestPointList({
+    required String type,
+    required String idxList,
+  });
 }

@@ -9,12 +9,14 @@ class SideHeader extends StatelessWidget {
   final ValueChanged<String> onSearch;
   final VoidCallback onTapRefresh;
   final VoidCallback onTapMenu;
+  final String group;
 
   const SideHeader({
     required this.onSearch,
     required this.onTapWirelessType,
     required this.onTapRefresh,
     required this.onTapMenu,
+    this.group = '',
     super.key,
   });
 
@@ -42,13 +44,27 @@ class SideHeader extends StatelessWidget {
                     size: 24,
                   ),
                 ),
-                const Text(
-                  'iRadar',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 22.0,
-                      fontFamily: 'Poppins',
-                      color: Colors.white),
+                Row(
+                  children: [
+                    const Text(
+                      'i-Radar Pro',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 22.0,
+                        fontFamily: 'Poppins',
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      group.isNotEmpty ? '($group)' : '',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
                 const Spacer(),
                 IconButton(

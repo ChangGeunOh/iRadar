@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/common/utils/extension.dart';
@@ -11,7 +13,9 @@ import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/presentation/screen/chart/viewmodel/chart_event.dart';
 import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
 
+import '../../../../common/const/constants.dart';
 import '../../../../domain/bloc/bloc_event.dart';
+import '../../../../domain/model/enum/wireless_type.dart';
 import '../../../../domain/model/map/area_data.dart';
 import '../../web/web_screen.dart';
 import '../components/excel_maker.dart';
@@ -91,12 +95,10 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         //   NpciScreen.routeName,
         //   extra: placeTableData,
         // );
-        print("Wirelesstype>${state.areaData.type!.name}");
-        print("ChartEvent.onTapNPci>${event.extra}");
-        context.push(NpciScreen.routeName, extra: {
-          'areaData': state.areaData,
-          'pci': event.extra as String
-        });
+        context.push(
+          NpciScreen.routeName,
+          extra: {'areaData': state.areaData, 'pci': event.extra as String},
+        );
         break;
       case ChartEvent.onTapWeb:
         final excelRequestData = ExcelRequestData(
@@ -141,6 +143,9 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       case ChartEvent.onChangedMeasureList:
         emit(state.copyWith(measureDataList: event.extra));
         break;
+      case ChartEvent.onTapExcelDownload:
+        makeChartExcel();
+        break;
     }
   }
 
@@ -149,15 +154,19 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     Emitter<ChartState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, areaData: areaData));
-    final response = await repository.loadMeasureList(areaData);
-    final List<MeasureData> measureDataList = response.data;
-    final sortedMeasureDataList = measureDataList
-      ..sort((a, b) => b.inIndex.compareTo(a.inIndex));
-    emit(state.copyWith(
-      isLoading: false,
-      measureDataList: sortedMeasureDataList,
-      message: response.meta.message,
-    ));
+    try {
+      final response = await repository.loadMeasureList(areaData);
+      final List<MeasureData> measureDataList = response.data;
+      final sortedMeasureDataList = measureDataList
+        ..sort((a, b) => b.inIndex.compareTo(a.inIndex));
+      emit(state.copyWith(
+        isLoading: false,
+        measureDataList: sortedMeasureDataList,
+        message: response.meta.message,
+      ));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, message: e.toString()));
+    }
   }
 
   List<ExcelData> _getExcelDataList() {
@@ -181,4 +190,85 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     }
     return excelDataList;
   }
+
+  Future<void> makeChartExcel() async {
+    var excel = Excel.createExcel();
+    Sheet sheetObject = excel['Sheet1'];
+    sheetObject.setColumnAutoFit(1);
+    sheetObject.merge(
+      CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0),
+      CellIndex.indexByColumnRow(
+          columnIndex: state.measureDataList.first
+                  .getRowValues(state.areaData.type!)
+                  .length -
+              1,
+          rowIndex: 0),
+    );
+
+    sheetObject.setRowHeight(0, 24);
+
+    sheetObject.cell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: 0))
+      ..value =
+          TextCellValue("${state.areaData.name} ${state.areaData.type?.name}")
+      ..cellStyle = CellStyle(
+        bold: true,
+        underline: Underline.Single,
+        horizontalAlign: HorizontalAlign.Center,
+        verticalAlign: VerticalAlign.Center,
+      );
+
+    sheetObject.setColumnWidth(
+      state.measureDataList.first.getRowValues(state.areaData.type!).length - 2,
+      50,
+    );
+    sheetObject.cell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: 0))
+      ..value = TextCellValue(state.areaData.name)
+      ..cellStyle = CellStyle(
+        bold: true,
+        underline: Underline.Single,
+        horizontalAlign: HorizontalAlign.Center,
+      );
+
+    var headerTitle = List.from(state.areaData.type == WirelessType.wLte
+        ? headerLteTitle
+        : header5gTitle);
+
+    headerTitle.removeLast();
+    headerTitle.add('거리\n(km)');
+    headerTitle.add('국소명');
+    headerTitle.add('장비ID');
+
+    for (var i = 0; i < headerTitle.length; i++) {
+      sheetObject.cell(CellIndex.indexByColumnRow(rowIndex: 1, columnIndex: i))
+        ..value = TextCellValue(headerTitle[i])
+        ..cellStyle = _cellStyle(ExcelColor.fromHexString('#D4D4D4'));
+    }
+
+    var index = 1;
+    for (var measureData in state.measureDataList) {
+      measureData.getRowValues(state.areaData.type!).forEachIndexed((i, value) {
+        sheetObject.cell(
+            CellIndex.indexByColumnRow(rowIndex: index + 1, columnIndex: i))
+          ..value = TextCellValue(value)
+          ..cellStyle = _cellStyle(measureData.hasColor
+              ? ExcelColor.fromHexString('#fffd54')
+              : ExcelColor.none);
+      });
+      index++;
+    }
+    excel.save(
+        fileName: '${state.areaData.name}_${state.areaData.type?.name}.xlsx');
+  }
+
+  CellStyle _cellStyle(ExcelColor background) => CellStyle(
+        horizontalAlign: HorizontalAlign.Center,
+        verticalAlign: VerticalAlign.Center,
+        bold: true,
+        textWrapping: TextWrapping.WrapText,
+        backgroundColorHex: background,
+        leftBorder: Border(borderStyle: BorderStyle.Thin),
+        rightBorder: Border(borderStyle: BorderStyle.Thin),
+        topBorder: Border(borderStyle: BorderStyle.Thin),
+        bottomBorder: Border(borderStyle: BorderStyle.Thin),
+      );
 }

@@ -42,6 +42,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     growable: false,
   );
 
+  late List<BitmapDescriptor> bestBitmapDescriptor;
+
   CameraPosition initCameraPosition() {
     return repository.getCameraPosition();
   }
@@ -159,7 +161,11 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         ));
         break;
       case MapEvent.onChangeAreaDataSet:
-        emit(state.copyWith(areaDataSet: event.extra));
+        emit(state.copyWith(
+          areaDataSet: event.extra,
+          isShowBestPoint: false,
+          bestPointMarkerSet: {},
+        ));
         await _changedAreaData(
           emit,
           event.extra,
@@ -214,31 +220,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
               type: state.wirelessType,
               isLabelEnabled: isShowCaption,
             );
-            // if (isShowCaption) {
-            //   // mapBaseMarkerSet = await _getMapBaseMarkers(
-            //   //   areaData.idx,
-            //   //   data.baseData,
-            //   //   state.wirelessType,
-            //   // );
-            //   mapBaseMarkerSet = await _getBaseMarkers(
-            //     idx: areaData.idx,
-            //     mapBaseDataSet: data.baseData,
-            //     type: state.wirelessType,
-            //     isLabelEnabled: true,
-            //   );
-            // } else {
-            //   // mapBaseMarkerSet = await _getNoLabelMapBaseMarkers(
-            //   //   areaData.idx,
-            //   //   data.baseData,
-            //   //   state.wirelessType,
-            //   // );
-            //   mapBaseMarkerSet = await _getBaseMarkers(
-            //     idx: areaData.idx,
-            //     mapBaseDataSet: data.baseData,
-            //     type: state.wirelessType,
-            //     isLabelEnabled: false,
-            //   );
-            // }
           }
           emit(state.copyWith(
             isLoading: false,
@@ -247,6 +228,40 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           ));
           break;
         }
+      case MapEvent.onShowBestPoint:
+        if (state.areaDataSet.isEmpty) return;
+        if (state.bestPointList.isNotEmpty || state.isShowBestPoint) {
+          emit(state.copyWith(isShowBestPoint: !state.isShowBestPoint));
+          return;
+        }
+        emit(state.copyWith(isLoading: true));
+        final List<String> idxList =
+            state.areaDataSet.map((e) => e.idx.toString()).toList();
+        final bestPointList = await repository.getBestPointList(
+          state.wirelessType,
+          idxList,
+        );
+
+        final makers = bestPointList.mapIndexed((index, e) {
+          return Marker(
+            markerId: MarkerId('BEST_POINT_$index'),
+            position: LatLng(e.latitude, e.longitude),
+            icon: bestBitmapDescriptor[index],
+            infoWindow: InfoWindow(
+              title: e.pci.toString(),
+              snippet: e.dltp.toString(),
+            ),
+            zIndex: 1,
+          );
+        }).toSet();
+
+        emit(state.copyWith(
+          bestPointList: bestPointList,
+          bestPointMarkerSet: makers,
+          isLoading: false,
+          isShowBestPoint: !state.isShowBestPoint,
+        ));
+        break;
     }
   }
 
@@ -297,8 +312,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
       final iconImage = e.type == '5G'
           ? basePin5G!
           : e.isRelay
-          ? baseRelay!
-          : basePinLTE!;
+              ? baseRelay!
+              : basePinLTE!;
 
       markers.add(
         Marker(
@@ -528,8 +543,8 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           icon: icon,
           position: LatLng(measure.latitude, measure.longitude),
           infoWindow: InfoWindow(
-            title: measure.idx.toString(),
-            snippet: "${measure.pci}/${measure.rsrp}",
+            title: "${measure.pci}/${measure.rsrp}",
+            snippet: measure.idx.toString(),
           ),
         ),
       );
@@ -665,6 +680,14 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         strokeWidth: 0,
         fillColor: const Color(0x80ff0000),
       ),
+    );
+
+    bestBitmapDescriptor = await Future.wait(
+      List.generate(10, (e) async {
+        final image = await rootBundle.load(
+            'assets/icons/ic_best_${(e + 1).toString().padLeft(2, '0')}.png');
+        return BitmapDescriptor.bytes(image.buffer.asUint8List());
+      }),
     );
   }
 

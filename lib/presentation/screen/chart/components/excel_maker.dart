@@ -48,7 +48,7 @@ class ExcelMaker {
       );
 
   void makeExcel({String? fileName}) {
-    var saveFileName = fileName ?? areaData.name;
+    var saveFileName = fileName ?? 'Scenario_${areaData.name}_${areaData.type?.name}';
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
     _makeRowTitle(sheet);

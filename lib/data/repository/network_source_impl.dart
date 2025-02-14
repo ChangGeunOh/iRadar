@@ -7,6 +7,7 @@ import '../../common/utils/utils.dart';
 import '../../domain/model/base/base_data.dart';
 import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/map/area_data.dart';
+import '../../domain/model/map/best_point_data.dart';
 import '../../domain/model/map/map_data.dart';
 import '../../domain/model/map/merge_data.dart';
 import '../../domain/model/notice/notice_data.dart';
@@ -158,4 +159,18 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @Headers({'access_token': true})
   @GET(kBaseDataPath)
   Future<ResponseData<List<BaseData>>> getBaseDataList();
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kBaseLastDatePath)
+  Future<ResponseData<String>> getBaseLastDate();
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kBestPointListPath)
+  Future<ResponseData<List<BestPointData>>> getBestPointList({
+    @Path('type') required String type,
+    @Path('idx') required String idxList,
+  });
+
 }

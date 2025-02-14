@@ -19,9 +19,14 @@ const kPostMergeDataPath = 'map/merge';
 const kGetMeasureListPath = 'chart/{type}/{idx}';
 
 const kBaseDataPath = 'base/';
+const kBaseLastDatePath = 'base/version';
+
 const kPciDataPath = 'pci/{type}/{idx}';
 
 const kNpciDataPath = 'npci/{type}/{idx}';
 
 const kNoticePath = 'notice';
 const kNoticeDetailPath = 'notice/{idx}';
+
+const kBestPointListPath = 'best/{type}/{idx}';
+

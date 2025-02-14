@@ -42,7 +42,11 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     switch (event.type) {
       case MainEvent.init:
         final userData = await repository.getUserData();
-        emit(state.copyWith(userData: userData));
+        final baseLastDate = await repository.getBaseLastDate();
+        emit(state.copyWith(
+          userData: userData,
+          baseLastDate: baseLastDate,
+        ));
         await _getAreaList(emit, state);
         break;
       case MainEvent.onTapRefresh:
@@ -177,18 +181,33 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
   }
 
   List<AreaData> _getFilteredAreaDataList(
-    List<AreaData>? areaDataList,
-    String search,
-    WirelessType type,
-  ) {
-    if (areaDataList == null) {
+      List<AreaData>? areaDataList,
+      String search,
+      WirelessType type,
+      ) {
+    if (areaDataList == null || areaDataList.isEmpty) {
       return [];
     }
+
     return areaDataList
-        .where((element) => element.name.contains(search))
-        .where((element) =>
-            element.type == type || element.type == WirelessType.all)
-        .toList();
+        .where((element) {
+      final matchesName = element.name.contains(search);
+      final matchesType = element.type == type || element.type == WirelessType.all;
+      return matchesName && matchesType;
+    })
+        .toList()
+      ..sort((a, b) {
+        // 1. division 기준으로 정렬 (null 안전)
+        final divisionA = a.division?.toString() ?? '';
+        final divisionB = b.division?.toString() ?? '';
+        final divisionComparison = divisionA.compareTo(divisionB);
+
+        if (divisionComparison != 0) return divisionComparison;
+
+        // 2. measuredAt 기준 내림차순 정렬 (null 안전)
+        return (b.measuredAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(a.measuredAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+      });
   }
 
   Future<void> _downloadExcelBaseData() async {

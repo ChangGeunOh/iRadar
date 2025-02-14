@@ -10,6 +10,7 @@ import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
+import 'package:googlemap/domain/model/map/best_point_data.dart';
 import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/map/map_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
@@ -384,5 +385,19 @@ class Repository {
 
   BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
     return _dataCacheSource.getCustomMeasureMarker(pci, iconPath);
+  }
+
+  Future<String> getBaseLastDate() async {
+    final response = await _networkSource.getBaseLastDate();
+    return response.data ?? '';
+  }
+
+  Future<List<BestPointData>> getBestPointList(WirelessType wirelessType, List<String> idxList) async {
+    final idxs = idxList.join(',');
+    final response = await _networkSource.getBestPointList(
+      type: wirelessType.name,
+      idxList: idxs,
+    );
+    return response.data ?? [];
   }
 }

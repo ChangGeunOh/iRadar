@@ -47,11 +47,11 @@ class ChartScreen extends StatelessWidget {
               ],
             ),
             actions: [
-              ExpandedSearch(
-                onSearchValue: (value) {
-                  print("value>$value");
-                },
-              ),
+              // ExpandedSearch(
+              //   onSearchValue: (value) {
+              //     print("value>$value");
+              //   },
+              // ),
               IconButton(
                 onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapWeb)),
                 icon: const Icon(
@@ -60,7 +60,15 @@ class ChartScreen extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapExcel)),
+                  onPressed: () => bloc.add(BlocEvent(ChartEvent.onTapExcel)),
+                  icon: Image.asset(
+                    'assets/icons/ic_excel.png',
+                    width: 20,
+                    height: 20,
+                  )),
+              IconButton(
+                onPressed: () =>
+                    bloc.add(BlocEvent(ChartEvent.onTapExcelDownload)),
                 icon: const Icon(
                   Icons.file_download,
                   color: Colors.black87,
@@ -100,8 +108,7 @@ class ChartScreen extends StatelessWidget {
                         child: TableView(
                             type: state.areaData.type!,
                             measureDataList: state.measureDataList,
-                            onChange: (measureDataList) =>
-                                bloc.add(BlocEvent(
+                            onChange: (measureDataList) => bloc.add(BlocEvent(
                                   ChartEvent.onChangedMeasureList,
                                   extra: measureDataList,
                                 )),

@@ -45,7 +45,6 @@ class _GoogleMapViewState extends State<GoogleMapView> {
 
   @override
   void initState() {
-    print('------------------------------------>GoogleMapView initState');
     init();
     super.initState();
   }
@@ -82,7 +81,7 @@ class _GoogleMapViewState extends State<GoogleMapView> {
             color: Colors.white.withOpacity(0.8),
             child: Center(
               child: Text(
-                '${widget.isService ? '서빙셀' : '네이버셀'} (${widget.pci})',
+                '${widget.isService ? 'Serving Cell' : 'Neighbor Cell'} (${widget.pci})',
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
@@ -121,8 +120,8 @@ class _GoogleMapViewState extends State<GoogleMapView> {
         widget.pciDataList!.mapIndexed((index, pciData) async {
           return Marker(
             markerId: MarkerId('data-$index'),
-            // icon: getRsrpIcon(pciData.rsrp),
-            icon: await _createCustomMarker(pciData.rsrp.toDouble()),
+            icon: getRsrpIcon(pciData.rsrp),
+            // icon: await _createCustomMarker(pciData.rsrp.toDouble()),
             position: LatLng(pciData.latitude, pciData.longitude),
             infoWindow: InfoWindow(
               title: 'PCI: ${pciData.pci}',
@@ -152,7 +151,7 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     List<int> pinIndices = [0, 1, 2, 4, 7, 8, 10];
 
     for (int i = 0; i < rsrpThresholds.length; i++) {
-      if (rsrp >= rsrpThresholds[i]) {
+      if (rsrp <= rsrpThresholds[i]) {
         return mapPins[pinIndices[i]];
       }
     }

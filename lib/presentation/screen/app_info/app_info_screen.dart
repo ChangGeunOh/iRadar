@@ -61,7 +61,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         Image.asset('assets/images/img_mobile.jpg'),
         const SizedBox(height: 48),
         const Text(
-          "iRadar 2.0",
+          "i-Radar Pro",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 24,
@@ -78,7 +78,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         ),
         const Spacer(),
         const Text(
-          'iRadar는 Flutter와 fast-api로 제작되었습니다.',
+          'i-Radar Pro는 Flutter와 fast-api로 제작되었습니다.',
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey,
