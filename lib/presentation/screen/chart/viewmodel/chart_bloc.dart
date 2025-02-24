@@ -97,7 +97,10 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         // );
         context.push(
           NpciScreen.routeName,
-          extra: {'areaData': state.areaData, 'pci': event.extra as String},
+          extra: {
+            'areaData': state.areaData,
+            'pci': event.extra as String,
+          },
         );
         break;
       case ChartEvent.onTapWeb:
@@ -146,6 +149,10 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       case ChartEvent.onTapExcelDownload:
         makeChartExcel();
         break;
+      case ChartEvent.onTapDeduplication:
+        emit(state.copyWith(isDeduplication: !state.isDeduplication));
+        await _loadMeasureDataList(state.areaData, emit);
+        break;
     }
   }
 
@@ -154,8 +161,12 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     Emitter<ChartState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, areaData: areaData));
+    print('areaData: ${areaData.toJson()}');
     try {
-      final response = await repository.loadMeasureList(areaData);
+      final response = await repository.loadMeasureList(
+        areaData,
+        state.isDeduplication,
+      );
       final List<MeasureData> measureDataList = response.data;
       final sortedMeasureDataList = measureDataList
         ..sort((a, b) => b.inIndex.compareTo(a.inIndex));

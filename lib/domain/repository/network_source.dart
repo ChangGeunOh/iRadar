@@ -34,8 +34,11 @@ abstract class NetworkSource {
 
   Future<ResponseData> postMergeData(MergeData mergeData);
 
-  Future<ResponseData<List<MeasureData>>> getMeasureList(
-      {required int idx, required String type});
+  Future<ResponseData<List<MeasureData>>> getMeasureList({
+    required int idx,
+    required String type,
+    required bool isRemove,
+  });
 
   Future<ResponseData> uploadBaseData(List<BaseData> uploadData);
 

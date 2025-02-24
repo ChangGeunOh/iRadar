@@ -4,6 +4,7 @@ import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/common/utils/mixin.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/presentation/screen/chart/components/chart_view.dart';
@@ -17,10 +18,12 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
   static String get routeName => 'npci_screen';
   final AreaData areaData;
   final String pci;
+  final List<MeasureData> measureDataList;
 
   const NpciScreen({
     required this.areaData,
     required this.pci,
+    required this.measureDataList,
     super.key,
   });
 
@@ -32,6 +35,7 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
           NpciState(
             areaData: areaData,
             pci: pci,
+            measureDataList: measureDataList,
           )),
       appBarBuilder: (context, bloc, state) {
         return AppBar(
@@ -85,12 +89,25 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
                 const SizedBox(height: 24),
                 if (state.measureDataList.isNotEmpty)
                   SizedBox(
-                    height: 350,
+                    height: 300,
                     child: ChartView(
                       measureDataList: state.measureDataList,
                     ),
                   ),
                 const SizedBox(height: 24),
+                const Padding(
+                  padding: EdgeInsets.only(
+                    left: 24.0,
+                    bottom: 8.0,
+                  ),
+                  child: Text(
+                    '※ 전체 루트 (참조용)',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 if (state.measureDataList.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),

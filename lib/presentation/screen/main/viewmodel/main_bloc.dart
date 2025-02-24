@@ -54,10 +54,20 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         await _getAreaList(emit, state);
         break;
       case MainEvent.onTapType:
+        print('onTapType');
         final filteredAreaDataList = state.areaDataList
             .where((element) =>
                 element.type == event.extra || element.type == WirelessType.all)
-            .toList();
+            .toList()
+          ..sort((a, b) {
+            final divisionA = a.division?.toString() ?? '';
+            final divisionB = b.division?.toString() ?? '';
+            final divisionComparison = divisionA.compareTo(divisionB);
+            if (divisionComparison != 0) return divisionComparison;
+            return (b.measuredAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+                .compareTo(
+                    a.measuredAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+          });
         emit(state.copyWith(
           type: event.extra,
           filteredAreaDataList: filteredAreaDataList,
@@ -181,21 +191,20 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
   }
 
   List<AreaData> _getFilteredAreaDataList(
-      List<AreaData>? areaDataList,
-      String search,
-      WirelessType type,
-      ) {
+    List<AreaData>? areaDataList,
+    String search,
+    WirelessType type,
+  ) {
     if (areaDataList == null || areaDataList.isEmpty) {
       return [];
     }
 
-    return areaDataList
-        .where((element) {
+    return areaDataList.where((element) {
       final matchesName = element.name.contains(search);
-      final matchesType = element.type == type || element.type == WirelessType.all;
+      final matchesType =
+          element.type == type || element.type == WirelessType.all;
       return matchesName && matchesType;
-    })
-        .toList()
+    }).toList()
       ..sort((a, b) {
         // 1. division 기준으로 정렬 (null 안전)
         final divisionA = a.division?.toString() ?? '';

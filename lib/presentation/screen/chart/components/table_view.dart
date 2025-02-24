@@ -63,18 +63,27 @@ class _TableViewState extends State<TableView> {
     if (measureDataList.isEmpty) {
       return const SizedBox();
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Table(
-        border: TableBorder.all(
-          color: Colors.grey,
-        ),
-        columnWidths: headerWidth,
-        children: [
-          buildTableTitle(),
-          ...getMeasuredRows(),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth
+            ),
+            child: Table(
+              border: TableBorder.all(
+                color: Colors.grey,
+              ),
+              columnWidths: headerWidth,
+              children: [
+                buildTableTitle(),
+                ...getMeasuredRows(),
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 
@@ -130,10 +139,9 @@ class _TableViewState extends State<TableView> {
                               const Text(
                                 'Serving\nTime',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                  color: Colors.black54
-                                ),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                    color: Colors.black54),
                               ),
                               const SizedBox(width: 16),
                               DropdownButton<String>(

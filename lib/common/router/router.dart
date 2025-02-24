@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/data/repository/repository.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
@@ -44,7 +45,13 @@ final routerConfig = GoRouter(
             final extra = state.extra as Map<String, dynamic>;
             final areaData = extra['wirelessType'] as AreaData;
             final pci = extra['pci'] as String;
-            return NpciScreen(areaData: areaData, pci: pci);
+            final measureDataList =
+                extra['measureDataList'] as List<MeasureData>;
+            return NpciScreen(
+              areaData: areaData,
+              pci: pci,
+              measureDataList: measureDataList,
+            );
           },
         ),
         GoRoute(

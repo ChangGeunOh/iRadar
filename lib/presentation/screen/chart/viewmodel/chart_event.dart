@@ -6,5 +6,5 @@ enum ChartEvent {
   onTapNPci,
   onTapWeb,
   onTapExcel,
-  onChangedAreaData, onChangedMeasureList, onTapExcelDownload,
+  onChangedAreaData, onChangedMeasureList, onTapExcelDownload, onTapDeduplication,
 }

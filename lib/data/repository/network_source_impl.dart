@@ -75,6 +75,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   Future<ResponseData<List<MeasureData>>> getMeasureList({
     @Path('idx') required int idx,
     @Path('type') required String type,
+    @Query('remove') required bool isRemove,
   });
 
   @override

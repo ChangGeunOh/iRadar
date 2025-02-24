@@ -12,9 +12,9 @@ class NpciState  {
   NpciState({
     required this.areaData,
     required this.pci,
+    required this.measureDataList,
     this.isLoading = false,
     this.message = '',
-    this.measureDataList = const [],
   });
 
   NpciState copyWith({

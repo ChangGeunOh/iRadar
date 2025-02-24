@@ -245,11 +245,11 @@ class ExcelFile {
     switch (value.toString()) {
       case 'NonCA':
         return 1;
-      case 'CA2':
+      case 'CA2' || '2CA':
         return 2;
-      case 'CA3':
+      case 'CA3' || '3CA':
         return 3;
-      case 'CA4':
+      case 'CA4' || '4CA':
         return 4;
       default:
         return 0;

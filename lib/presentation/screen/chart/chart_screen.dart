@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
+import 'package:googlemap/domain/model/chart_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/presentation/screen/chart/components/expanded_search.dart';
 import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
@@ -45,6 +47,15 @@ class ChartScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Text(areaData.name),
               ],
+            ),
+            leading: IconButton(
+              onPressed: () {
+                bloc.add(BlocEvent(ChartEvent.onTapDeduplication));
+              },
+              icon:  Icon(
+                Icons.timer_outlined,
+                color: state.isDeduplication ? Colors.black87 : Colors.grey,
+              ),
             ),
             actions: [
               // ExpandedSearch(
@@ -129,6 +140,7 @@ class ChartScreen extends StatelessWidget {
                                 type: areaData.type!,
                                 idx: areaData.idx,
                                 spci: npci,
+                                measureDataList: state.measureDataList,
                               );
                             }),
                       ),
@@ -220,6 +232,7 @@ class ChartScreen extends StatelessWidget {
     required WirelessType type,
     required int idx,
     required String spci,
+    required List<MeasureData> measureDataList,
   }) async {
     await showDialog(
         context: context,
@@ -248,6 +261,7 @@ class ChartScreen extends StatelessWidget {
                       child: NpciScreen(
                         areaData: areaData,
                         pci: spci,
+                        measureDataList: measureDataList,
                       ),
                     ),
                   ),

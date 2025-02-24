@@ -10,6 +10,7 @@ class ChartState {
   final String message;
   final bool isCheck;
   final bool isLoading;
+  final bool isDeduplication;
 
   ChartState({
     required this.areaData,
@@ -17,6 +18,7 @@ class ChartState {
     this.isCheck = false ,
     this.isLoading = false,
     this.message = '',
+    this.isDeduplication = false,
   });
 
   ChartState copyWith({
@@ -26,6 +28,7 @@ class ChartState {
     bool? isCheck,
     bool? isLoading,
     String? message,
+    bool? isDeduplication,
   }) {
     return ChartState(
       areaData: areaData ?? this.areaData,
@@ -33,6 +36,7 @@ class ChartState {
       isCheck: isCheck ?? this.isCheck,
       isLoading: isLoading ?? this.isLoading,
       message: message ?? this.message,
+      isDeduplication: isDeduplication ?? this.isDeduplication,
     );
   }
 }

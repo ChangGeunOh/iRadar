@@ -15,7 +15,7 @@ MeasureData _$MeasureDataFromJson(Map<String, dynamic> json) => MeasureData(
       sTime: (json['sTime'] as num?)?.toInt(),
       rp: (json['rp'] as num?)?.toDouble(),
       freq: (json['freq'] as num?)?.toInt(),
-      ca: (json['ca'] as num?)?.toInt(),
+      ca: (json['ca'] as num?)?.toDouble(),
       cqi: (json['cqi'] as num?)?.toDouble(),
       ri: (json['ri'] as num?)?.toDouble(),
       dlMcs: (json['dlMcs'] as num?)?.toDouble(),

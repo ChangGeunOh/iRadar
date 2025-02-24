@@ -15,7 +15,7 @@ class MeasureData {
   final int? sTime;
   final double? rp;
   final int? freq;
-  final int? ca;
+  final double? ca;
   final double? cqi;
   final double? ri;
   final double? dlMcs;
@@ -54,7 +54,7 @@ class MeasureData {
     List<String> commonValues = [
       nTime.toString(),
       nRsrp.toStringAsFixed(1),
-      inIndex.toStringAsFixed(1),
+      inIndex.toStringAsFixed(0),
       sTime?.toString() ?? '-',
       rp?.toStringAsFixed(1) ?? '-',
       cqi?.toStringAsFixed(1) ?? '-',
@@ -66,7 +66,7 @@ class MeasureData {
 
     if (type == WirelessType.wLte) {
       commonValues.insert(4, freq?.toString() ?? '-');
-      commonValues.insert(5, ca?.toString() ?? '-');
+      commonValues.insert(5, ca?.toStringAsFixed(1) ?? '-');
     } else {
       commonValues.insert(8, dlLayer?.toStringAsFixed(1) ?? '-');
     }
@@ -90,7 +90,7 @@ class MeasureData {
     int? sTime,
     double? rp,
     int? freq,
-    int? ca,
+    double? ca,
     double? cqi,
     double? ri,
     double? dlMcs,

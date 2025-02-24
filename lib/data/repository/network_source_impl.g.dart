@@ -261,9 +261,10 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   Future<ResponseData<List<MeasureData>>> getMeasureList({
     required int idx,
     required String type,
+    required bool isRemove,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'remove': isRemove};
     final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;

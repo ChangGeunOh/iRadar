@@ -21,7 +21,9 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
 
   @override
   FutureOr<void> onBlocEvent(
-      BlocEvent<NpciEvent> event, Emitter<NpciState> emit) async {
+    BlocEvent<NpciEvent> event,
+    Emitter<NpciState> emit,
+  ) async {
     switch (event.type) {
       case NpciEvent.init:
         final response = await repository.loadNpciList(
@@ -30,17 +32,34 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
           spci: state.pci,
         );
         final list = response.data as List<MeasureData>;
-        list.map((e){
-          print(e.toJson());
-        });
-        final measureDataList = list.map((e) {
+        var measureDataList = list.map((e) {
           final baseList = e.baseList.map((base) {
             return base.copyWith(isChecked: !e.hasColor);
           }).toList();
           return e.copyWith(baseList: baseList);
         }).toList();
+
+        final measureList = measureDataList.map((e) {
+          final measureData = state.measureDataList.firstWhere(
+            (element) => element.pci == e.pci,
+          );
+          return e.copyWith(
+            mw: measureData.mw,
+            sTime: measureData.sTime,
+            rp: measureData.rp,
+            freq: measureData.freq,
+            ca: measureData.ca,
+            cqi: measureData.cqi,
+            ri: measureData.ri,
+            dlMcs: measureData.dlMcs,
+            dlLayer: measureData.dlLayer,
+            dlRb: measureData.dlRb,
+            dlTp: measureData.dlTp,
+          );
+        }).toList();
+
         emit(state.copyWith(
-          measureDataList: measureDataList,
+          measureDataList: measureList,
           message: response.meta.message,
         ));
         break;
@@ -83,7 +102,7 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
             pci: element.pci,
             type: state.areaData.type!.name,
             regDate:
-            state.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
+                state.areaData.measuredAt!.toDateString(format: 'yyyy-MM-dd'),
             hasColor: element.nPci.isNotEmpty,
           ));
         }
@@ -91,5 +110,4 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
     }
     return excelDataList;
   }
-
 }

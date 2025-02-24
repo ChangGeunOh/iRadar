@@ -98,23 +98,20 @@ class Repository {
 
   Future<ResponseData> loadMeasureList(
     AreaData areaData,
+    bool isRemove,
   ) async {
-    // final List<MeasureData> measureDataList =
-    //    await _dataStoreSource.getMeasureList(areaData.idx, areaData.type);
-    // if (measureDataList.isNotEmpty) {
-    //   return ResponseData(data: measureDataList);
-    // }
     final response = await _networkSource.getMeasureList(
       idx: areaData.idx,
       type: areaData.type!.name,
+      isRemove: isRemove,
     );
-    if (response.meta.code == 200) {
-      await _dataStoreSource.setMeasureList(
-        areaData.idx,
-        areaData.type!,
-        response.data!,
-      );
-    }
+    // if (response.meta.code == 200) {
+    //   await _dataStoreSource.setMeasureList(
+    //     areaData.idx,
+    //     areaData.type!,
+    //     response.data!,
+    //   );
+    // }
     return response;
   }
 
@@ -153,6 +150,8 @@ class Repository {
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
   ) async {
+    return null;
+
     // final List<String> bts = excelRequestData.tableList
     //     .where((element) => element.checked)
     //     .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
@@ -392,7 +391,8 @@ class Repository {
     return response.data ?? '';
   }
 
-  Future<List<BestPointData>> getBestPointList(WirelessType wirelessType, List<String> idxList) async {
+  Future<List<BestPointData>> getBestPointList(
+      WirelessType wirelessType, List<String> idxList) async {
     final idxs = idxList.join(',');
     final response = await _networkSource.getBestPointList(
       type: wirelessType.name,

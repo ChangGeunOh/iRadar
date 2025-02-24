@@ -73,8 +73,11 @@ class ChartView extends StatelessWidget {
             tooltipMargin: 0.0,
             getTooltipItem: (group, groupIndex, rod, rodIndex) =>
                 BarTooltipItem(
-              rod.toY.toString(),
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              rod.toY.toStringAsFixed(0),
+              const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
