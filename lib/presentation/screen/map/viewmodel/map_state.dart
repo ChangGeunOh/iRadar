@@ -67,7 +67,7 @@ class MapState {
     this.isShowBase = false,
     this.otherBaseMarkerSet = const {},
     this.latLngBounds,
-    this.isShowCaption = true,
+    this.isShowCaption = false,
     this.noLabelBaseMarkerSet = const {},
     this.isShowBestPoint = false,
     this.bestPointList = const [],

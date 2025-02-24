@@ -113,12 +113,12 @@ class BaseCsvFile {
       return doubleLatLng;
     }
 
-    List<String> parts = coordinate.split(RegExp(r"[ -]+"));
+    List<String> parts = coordinate.split(RegExp(r"[:\s]+"));
     print('coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}');
     if (parts.length != 4 && parts.length != 3) {
       return 0.0;
     }
-    double degrees = double.parse(parts[parts.length == 4 ? 1 : 0]);
+    double degrees = double.parse(parts[parts.length == 4 ? 1 : 0].replaceAll(RegExp(r'[^\d.-]'), ''));
     double minutes = double.parse(parts[parts.length == 4 ? 2 : 1]);
     double seconds = double.parse(parts[parts.length == 4 ? 3 : 2]);
     double decimalDegrees = degrees + (minutes / 60) + (seconds / 3600);
@@ -126,3 +126,38 @@ class BaseCsvFile {
     return decimalDegrees;
   }
 }
+
+/*
+void main() {
+  print(convertToLatLng("035:33:51.402"));  // 결과: 35.564278333333336
+  print(convertToLatLng("128:44:15.594"));  // 결과: 128.737665
+}
+
+double convertToLatLng(String coordinate) {
+  var latLng = int.tryParse(coordinate);
+  if (latLng != null) {
+    return latLng.toDouble() / 1000000.0;
+  }
+
+  final doubleLatLng = double.tryParse(coordinate);
+  if (doubleLatLng != null) {
+    return doubleLatLng;
+  }
+
+  // ':' 또는 공백 문자로 분할
+  List<String> parts = coordinate.split(RegExp(r"[:\s]+"));
+  print('coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}');
+
+  if (parts.length < 3) {
+    return 0.0;
+  }
+
+  double degrees = double.parse(parts[0].replaceAll(RegExp(r'[^\d.-]'), ''));
+  double minutes = double.parse(parts[1]);
+  double seconds = double.parse(parts[2]);
+  double decimalDegrees = degrees + (minutes / 60) + (seconds / 3600);
+
+  return decimalDegrees;
+}
+
+ */

@@ -30,6 +30,7 @@ class _NoticeScreenState extends State<NoticeScreen> {
   Widget build(BuildContext context) {
     return BlocScaffold<NoticeBloc, NoticeState>(
       create: (context) => NoticeBloc(context, NoticeState()),
+      backgroundColor: Colors.white,
       builder: (context, bloc, state) {
         return Column(
           children: [

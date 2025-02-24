@@ -227,6 +227,7 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     sheet.appendRow([
       TextCellValue('No.'),
       TextCellValue('Type'),
+      TextCellValue('RU_ID'),
       TextCellValue('Name'),
       TextCellValue('PCI'),
       TextCellValue('Latitude'),
@@ -236,6 +237,7 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       sheet.appendRow([
         IntCellValue(i + 1),
         TextCellValue(baseDataList[i].type),
+        TextCellValue(baseDataList[i].code),
         TextCellValue(baseDataList[i].rnm),
         IntCellValue(baseDataList[i].pci),
         DoubleCellValue(baseDataList[i].latitude),

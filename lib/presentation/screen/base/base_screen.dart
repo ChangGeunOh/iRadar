@@ -18,6 +18,7 @@ class BaseScreen extends StatelessWidget with ShowMessageMixin {
   @override
   Widget build(BuildContext context) {
     return BlocScaffold<BaseBloc, BaseState>(
+        backgroundColor: Colors.white,
         create: (context) => BaseBloc(context, BaseState()),
         builder: (context, bloc, state) {
           if (state.message.isNotEmpty) {
