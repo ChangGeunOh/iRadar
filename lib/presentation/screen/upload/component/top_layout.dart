@@ -1,138 +1,188 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:googlemap/presentation/screen/upload/viewmodel/upload_event.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
+import 'package:googlemap/presentation/screen/upload/component/measure_edit_text.dart';
 
 import '../../../../common/const/constants.dart';
+import '../../../../domain/model/excel_file.dart';
+import '../../../../domain/model/upload/measure_upload_data.dart';
+import '../../../component/check_text_box.dart';
 import '../../../component/dropdown_box.dart';
 import '../../../component/edit_text.dart';
+import 'area_dialog.dart';
 
-class TopLayout extends StatelessWidget {
-  final VoidCallback onTapFile;
-  final String group;
-  final String division;
-  final String fileName;
-  final String area;
-  final bool isDuplicate;
-  final Function(UploadChangedType type, String value) onChanged;
+class TopLayout extends StatefulWidget {
+  final ValueChanged<MeasureUploadData> onTapUpload;
+  final ValueChanged<ExcelFile> onChangedData;
+  final ValueChanged<bool> onChangeLoading;
 
   const TopLayout({
-    required this.onTapFile,
-    required this.group,
-    required this.division,
-    required this.area,
-    required this.fileName,
-    required this.onChanged,
-    required this.isDuplicate,
+    required this.onTapUpload,
+    required this.onChangedData,
+    required this.onChangeLoading,
     super.key,
   });
 
   @override
+  State<TopLayout> createState() => _TopLayoutState();
+}
+
+class _TopLayoutState extends State<TopLayout> {
+  var division = '';
+  var fileName = '';
+  var area = '';
+  var isNoLocation = false;
+  var isLteOnly = false;
+  var isAddData = false;
+  var isWideArea = false;
+
+  ExcelFile? excelFile;
+  AreaData? areaData;
+
+  @override
   Widget build(BuildContext context) {
-    // print('fileName>$fileName');
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    final isEnableUpload =
+        division.isNotEmpty && fileName.isNotEmpty && area.isNotEmpty;
+    return Column(
       children: [
-        SizedBox(
-          width: 150,
-          child: EditText(
-            onChanged: (value) {},
-            label: '지역',
-            value: group,
-            enabled: false,
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 200,
-          child: DropdownBox(
-            onChanged: (value) => onChanged(
-              UploadChangedType.onDivision,
-              value,
-            ),
-            hint: '구분선택',
-            label: '구분',
-            items: divisionList,
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 400,
-          child: EditText(
-            label: '파일명',
-            value: fileName,
-            onChanged: (value) {},
-            suffixIcon: IconButton(
-              onPressed: () {
-                FocusScope.of(context).nextFocus();
-                FocusScope.of(context).nextFocus();
-                onTapFile();
-              },
-              icon: const Icon(
-                Icons.attach_file_rounded,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(
+              width: 200,
+              child: DropdownBox(
+                onChanged: (value) => setState(() {
+                  division = value as String;
+                }),
+                hint: '구분선택',
+                label: '구분',
+                items: divisionList,
+                value: division.isEmpty ? null : division,
               ),
             ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: EditText(
-            onChanged: (value) => onChanged(
-              UploadChangedType.onArea,
-              value,
+            const SizedBox(width: 16),
+            SizedBox(
+              width: 400,
+              child: EditText(
+                label: '측정 DB 선택',
+                value: fileName,
+                onChanged: (value) {},
+                suffixIcon: IconButton(
+                  onPressed: _onTapFile,
+                  icon: const Icon(
+                    Icons.attach_file_rounded,
+                  ),
+                ),
+              ),
             ),
-            label: '측정장소',
-            value: area,
-            suffixIcon: isDuplicate
-                ? Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 16),
-                    // color: Colors.red,
-                    child: const Text(
-                      '중복',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.red),
-                    ),
-                  )
-                : null,
-          ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: MeasureEditText(
+                onChanged: (value) {
+                  area = value;
+                  setState(() {});
+                },
+                label: 'i-Radar Pro 파일명',
+                onChangedArea: (value) {
+                  areaData = value;
+                  division = areaData?.division?.name ?? '';
+                  setState(() {});
+                },
+              ),
+            ),
+          ],
         ),
-        // const SizedBox(width: 16),
-        // SizedBox(
-        //   width: 400,
-        //   child: EditText(
-        //     onChanged: (value) => onChanged(
-        //       UploadChangedType.onFile,
-        //       value,
-        //     ),
-        //     label: '파일명',
-        //     enabled: false,
-        //     value: fileName,
-        //   ),
-        // ),
-        // const SizedBox(width: 16),
-        // SizedBox(
-        //   width: 150,
-        //   child: ElevatedButton(
-        //     onPressed: onTapFile,
-        //     style: ElevatedButton.styleFrom(
-        //       padding: const EdgeInsets.only(top: 16, bottom: 18),
-        //       foregroundColor: Colors.white,
-        //       backgroundColor: Colors.blue,
-        //       shape: RoundedRectangleBorder(
-        //         borderRadius:
-        //             BorderRadius.circular(50), // Adjust the radius as needed
-        //       ),
-        //     ),
-        //     child: const Text(
-        //       '파일선택',
-        //       style: TextStyle(
-        //         fontSize: 16,
-        //         fontWeight: FontWeight.w500,
-        //         color: Colors.white,
-        //       ),
-        //     ),
-        //   ),
-        // ),
+        const SizedBox(height: 24),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CheckTextBox(
+              onChanged: null,
+              text: '위치정보없음',
+              value: isNoLocation,
+            ),
+            const SizedBox(width: 24),
+            CheckTextBox(
+              onChanged: null,
+              text: 'LTE Only',
+              value: isLteOnly,
+            ),
+            // const SizedBox(width: 24),
+            // CheckTextBox(
+            //   onChanged: (value) {
+            //     isWideArea = value;
+            //     setState(() {});
+            //   },
+            //   text: '넓은 지역 (고속도로 등)',
+            //   value: isWideArea,
+            // ),
+            const SizedBox(width: 24),
+            CheckTextBox(
+              onChanged: areaData == null
+                  ? null
+                  : (value) {
+                      isAddData = value;
+                      setState(() {});
+                    },
+              text: '기존자료에 추가',
+              checkColor: Colors.red,
+              value: isAddData,
+            ),
+            const Spacer(),
+            SizedBox(
+              width: 150,
+              child: ElevatedButton(
+                onPressed: isEnableUpload
+                    ? () {
+                        final areaIdx = isAddData ? areaData!.idx : -1;
+                        final uploadData = excelFile!.getUploadData(
+                          areaIdx: areaIdx,
+                          area: area,
+                          division: division,
+                          isWideArea: isWideArea,
+                        );
+                        widget.onTapUpload(uploadData);
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.only(top: 16, bottom: 18),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        50), // Adjust the radius as needed
+                  ),
+                ),
+                child: const Text(
+                  '저장하기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     );
+  }
+
+  Future<void> _onTapFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowedExtensions: ['xls', 'xlsx'],
+      type: FileType.custom,
+      allowMultiple: false,
+    );
+    if (result != null) {
+      final file = result.files.single;
+      fileName = file.name;
+      excelFile = await ExcelFile.fromBytes(file.bytes!);
+      isLteOnly = excelFile!.isLteOnly;
+      isNoLocation = excelFile!.isNoLocation;
+      widget.onChangedData(excelFile!);
+      setState(() {});
+    }
   }
 }

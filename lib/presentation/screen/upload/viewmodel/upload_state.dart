@@ -1,6 +1,7 @@
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '../../../../domain/model/map/area_data.dart';
 import '../../../../domain/model/excel_file.dart';
 
 class UploadState {
@@ -20,38 +21,33 @@ class UploadState {
   final String password;
   final ExcelFile? excelFile;
   final bool isDuplicate;
+  final bool isSearch;
+  final List<AreaData> areaList;
+  final AreaData? areaData;
+  final bool enabledAddData;
 
   UploadState({
-    bool? isNoLocation,
-    bool? isLteOnly,
-    bool? isWideArea,
-    bool? isAddData,
-    String? group,
-    String? division,
-    String? area,
-    String? location,
-    String? fileName,
-    bool? isLoading,
-    bool? isDuplicate,
+    this.isNoLocation = false,
+    this.isLteOnly = false,
+    this.isWideArea = false,
+    this.isAddData = false,
+    this.group = '',
+    this.division = '',
+    this.area = '',
+    this.location = '',
+    this.fileName = '',
+    this.isLoading = false,
+    this.isDuplicate = false,
     this.filePickerResult,
-    bool? enabledSave,
-    String? password,
-    String? message,
+    this.enabledSave = false,
+    this.password = '',
+    this.message = '',
     this.excelFile,
-  })  : isNoLocation = isNoLocation ?? false,
-        isLteOnly = isLteOnly ?? false,
-        isWideArea = isWideArea ?? false,
-        isAddData = isAddData ?? false,
-        group = group ?? '',
-        division = division ?? '',
-        area = area ?? '',
-        location = location ?? '',
-        fileName = fileName ?? '',
-        isLoading = isLoading ?? false,
-        enabledSave = enabledSave ?? false,
-        password = password ?? '',
-        isDuplicate = isDuplicate ?? false,
-        message = message ?? '';
+    this.isSearch = false,
+    this.areaList = const [],
+    this.areaData,
+    this.enabledAddData = true,
+  });
 
   UploadState copyWith({
     bool? isNoLocation,
@@ -70,6 +66,10 @@ class UploadState {
     ExcelFile? excelFile,
     String? message,
     bool? isDuplicate,
+    bool? isSearch,
+    List<AreaData>? areaList,
+    AreaData? areaData,
+    bool? enabledAddData,
   }) {
     return UploadState(
       isNoLocation: isNoLocation ?? this.isNoLocation,
@@ -88,6 +88,10 @@ class UploadState {
       excelFile: excelFile ?? this.excelFile,
       message: message ?? this.message,
       isDuplicate: isDuplicate ?? this.isDuplicate,
+      isSearch: isSearch ?? this.isSearch,
+      areaList: areaList ?? this.areaList,
+      areaData: areaData ?? this.areaData,
+      enabledAddData: enabledAddData ?? this.enabledAddData,
     );
   }
 }

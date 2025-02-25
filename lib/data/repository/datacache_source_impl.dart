@@ -1,14 +1,16 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/excel_response_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_base_data.dart';
-import 'package:googlemap/domain/model/meta_data.dart';
+import 'package:googlemap/domain/model/map/map_base_data.dart';
+import 'package:googlemap/domain/model/response/meta_data.dart';
 import 'package:googlemap/domain/repository/datacache_source.dart';
 
-import '../../domain/model/wireless_type.dart';
+import '../../domain/model/user_data.dart';
+import '../../domain/model/enum/wireless_type.dart';
 import '../datacache/local_datacache.dart';
 
 class DataCacheSourceImpl extends DataCacheSource {
@@ -59,23 +61,59 @@ class DataCacheSourceImpl extends DataCacheSource {
   }
 
   @override
-  void setBaseMarkers(int idx, List<Marker> markers) {
-    _dataCache.cacheBaseMarkers[idx] = markers;
+  void setBaseMarkers(int idx, Set<Marker> markers, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      _dataCache.cache5GBaseMarkers[idx] = markers;
+    } else {
+      _dataCache.cacheLTEBaseMarkers[idx] = markers;
+    }
   }
 
   @override
-  List<Marker>? getBaseMarkers(int idx) {
-    return _dataCache.cacheBaseMarkers[idx];
+  Set<Marker>? getBaseMarkers(int idx, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      return _dataCache.cache5GBaseMarkers[idx];
+    } else {
+      return _dataCache.cacheLTEBaseMarkers[idx];
+    }
   }
 
   @override
-  void setMeasureMarkers(int idx, List<Marker> markers) {
-    _dataCache.cacheMeasureMarkers[idx] = markers;
+  void setMeasureMarkers(
+      int idx, Set<Marker> markers, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      _dataCache.cache5GMeasureMarkers[idx] = markers;
+    } else {
+      _dataCache.cacheLTEMeasureMarkers[idx] = markers;
+    }
   }
 
   @override
-  List<Marker>? getMeasureMarkers(int idx) {
-    return _dataCache.cacheMeasureMarkers[idx];
+  void setNoLabelBaseMarkers(
+      int idx, Set<Marker> markers, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      _dataCache.cache5GNoLabelMeasureMarkers[idx] = markers;
+    } else {
+      _dataCache.cacheLTENoLabelMeasureMarkers[idx] = markers;
+    }
+  }
+
+  @override
+  Set<Marker>? getNoLabelBaseMarkers(int idx, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      return _dataCache.cache5GNoLabelMeasureMarkers[idx];
+    } else {
+      return _dataCache.cacheLTENoLabelMeasureMarkers[idx];
+    }
+  }
+
+  @override
+  Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType) {
+    if (wirelessType == WirelessType.w5G) {
+      return _dataCache.cache5GMeasureMarkers[idx];
+    } else {
+      return _dataCache.cacheLTEMeasureMarkers[idx];
+    }
   }
 
   @override
@@ -104,7 +142,32 @@ class DataCacheSourceImpl extends DataCacheSource {
   }
 
   @override
-  void setExcelResponseDataList(int idx, List<ExcelResponseData> excelResponseDataList) {
+  void setExcelResponseDataList(
+      int idx, List<ExcelResponseData> excelResponseDataList) {
     _dataCache.cacheExcelResponseDataList[idx] = excelResponseDataList;
+  }
+
+  @override
+  void setUserData(UserData userData) {
+    _dataCache.userData = userData;
+  }
+
+  @override
+  UserData? getUserData() {
+    return _dataCache.userData;
+  }
+
+  @override
+  void setCustomMeasureMarker(
+    String pci,
+    String iconPath,
+    BitmapDescriptor bitmapDescriptor,
+  ) {
+    _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'] = bitmapDescriptor;
+  }
+
+  @override
+  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
+    return _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'];
   }
 }

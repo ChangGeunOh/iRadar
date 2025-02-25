@@ -8,14 +8,14 @@ part of 'excel_request_data.dart';
 
 ExcelRequestData _$ExcelRequestDataFromJson(Map<String, dynamic> json) =>
     ExcelRequestData(
-      placeData: PlaceData.fromJson(json['placeData'] as Map<String, dynamic>),
-      tableList: (json['tableList'] as List<dynamic>)
-          .map((e) => TableData.fromJson(e as Map<String, dynamic>))
+      areaData: AreaData.fromJson(json['areaData'] as Map<String, dynamic>),
+      measureDataList: (json['measureDataList'] as List<dynamic>)
+          .map((e) => MeasureData.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$ExcelRequestDataToJson(ExcelRequestData instance) =>
     <String, dynamic>{
-      'placeData': instance.placeData,
-      'tableList': instance.tableList,
+      'areaData': instance.areaData,
+      'measureDataList': instance.measureDataList,
     };

@@ -1,4 +1,17 @@
+import 'package:googlemap/domain/model/enum/location_type.dart';
+
+import '../../domain/model/enum/wireless_type.dart';
+
 class Convert {
+  static WirelessType dynamicToWirelessType(dynamic value) {
+    final type = WirelessType.values.firstWhere((e) => e.name.toLowerCase() == value.toString().toLowerCase());
+    return type;
+  }
+
+  static dynamic wirelessTypeToDynamic(WirelessType? value) {
+    return value?.name ?? 'none';
+  }
+
   static String dynamicToString(dynamic value) {
     return value.toString();
   }
@@ -40,8 +53,28 @@ class Convert {
   }
 
   static int dynamicToInt(dynamic value) {
-    value = value ?? 0;
-    return value.runtimeType == int ? value as int : int.parse(value);
+    switch(value.runtimeType) {
+      case const (int):
+        return value as int;
+      case const (String):
+        final intValue = int.tryParse(value);
+        return intValue ?? -1;
+      default:
+        return -1;
+    }
+  }
+  static double dynamicToDouble(dynamic value) {
+    switch(value.runtimeType) {
+      case const (double):
+        return value as double;
+      case const (int):
+        return (value as int).toDouble();
+      case const (String):
+        final doubleValue = double.tryParse(value);
+        return doubleValue ?? -1.0;
+      default:
+        return -1.0;
+    }
   }
 
   static bool dynamicToBool(dynamic value) {
@@ -59,4 +92,26 @@ class Convert {
     }
     return convertedValue;
   }
+
+  static DateTime dynamicToDateTime(dynamic value) {
+    if (value == null) {
+      return DateTime.now();
+    }
+    switch (value.runtimeType) {
+      case const (DateTime):
+        return value as DateTime;
+      case const (int):
+        value.fromMillisecondsSinceEpoch(value * 1000);
+      case const (String):
+        return DateTime.parse(value);
+      default:
+        return DateTime.now();
+    }
+    return DateTime.now();
+  }
+
+  static dynamic dateTimeToDynamic(DateTime? value) {
+    return value?.toIso8601String();
+  }
+
 }

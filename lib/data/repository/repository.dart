@@ -1,16 +1,31 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
+import 'package:googlemap/common/utils/utils.dart';
+import 'package:googlemap/domain/model/base/base_data.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
-import 'package:googlemap/domain/model/map_base_data.dart';
-import 'package:googlemap/domain/model/measure_upload_data.dart';
+import 'package:googlemap/domain/model/map/best_point_data.dart';
+import 'package:googlemap/domain/model/map/map_base_data.dart';
+import 'package:googlemap/domain/model/map/map_data.dart';
+import 'package:googlemap/domain/model/map/merge_data.dart';
+import 'package:googlemap/domain/model/notice/notice_data.dart';
+import 'package:googlemap/domain/model/notice/notice_list_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/response/response_data.dart';
+import 'package:googlemap/domain/model/token_data.dart';
+import 'package:googlemap/domain/model/user_data.dart';
 
 import '../../domain/model/excel_response_data.dart';
-import '../../domain/model/meta_data.dart';
+import '../../domain/model/map/area_data.dart';
+import '../../domain/model/response/meta_data.dart';
 import '../../domain/model/table_data.dart';
+import '../../domain/model/upload/measure_upload_data.dart';
 import '../../domain/repository/database_source.dart';
 import '../../domain/repository/datacache_source.dart';
 import '../../domain/repository/datastore_source.dart';
@@ -32,20 +47,13 @@ class Repository {
         _networkSource = networkSource,
         _dataCacheSource = dataCacheSource;
 
-  Future<bool> login({
-    required String location,
+  Future<ResponseData> login({
+    required String userid,
     required String password,
   }) async {
-    final responseData = await _networkSource.login(
-      area: location,
-      password: password,
-    );
-    if (responseData.meta.code == 200) {
-      _dataCacheSource.setLoginData(responseData.data!);
-    }
-    print('retrofit response>${responseData.toString()}');
-    print('retrofit response>${responseData.data?.toJson()}');
-    return responseData.meta.code == 200;
+    final basicAuth = 'Basic ${base64Encode(utf8.encode('$userid:$password'))}';
+    final response = await _networkSource.loadLogin(basicAuth);
+    return response;
   }
 
   // Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
@@ -63,36 +71,8 @@ class Repository {
 
   bool hasMorePlaceList(WirelessType type) {
     var metaData = _dataCacheSource.getMetaData(type);
-    return metaData.page < metaData.total || metaData.total == 0;
-  }
-
-  Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-    var metaData = _dataCacheSource.getMetaData(type);
-    List<PlaceData> placeList = List.empty(growable: true);
-    List<PlaceData> list = await _dataStoreSource.loadPlaceList(type);
-    print('::Saved PlaceList>${list.length}');
-    placeList.addAll(list);
-
-    if (metaData.page < metaData.total || metaData.total == 0) {
-      var response = await _networkSource.loadPlaceList(
-        group: getLoginData().group,
-        type: type.name,
-        page: metaData.page + 1,
-        count: metaData.count,
-      );
-
-      if (response.meta.code == 200) {
-        print('::Download PlaceList>${response.data!.length}');
-        List<PlaceData> list = response.data!;
-        print('::Total PlaceList>${placeList!.length}');
-        placeList.addAll(list);
-        print('::Total PlaceList>${placeList!.length}');
-        _dataCacheSource.setMetaData(type, response.meta);
-        _dataStoreSource.savePlaceList(type, placeList);
-      }
-    }
-    print('loadPlaceList>${placeList.length}');
-    return placeList;
+    return metaData.pageData!.page < metaData.pageData!.total ||
+        metaData.pageData!.total == 0;
   }
 
   Future<void> remove(WirelessType type) async {
@@ -100,37 +80,56 @@ class Repository {
     await _dataStoreSource.remove(type);
   }
 
-  Future<MapBaseData?> loadMapBaseData(PlaceData placeData) async {
-    var mapBaseData = _dataCacheSource.getMapBaseData(placeData.idx);
+  // Future<MapBaseData?> loadMapBaseData(PlaceData placeData) async {
+  //   var mapBaseData = _dataCacheSource.getMapBaseData(placeData.idx);
+  //
+  //   if (mapBaseData == null) {
+  //     final responseData = await _networkSource.loadMapBaseData(
+  //       group: placeData.group,
+  //       idx: placeData.idx,
+  //     );
+  //     if (responseData.data != null) {
+  //       mapBaseData = responseData.data!;
+  //       _dataCacheSource.setMapBaseData(placeData.idx, mapBaseData);
+  //     }
+  //   }
+  //   return mapBaseData;
+  // }
 
-    if (mapBaseData == null) {
-      final responseData = await _networkSource.loadMapBaseData(
-        group: placeData.group,
-        idx: placeData.idx,
-      );
-      if (responseData.data != null) {
-        mapBaseData = responseData.data!;
-        _dataCacheSource.setMapBaseData(placeData.idx, mapBaseData);
-      }
-    }
-    print("MapBaseData>${mapBaseData?.toJson()}");
-    return mapBaseData;
+  Future<ResponseData> loadMeasureList(
+    AreaData areaData,
+    bool isRemove,
+  ) async {
+    final response = await _networkSource.getMeasureList(
+      idx: areaData.idx,
+      type: areaData.type!.name,
+      isRemove: isRemove,
+    );
+    // if (response.meta.code == 200) {
+    //   await _dataStoreSource.setMeasureList(
+    //     areaData.idx,
+    //     areaData.type!,
+    //     response.data!,
+    //   );
+    // }
+    return response;
   }
 
-  Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
-    var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
-    if (chartTableData == null) {
-      final responseData = await _networkSource.loadChartTableData(
-        group: placeData.group,
-        idx: placeData.idx,
-      );
-      if (responseData.data != null) {
-        chartTableData = responseData.data!;
-        _dataCacheSource.setChartTableData(placeData.idx, chartTableData);
-      }
-    }
-    return chartTableData;
-  }
+  // Future<ChartTableData?> loadChartTableData(PlaceData placeData) async {
+  //   var chartTableData = _dataCacheSource.getChartTableData(placeData.idx);
+  //   chartTableData = null;
+  //   if (chartTableData == null) {
+  //     final responseData = await _networkSource.loadChartTableData(
+  //       group: placeData.group,
+  //       idx: placeData.idx,
+  //     );
+  //     if (responseData.data != null) {
+  //       chartTableData = responseData.data!;
+  //       _dataCacheSource.setChartTableData(placeData.idx, chartTableData);
+  //     }
+  //   }
+  //   return chartTableData;
+  // }
 
   void setGoogleMapController(GoogleMapController controller) {
     _dataCacheSource.setGoogleMapController(controller);
@@ -151,107 +150,254 @@ class Repository {
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
   ) async {
-    final List<String> bts = excelRequestData.tableList
-        .where((element) => element.checked)
-        .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
-        .toList();
-    final loginData = getLoginData();
-    var excelResponseDataList = _dataCacheSource.getExcelResponseDataList(
-      excelRequestData.placeData.idx,
-    );
+    return null;
 
-    if (excelResponseDataList == null) {
-      var responseData = await _networkSource.loadExcelResponseData(
-        group: loginData.group,
-        type: excelRequestData.placeData.type.name,
-        idx: excelRequestData.placeData.idx,
-        bts: bts,
-        cmd: '',
-      );
-
-      excelResponseDataList = responseData.data;
-      if (excelResponseDataList != null) {
-        _dataCacheSource.setExcelResponseDataList(
-          excelRequestData.placeData.idx,
-          excelResponseDataList,
-        );
-      }
-    }
-
-    return excelResponseDataList;
+    // final List<String> bts = excelRequestData.tableList
+    //     .where((element) => element.checked)
+    //     .map((e) => '${e.nId}:${e.hasColor ? "1" : ""}')
+    //     .toList();
+    // final loginData = getLoginData();
+    // var excelResponseDataList = _dataCacheSource.getExcelResponseDataList(
+    //   excelRequestData.placeData.idx,
+    // );
+    //
+    // if (excelResponseDataList == null) {
+    //   var responseData = await _networkSource.loadExcelResponseData(
+    //     group: loginData.group,
+    //     type: excelRequestData.placeData.type.name,
+    //     idx: excelRequestData.placeData.idx,
+    //     bts: bts,
+    //     cmd: '',
+    //   );
+    //
+    //   excelResponseDataList = responseData.data;
+    //   if (excelResponseDataList != null) {
+    //     _dataCacheSource.setExcelResponseDataList(
+    //       excelRequestData.placeData.idx,
+    //       excelResponseDataList,
+    //     );
+    //   }
+    // }
+    //
+    // return excelResponseDataList;
   }
 
-  void setMeasureMarkers(PlaceData placeData, List<Marker> markers) {
-    _dataCacheSource.setMeasureMarkers(placeData.idx, markers);
+  void setMeasureMarkers(
+      PlaceData placeData, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setMeasureMarkers(placeData.idx, markers, wirelessType);
   }
 
-  List<Marker>? getMeasureMarkers(PlaceData placeData) {
-    return _dataCacheSource.getMeasureMarkers(placeData.idx);
+  Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType) {
+    return _dataCacheSource.getMeasureMarkers(idx, wirelessType);
   }
 
-  void setBaseMarkers(PlaceData placeData, List<Marker> markers) {
-    _dataCacheSource.setBaseMarkers(placeData.idx, markers);
+  void setBaseMarkers(int idx, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setBaseMarkers(idx, markers, wirelessType);
   }
 
-  List<Marker>? getBaseMarkers(PlaceData placeData) {
-    return _dataCacheSource.getBaseMarkers(placeData.idx);
+  Set<Marker>? getBaseMarkers(int idx, WirelessType wirelessType) {
+    return _dataCacheSource.getBaseMarkers(idx, wirelessType)?.toSet();
   }
 
-  Future<List<TableData>?> loadNpciTableList(
-    String link,
-    String nPci,
-  ) async {
-    final response = await _networkSource.loadNpciTableList(link, nPci);
-    return response.data;
+  Set<Marker>? getNoLabelBaseMarkers(int idx, WirelessType type) {
+    return _dataCacheSource.getNoLabelBaseMarkers(idx, type)?.toSet();
   }
+
+  void setNoLabelBaseMarkers(
+      int idx, Set<Marker> markers, WirelessType wirelessType) {
+    _dataCacheSource.setNoLabelBaseMarkers(idx, markers, wirelessType);
+  }
+
+  // Future<List<TableData>?> loadNpciTableList(
+  //   String link,
+  //   String nPci,
+  // ) async {
+  //   final response = await _networkSource.loadNpciTableList(link, nPci);
+  //   return response.data;
+  // }
 
   LoginData getLoginData() {
     // TODO: null 체크 부문 수정 요함
-    return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
+    // return _dataCacheSource.getLoginData() ?? LoginData(idx: 1, group: '부산');
+    return LoginData(userid: 'admin', password: 'admin');
   }
 
-  Future<void> uploadMeasureData(MeasureUploadData measureUploadData) async {
-    final data = MeasureUploadData(
-      intf5GList: measureUploadData.intf5GList.sublist(0, 1),
-      intfLteList: measureUploadData.intfLteList.sublist(0, 1),
-      intfTTList: measureUploadData.intfTTList.sublist(0, 1),
-    );
-    data.group = measureUploadData.group;
-    data.area = measureUploadData.area;
-    data.password = measureUploadData.password;
-    data.type = measureUploadData.type;
-
+  Future<ResponseData> uploadMeasureData(
+    MeasureUploadData measureUploadData,
+  ) async {
     final result = await _networkSource.uploadMeasureData(measureUploadData);
     print('uploadMeasureData>${result.toString()}');
+    return result;
   }
 
-  Future<int> getCountArea({
-    required String group,
-    required String area,
-  }) async {
-    final response = await _networkSource.getCountArea(
-      group: group,
-      area: area,
-    );
-    if (response.data != null) {
-      return int.parse(response.data!);
+  // Future<int> getCountArea({
+  //   required String group,
+  //   required String area,
+  // }) async {
+  //   final response = await _networkSource.getCountArea(
+  //     group: group,
+  //     area: area,
+  //   );
+  //   if (response.data != null) {
+  //     return int.parse(response.data!);
+  //   }
+  //   return 0;
+  // }
+
+  Future<void> loadUserData() async {
+    final response = await _networkSource.getUserData();
+    if (response.meta.code == 200) {
+      // _dataCacheSource.setUserData(response.data!);
+      _dataStoreSource.setUserData(response.data!);
     }
-    return 0;
   }
 
-  Future<void> saveMergedData(
-    PlaceData mergedPlaceData,
-    List<PlaceData> placeDataList,
+  Future<UserData?> getUserData() {
+    return _dataStoreSource.getUserData();
+  }
+
+  Future<ResponseData<List<AreaData>>> getAreaList() async {
+    return await _networkSource.getAreaList('test');
+  }
+
+  Future<ResponseData<MapData>> getMapData(
+    WirelessType type,
+    int areaCode,
   ) async {
-    final mergedIdxList = placeDataList.map((e) => e.idx).toList();
-    await _networkSource.saveMergedData(
-      name: mergedPlaceData.name,
-      division: mergedPlaceData.division.name,
-      latitude: mergedPlaceData.latitude,
-      longitude: mergedPlaceData.longitude,
-      type: mergedPlaceData.type.name,
-      mergedIdxList: mergedIdxList,
-      password: mergedPlaceData.password,
+    final mapData = await _dataStoreSource.loadMapData(type, areaCode);
+    if (mapData == null) {
+      final responseData = await _networkSource.getMapDataList(
+        type: type.name,
+        idx: areaCode,
+      );
+      if (responseData.meta.code == 200) {
+        _dataStoreSource.saveMapData(type, areaCode, responseData.data!);
+        return responseData;
+      } else {
+        return responseData;
+      }
+    } else {
+      return ResponseData<MapData>(data: mapData);
+      ;
+    }
+  }
+
+  Future<ResponseData> postMergeData(MergeData mergeData) async {
+    return await _networkSource.postMergeData(mergeData);
+  }
+
+  Future<ResponseData> getNoticeList(int page) async {
+    return _networkSource.getNoticeList(page);
+  }
+
+  Future<ResponseData> getNoticeData(int id) async {
+    return await _networkSource.getNoticeDetail(id);
+  }
+
+  Future<ResponseData> uploadBaseData(List<BaseData> uploadData) {
+    final updateList = uploadData.map((e) {
+      return e.clearIdx();
+    }).toList();
+    return _networkSource.uploadBaseData(updateList);
+  }
+
+  Future<ResponseData> loadPasswordChange(
+    String oldPassword,
+    String newPassword,
+  ) async {
+    return _networkSource.postPassword(
+      hashPassword(oldPassword, kSecreteKey),
+      hashPassword(newPassword, kSecreteKey),
     );
+  }
+
+  Future<ResponseData> deleteAreaData(AreaData areaData) {
+    final data = AreaData(idx: areaData.idx, name: '');
+    return _networkSource.postAreaData(data);
+  }
+
+  Future<void> logout() async {
+    await _dataStoreSource.removeTokenData();
+    await _dataStoreSource.removeUserData();
+  }
+
+  Future<TokenData?> getTokenData() async {
+    return _dataStoreSource.getTokenData();
+  }
+
+  Future<ResponseData> loadPciData({
+    required String type,
+    required int idx,
+    required String spci,
+  }) {
+    return _networkSource.loadPciData(
+      type: type,
+      idx: idx,
+      spci: spci,
+    );
+  }
+
+  Future<ResponseData> loadNpciList({
+    required String type,
+    required int idx,
+    required String spci,
+  }) {
+    return _networkSource.loadNpciList(
+      type: type,
+      idx: idx,
+      spci: spci,
+    );
+  }
+
+  Future<ResponseData> getBaseList(
+    WirelessType type,
+    LatLngBounds latLngBounds,
+  ) async {
+    return _networkSource.getBaseList(
+      type: type.name,
+      northEastLatitude: latLngBounds.northeast.latitude,
+      northEastLongitude: latLngBounds.northeast.longitude,
+      southWestLatitude: latLngBounds.southwest.latitude,
+      southWestLongitude: latLngBounds.southwest.longitude,
+    );
+  }
+
+  Future<ResponseData> getSearchArea() {
+    return _networkSource.getSearchAreaList();
+  }
+
+  Future<void> clearCacheData() async {
+    _dataStoreSource.clearMapData();
+  }
+
+  Future<ResponseData> getBaseDataList() async {
+    return _networkSource.getBaseDataList();
+  }
+
+  void setCustomMeasureMarker(
+    String pci,
+    String iconPath,
+    BitmapDescriptor bitmapDescriptor,
+  ) {
+    _dataCacheSource.setCustomMeasureMarker(pci, iconPath, bitmapDescriptor);
+  }
+
+  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
+    return _dataCacheSource.getCustomMeasureMarker(pci, iconPath);
+  }
+
+  Future<String> getBaseLastDate() async {
+    final response = await _networkSource.getBaseLastDate();
+    return response.data ?? '';
+  }
+
+  Future<List<BestPointData>> getBestPointList(
+      WirelessType wirelessType, List<String> idxList) async {
+    final idxs = idxList.join(',');
+    final response = await _networkSource.getBestPointList(
+      type: wirelessType.name,
+      idxList: idxs,
+    );
+    return response.data ?? [];
   }
 }

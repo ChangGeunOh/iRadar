@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const keyFunctionMenuList = "function_menu_list";
@@ -39,18 +39,27 @@ class LocalDataStore {
     return list?.map((e) => jsonDecode(e)).toList();
   }
 
-  Future<void> saveListData(WirelessType type, List<Object> list) async {
+  Future<void> saveListData(String key, List<Object> list) async {
     final dataStore = await getSharedPreferences();
     final encodedList = list.map((e) => jsonEncode(e)).toList();
-    print(encodedList.toString());
-    await dataStore.setStringList(type.name, encodedList);
-    var savedList = dataStore.getStringList(type.name);
-    print("Save List-----------------------${type.name}");
-    print(savedList.toString());
+    // print(encodedList.toString());
+    await dataStore.setStringList(key, encodedList);
+    // var savedList = dataStore.getStringList(type.name);
+    // print("Save List-----------------------${type.name}");
+    // print(savedList.toString());
   }
 
-  Future<void> remove(WirelessType type) async {
+  Future<void> remove(String key) async {
     final dataStore = await getSharedPreferences();
-    dataStore.remove(type.name);
+    dataStore.remove(key);
+  }
+
+  Future<void> clearMapData() async {
+    final dataStore = await getSharedPreferences();
+    dataStore.getKeys().forEach((key) {
+      if (key.startsWith('map_data_')) {
+        dataStore.remove(key);
+      }
+    });
   }
 }

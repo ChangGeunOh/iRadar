@@ -23,12 +23,14 @@ const kWebHeaders = [
   'I-Radar\n기준일자',
 ];
 
-// x 1.35
+const kSecreteKey = '1649aef524be871f5ba53d5790d4e6aa462fa518aa568bc27bf0e37a546d0aa1';
 
 const initCameraPosition = CameraPosition(
   target: LatLng(35.16861, 129.05091),
   zoom: 14.4746,
 );
+
+const kVersionCode = '1.2.0';
 
 const List<Country> countryOptions = <Country>[
   Country(name: 'Africa', size: 30370000),
@@ -79,3 +81,110 @@ class Country {
     return '$name ($size)';
   }
 }
+
+
+const List<String> headerLteTitle = [
+  'PCI',
+  'Neighbor\nPCI',
+  'Neighbor\nTime',
+  'Neighbor\nRSRP\nSUM(dBm)',
+  'Interference Index',
+  'Serving\nTime',
+  'FREQ',
+  'CA Type',
+  'RSRP',
+  'CQI',
+  'RI',
+  'DL\nMCS',
+  'DL\nRB',
+  'DL\nMac\nT/P',
+  '인근장비'
+];
+
+const List<String> header5gTitle = [
+  'PCI',
+  'Neighbor\nPCI',
+  'Neighbor\nTime',
+  'Neighbor\nRSRP\nSUM(dBm)',
+  'Interference Index',
+  'Serving\nTime',
+  'SS-\nRSRP',
+  'CQI',
+  'RI',
+  'DL\nMCS',
+  'DL\nLayer',
+  'DL\nRB',
+  'DL\nMac\nT/P',
+  '인근장비'
+];
+
+
+const headerLteWidth = {
+  0: FixedColumnWidth(60),
+  1: IntrinsicColumnWidth(),
+  2: FixedColumnWidth(80),
+  3: FixedColumnWidth(85),
+  4: FixedColumnWidth(80),
+  5: FixedColumnWidth(80),
+  6: FixedColumnWidth(60),
+  7: FixedColumnWidth(60),
+  8: FixedColumnWidth(60),
+  9: FixedColumnWidth(60),
+  10: FixedColumnWidth(60),
+  11: FixedColumnWidth(60),
+  12: FixedColumnWidth(60),
+  13: FixedColumnWidth(60),
+  14: IntrinsicColumnWidth(),
+};
+
+// const headerLteWidth = {
+//   0: FixedColumnWidth(60),
+//   1: IntrinsicColumnWidth(),
+//   2: FlexColumnWidth(1.3),
+//   3: FlexColumnWidth(1.5),
+//   4: FlexColumnWidth(1.3),
+//   5: FlexColumnWidth(1.3),
+//   6: FlexColumnWidth(1.3),
+//   7: FlexColumnWidth(1),
+//   8: FlexColumnWidth(1),
+//   9: FlexColumnWidth(1),
+//   10: FlexColumnWidth(1),
+//   11: FlexColumnWidth(1),
+//   12: FlexColumnWidth(1),
+//   13: FlexColumnWidth(1.2),
+//   14: IntrinsicColumnWidth(),
+// };
+
+const header5gWidth = {
+  0: FixedColumnWidth(60),
+  1: IntrinsicColumnWidth(),
+  2: FixedColumnWidth(80),
+  3: FixedColumnWidth(85),
+  4: FixedColumnWidth(80),
+  5: FixedColumnWidth(80),
+  6: FixedColumnWidth(60),
+  7: FixedColumnWidth(60),
+  8: FixedColumnWidth(60),
+  9: FixedColumnWidth(60),
+  10: FixedColumnWidth(60),
+  11: FixedColumnWidth(60),
+  12: FixedColumnWidth(60),
+  13: IntrinsicColumnWidth(),
+};
+
+// const header5gWidth = {
+//   0: FixedColumnWidth(60),
+//   1: IntrinsicColumnWidth(),
+//   2: FlexColumnWidth(1.3),
+//   3: FlexColumnWidth(1.5),
+//   4: FlexColumnWidth(1.3),
+//   5: FlexColumnWidth(1.3),
+//   6: FlexColumnWidth(1.3),
+//   7: FlexColumnWidth(1),
+//   8: FlexColumnWidth(1),
+//   9: FlexColumnWidth(1),
+//   10: FlexColumnWidth(1),
+//   11: FlexColumnWidth(1),
+//   12: FlexColumnWidth(1.2),
+//   13: IntrinsicColumnWidth(),
+// };

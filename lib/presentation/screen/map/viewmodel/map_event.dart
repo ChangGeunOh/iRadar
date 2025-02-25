@@ -1,8 +1,11 @@
 enum MapEvent {
-  init,
-  onTapRectangle,
   onTapMap,
   onMoveCursor,
   onChangeRadius,
-  onChangeCursorState, onInit, onDataLoading, onMergeData,
+  onChangeCursorState,
+  onInit,
+  onMergeData,
+  onCameraIdle,
+  onChangeWirelessType,
+  onChangeAreaDataSet, onMessage, onShowDialog, onShowBase, onShowCaption, onShowBestPoint,
 }

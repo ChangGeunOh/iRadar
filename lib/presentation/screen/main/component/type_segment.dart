@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:googlemap/domain/model/wireless_type.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
 class TypeSegment extends StatefulWidget {
   final ValueChanged onChangedValue;

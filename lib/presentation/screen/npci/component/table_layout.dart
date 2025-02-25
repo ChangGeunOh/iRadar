@@ -80,7 +80,7 @@ class TableLayout extends StatelessWidget {
               DataCell(Text(e.dlMcs)),
               DataCell(Text(e.dlLayer)),
               DataCell(Text(e.dlRb)),
-              DataCell(Text(e.dlTb)),
+              DataCell(Text(e.dlTp)),
               DataCell(
                 Row(
                   children: [

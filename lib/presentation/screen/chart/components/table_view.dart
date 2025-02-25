@@ -1,293 +1,296 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:googlemap/domain/model/chart/measure_data.dart';
+import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
-import '../../../../domain/model/table_data.dart';
+import '../../../../common/const/constants.dart';
+import 'base_list_check_box.dart';
 
-const List<String> headTitles = [
-  'PCI',
-  'Neighbor\nPCI',
-  'Neighbor\nTime',
-  'Neighbor\nRSRP\nSUM(dBm)',
-  'Interference\nIndex',
-  'Serving\nTime',
-  'RP',
-  'CQI',
-  'RI',
-  'DL\nMCS',
-  'DL\nLayer',
-  'DL\nRB',
-  'DL\nT/P',
-  '인근장비'
-];
-
-class TableView extends StatelessWidget {
-  final List<TableData> tableData;
-  final ValueChanged onTapNId;
-  final VoidCallback onTapToggle;
-  final bool isCheck;
-  final ValueChanged onTapPci;
-  final ValueChanged onTapNPci;
+class TableView extends StatefulWidget {
+  final WirelessType type;
+  final List<MeasureData> measureDataList;
+  final ValueChanged<int> onTapNId;
+  final ValueChanged<String> onTapPci;
+  final ValueChanged<String> onTapNPci;
+  final ValueChanged<List<MeasureData>> onChange;
+  final bool isNpci;
 
   const TableView({
-    required this.isCheck,
-    required this.tableData,
+    required this.type,
+    required this.measureDataList,
     required this.onTapNId,
-    required this.onTapToggle,
     required this.onTapPci,
     required this.onTapNPci,
+    required this.onChange,
+    this.isNpci = false,
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columns: getColumns(),
-        horizontalMargin: 16.0,
+  State<TableView> createState() => _TableViewState();
+}
 
-        rows: getRows(),
-      ),
+class _TableViewState extends State<TableView> {
+  late List<MeasureData> measureDataList;
+  late Map<int, TableColumnWidth> headerWidth;
+  late List<String> headerTitle;
+  var servingTime = "6";
+
+  @override
+  void initState() {
+    init();
+    super.initState();
+  }
+
+  void init() {
+    measureDataList = widget.measureDataList;
+    headerWidth =
+        widget.type == WirelessType.wLte ? headerLteWidth : header5gWidth;
+    headerTitle =
+        widget.type == WirelessType.wLte ? headerLteTitle : header5gTitle;
+  }
+
+  @override
+  void didUpdateWidget(covariant TableView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.measureDataList != widget.measureDataList) {
+      init();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (measureDataList.isEmpty) {
+      return const SizedBox();
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minWidth: constraints.maxWidth
+            ),
+            child: Table(
+              border: TableBorder.all(
+                color: Colors.grey,
+              ),
+              columnWidths: headerWidth,
+              children: [
+                buildTableTitle(),
+                ...getMeasuredRows(),
+              ],
+            ),
+          ),
+        );
+      }
     );
   }
 
-  List<DataRow> getRows() {
-    return tableData
-        .map(
-          (e) => DataRow(
-            selected: e.checked,
-            color: MaterialStateProperty.resolveWith((states) {
-              if (e.hasColor) {
-                return Colors.yellow.withAlpha(64);
-              }
-            }),
-            cells: [
-              DataCell(
-                InkWell(
-                  onTap: () => onTapPci(e),
-                  child: Text(
-                    e.pci,
-                    style: const TextStyle(
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-              DataCell(
-                InkWell(
-                  onTap: () => onTapNPci(e),
-                  child: Text(
-                    e.nPci,
-                    style: const TextStyle(
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-              DataCell(Text(e.nTime.toString())),
-              DataCell(Text(e.nRsrp.toString())),
-              DataCell(Text(e.index.toString())),
-              DataCell(Text(e.sTime.toString())),
-              DataCell(Text(e.rp.toString())),
-              DataCell(Text(e.cqi.toString())),
-              DataCell(Text(e.ri.toString())),
-              DataCell(Text(e.dlMcs.toString())),
-              DataCell(Text(e.dlLayer.toString())),
-              DataCell(Text(e.dlRb.toString())),
-              DataCell(Text(e.dlTb.toString())),
-              DataCell(
-                Row(
-                  children: [
-                    Transform.scale(
-                      scale: 0.7,
-                      child: Checkbox(
-                        value: e.checked,
-                        onChanged: (value) => onTapNId(e),
+  TableRow buildTableTitle() {
+    return TableRow(
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+      ),
+      children: headerTitle.map((e) {
+        final text = widget.isNpci ? 'PCI mW' : e;
+        return TableCell(
+          verticalAlignment: TableCellVerticalAlignment.middle,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 4.0,
+            ),
+            child: Center(
+              child: headerTitle.last == e
+                  ? Stack(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Transform.scale(
+                              scale: 0.7,
+                              child: Checkbox(
+                                value: isNeighborCheck,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    onChangeSelected(value ? 99999 : -1);
+                                    servingTime = "-";
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '인근장비',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
+                        Positioned(
+                          right: 8,
+                          top: 0,
+                          bottom: 0,
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Serving\nTime',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10,
+                                    color: Colors.black54),
+                              ),
+                              const SizedBox(width: 16),
+                              DropdownButton<String>(
+                                value: servingTime,
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    servingTime = newValue;
+                                    onChangeSelected(int.parse(servingTime));
+                                  }
+                                  setState(() {});
+                                },
+                                items: List.generate(
+                                        11,
+                                        (index) =>
+                                            index == 0 ? "-" : index.toString())
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(
+                                      value,
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                                icon: const SizedBox.shrink(),
+                              ),
+                              const Icon(Icons.arrow_drop_down_rounded),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      e == headerLteTitle[1] ? text : e,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
-                    Text(e.nearby().toString()),
-                  ],
-                ),
-                onTap: () => onTapNId(e),
-              ),
-            ],
+            ),
           ),
-        )
-        .toList();
+        );
+      }).toList(),
+    );
   }
 
-  List<DataColumn> getColumns() {
-    return headTitles.mapIndexed((index, e) {
-      final dataColumn = index == headTitles.length - 1
-          ? DataColumn(
-              label: Row(
-                children: [
-                  Transform.scale(
-                    scale: 0.7,
-                    child: Checkbox(
-                      value: isCheck,
-                      onChanged: (value) {
-                        print('onChagned...');
-                        onTapToggle();
-                      },
+  void onChangeSelected(int servingTime) {
+    measureDataList = measureDataList.map((measureData) {
+      return measureData.copyWith(
+        baseList: measureData.baseList.map((baseData) {
+          return baseData.copyWith(
+              isChecked: measureData.sTime == null ||
+                  measureData.sTime! <= servingTime);
+        }).toList(),
+      );
+    }).toList();
+    widget.onChange(measureDataList);
+    setState(() {});
+  }
+
+  List<TableRow> getMeasuredRows() {
+    return measureDataList.mapIndexed((measureIndex, measureData) {
+      return TableRow(
+        decoration: BoxDecoration(
+          color: measureData.hasColor ? Colors.yellowAccent : Colors.white,
+        ),
+        children: [
+          TableCell(
+            verticalAlignment: TableCellVerticalAlignment.middle,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: InkWell(
+                onTap: () => widget.onTapPci(measureData.pci),
+                child: Center(
+                  child: Text(
+                    measureData.pci,
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
                     ),
                   ),
-                  Text(
-                    e,
-                    textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          TableCell(
+            verticalAlignment: TableCellVerticalAlignment.middle,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Center(
+                child: InkWell(
+                  onTap: measureData.nPci.isEmpty
+                      ? null
+                      : () {
+                          widget.onTapNPci(measureData.pci);
+                        },
+                  child: Text(
+                    widget.isNpci
+                        ? measureData.mw?.toStringAsFixed(15) ?? ''
+                        : measureData.nPci,
+                    style: const TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
-                ],
+                ),
               ),
-            )
-          : DataColumn(
-              label: Text(
-                e,
-                textAlign: TextAlign.center,
+            ),
+          ),
+          ...measureData.getValues(widget.type).map(
+                (e) => TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Center(child: Text(e.toString())),
+                  ),
+                ),
               ),
-            );
-      return dataColumn;
+          TableCell(
+            verticalAlignment: TableCellVerticalAlignment.middle,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: SizedBox(
+                height: 20 * measureData.baseList.length.toDouble(),
+                child: BaseListCheckBox(
+                  baseList: measureData.baseList,
+                  onChanged: (baseDataList) {
+                    setState(() {
+                      measureDataList[measureIndex] =
+                          measureData.copyWith(baseList: baseDataList);
+                      widget.onChange(measureDataList);
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
     }).toList();
   }
-}
 
-/*
- [
-        const DataColumn(
-          label: Text(
-            'PCI',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'Neighbor\nPCI',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'Neighbor\nTime',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'Neighbor\nRSRP\nSUM(dBm)',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'Interference\nIndex',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'Serving\nTime',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'RP',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'CQI',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'RI',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'DL\nMCS',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'DL\nLayer',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'DL\nRB',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        const DataColumn(
-          label: Text(
-            'DL\nT/P',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.1,
-            ),
-          ),
-        ),
-        DataColumn(
-          label: Row(
-            children: [
-              Transform.scale(
-                scale: 0.7,
-                child: Checkbox(
-                  value: false,
-                  onChanged: (value) {},
-                ),
-              ),
-              const Text(
-                '인근장비',
-                style: TextStyle(
-                  fontSize: 12,
-                  height: 1.1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ]
- */
+  bool get isNeighborCheck {
+    return measureDataList
+        .map((measureData) => measureData.baseList)
+        .expand((element) => element)
+        .every((baseData) => baseData.isChecked);
+  }
+}

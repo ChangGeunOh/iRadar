@@ -19,7 +19,7 @@ class TableData {
   final String dlMcs;
   final String dlLayer;
   final String dlRb;
-  final String dlTb;
+  final String dlTp;
   final String nDst;
   final String nRnm;
   final String nId;
@@ -48,7 +48,7 @@ class TableData {
     required this.dlMcs,
     required this.dlLayer,
     required this.dlRb,
-    required this.dlTb,
+    required this.dlTp,
     required this.nDst,
     required this.nRnm,
     required this.nId,
@@ -75,7 +75,7 @@ class TableData {
       dlMcs: dlMcs,
       dlLayer: dlLayer,
       dlRb: dlRb,
-      dlTb: dlTb,
+      dlTp: dlTp,
       nDst: nDst,
       nRnm: nRnm,
       nId: nId,

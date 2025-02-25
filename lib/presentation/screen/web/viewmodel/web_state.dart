@@ -3,13 +3,13 @@ import 'package:googlemap/domain/model/excel_request_data.dart';
 import '../../../../domain/model/excel_response_data.dart';
 
 class WebState {
-  final ExcelRequestData? excelRequestData;
-  final List<ExcelResponseData>? excelResponseList;
+  final ExcelRequestData excelRequestData;
+  final List<ExcelResponseData> excelResponseList;
   final bool isLoading;
 
   WebState({
-    this.excelRequestData,
-    this.excelResponseList,
+    required this.excelRequestData,
+    this.excelResponseList = const [],
     this.isLoading = false,
   });
 

@@ -16,6 +16,19 @@ extension DynamicToDouble on dynamic {
   }
 }
 
+extension DateTimeToString on DateTime {
+  String toDateString({String? format}) {
+    final dateFormat = format ?? 'yyyy/MM/dd';
+    return DateFormat(dateFormat).format(this);
+  }
+
+  String toTimeString({String? format}) {
+    final timeFormat = format ?? 'HH:mm:ss';
+    return DateFormat(timeFormat).format(this);
+  }
+}
+
+
 extension StringToDouble on String {
   double? toDouble() {
     return isNotEmpty ? double.parse(this) : null;

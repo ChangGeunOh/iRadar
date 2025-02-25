@@ -8,6 +8,7 @@ import 'common/router/router.dart';
 import 'data/database/local_database.dart';
 import 'data/datacache/local_datacache.dart';
 import 'data/datastore/local_datastore.dart';
+import 'data/network/custom_interceptor.dart';
 import 'data/network/local_network.dart';
 import 'data/repository/database_source_impl.dart';
 import 'data/repository/datacache_source_impl.dart';
@@ -16,15 +17,34 @@ import 'data/repository/network_source_impl.dart';
 import 'data/repository/repository.dart';
 
 void main() {
-  runApp(const MyApp());
+  const String environment =
+      String.fromEnvironment("FLAVOR", defaultValue: "debug");
+  runApp(const MyApp(environment: environment));
+
+  // 뒤로 가기 버튼 제어
+  // html.window.onPopState.listen((event) {
+  //   print(html.window.location.pathname);
+  //
+  //   if (html.window.location.pathname == '/login' || html.window.location.pathname == '/') {
+  //     html.window.history.pushState(null, '', '/login');
+  //   }
+  // });
 }
 
+final rootScaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String environment;
+
+  const MyApp({
+    super.key,
+    required this.environment,
+  });
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return RepositoryProvider(
       lazy: false,
       create: (context) {
@@ -34,10 +54,13 @@ class MyApp extends StatelessWidget {
         final dataStoreSource = DataStoreSourceImpl(
           dataStore: LocalDataStore(),
         );
-        final networkSource = NetworkSourceImpl(
-          LocalNetwork.dio,
-          baseUrl: kNetworkBaseUrl,
+
+        final customInterceptor = CustomInterceptor(
+          dataStoreSource: dataStoreSource,
+          context: context,
         );
+        final LocalNetwork localNetwork = LocalNetwork(customInterceptor);
+        final networkSource = NetworkSourceImpl(localNetwork.dio);
         final dataCacheSource = DataCacheSourceImpl(
           dataCache: LocalDataCache(),
         );
@@ -50,6 +73,7 @@ class MyApp extends StatelessWidget {
       },
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: rootScaffoldKey,
         scrollBehavior: AppScrollBehavior(),
         title: 'iRadar',
         theme: ThemeData(

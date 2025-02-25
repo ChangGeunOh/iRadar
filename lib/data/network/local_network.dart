@@ -1,15 +1,18 @@
 import 'package:dio/dio.dart';
+import 'package:googlemap/common/const/network.dart';
+import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+
+import 'custom_interceptor.dart';
 
 class LocalNetwork {
-  static Dio get dio {
+  final CustomInterceptor customInterceptor;
+  LocalNetwork(this.customInterceptor,);
+
+  Dio get dio {
+
     final dio = Dio();
-    // dio.options.connectTimeout = const Duration(seconds: 5);
-    // dio.options.receiveTimeout = const Duration(seconds: 5);
-    // dio.options.sendTimeout = const Duration(seconds: 5);
-    dio.interceptors.add(CustomInterceptor());
+    dio.interceptors.add(customInterceptor);
     dio.interceptors.add(
       PrettyDioLogger(
         requestHeader: true,
@@ -21,29 +24,75 @@ class LocalNetwork {
         maxWidth: 90,
       ),
     );
+    dio.options.responseType = ResponseType.json;
+    dio.options.baseUrl = baseUrl;
+
     return dio;
   }
 }
 
-class CustomInterceptor extends Interceptor {
-  @override
-  void onError(DioError err, ErrorInterceptorHandler handler) async {
-    print(handler.toString());
-    print('onError${err.response.toString()}');
-    // super.onError(err, handler);
-    handler.next(err);
-  }
-
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    super.onRequest(options, handler);
-    print('onRequest${options.path}');
-    print('onRequest${options.data}');
-  }
-
-  @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    super.onResponse(response, handler);
-    print('onResponse');
-  }
-}
+// class CustomInterceptor extends Interceptor {
+//   TokenData tokenData = TokenData();
+//
+//   @override
+//   void onError(DioException err, ErrorInterceptorHandler handler) async {
+//     // final customResponse = Response(
+//     //   requestOptions: err.requestOptions,
+//     //   statusCode: err.response?.statusCode,
+//     //   data: err.response?.data, // 사용자 정의 응답 내용
+//     // );
+//     //
+//     // // 에러를 정상 응답으로 처리
+//     // handler.resolve(customResponse);
+//     final responseData = ResponseData(
+//       meta: MetaData(
+//         code: err.response?.statusCode ?? 200,
+//         message: '네트워크 장애 입니다. 잠시 후 다시 해 주세요.',
+//         timeStamp: DateTime.now().millisecondsSinceEpoch,
+//       ),
+//       data: null,
+//     );
+//     handler.resolve(Response(
+//       requestOptions: err.requestOptions,
+//       data: responseData.getJson(),
+//       statusCode: 200,
+//     ));
+//   }
+//
+//   @override
+//   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+//     _setToken(options);
+//     super.onRequest(options, handler);
+//   }
+//
+//   @override
+//   void onResponse(Response response, ResponseInterceptorHandler handler) {
+//     if (response.statusCode == 200) {
+//       _saveTokenData(response);
+//     }
+//     super.onResponse(response, handler);
+//   }
+//
+//   void _setToken(RequestOptions options) {
+//     if (tokenData.accessToken != null) {
+//       options.headers['Authorization'] = 'Bearer ${tokenData.accessToken}';
+//     }
+//   }
+//
+//   void _saveTokenData(Response response) {
+//     if (response.requestOptions.path == (kPostTokenDataPath)) {
+//       try {
+//         final data = response.data as Map<String, dynamic>;
+//         final token = ResponseData<TokenData>(
+//           meta: MetaData.fromJson(data['meta'] as Map<String, dynamic>),
+//           data: TokenData.fromJson(data['data'] as Map<String, dynamic>),
+//         ).data;
+//         if (token != null) {
+//           tokenData = token;
+//         }
+//       } catch (e) {
+//         print('Error parsing response data: $e');
+//       }
+//     }
+//   }
+// }

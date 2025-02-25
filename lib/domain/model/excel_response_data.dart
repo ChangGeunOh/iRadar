@@ -30,33 +30,40 @@ class ExcelResponseData {
   final String scenario;
   @JsonKey(name: 'reg_date')
   final String regDate;
-  @JsonKey(name: "has_color",
+  @JsonKey(
+    name: "has_color",
     toJson: Convert.boolToDynamic,
     fromJson: Convert.dynamicToBool,
   )
   final bool hasColor;
 
   ExcelResponseData({
-    required this.division,
-    required this.sido,
-    required this.sigungu,
-    required this.area,
-    required this.team,
-    required this.jo,
-    required this.year,
-    required this.type,
-    required this.id,
-    required this.rnm,
-    required this.memo,
-    required this.atten,
-    required this.cellLock,
-    required this.ruLock,
-    required this.relayLock,
-    required this.pci,
-    required this.scenario,
-    required this.regDate,
-    required this.hasColor,
-});
-  factory ExcelResponseData.fromJson(Map<String, dynamic> json) => _$ExcelResponseDataFromJson(json);
+    this.division = '',
+    this.sido = '',
+    this.sigungu = '',
+    this.area = '',
+    this.team = '',
+    this.jo = '',
+    this.year = '',
+    this.type = '',
+    this.id = '',
+    this.rnm = '',
+    this.memo = '',
+    String? atten, // this.atten = '200',       // relay인 경우 ''로 초기화
+    this.cellLock = '',
+    this.ruLock = '',
+    String? relayLock, // this.relayLock = '',    // relay인 경우 'O'로 초기화
+    this.pci = '',
+    this.scenario = 'iRadar',
+    this.regDate = '',
+    this.hasColor = false,
+  })  : atten = atten ?? (type == '5G' ? '200' :  ['RS', 'RB', 'RE'].any((e) => id.startsWith(e)) ? '' : '200'),
+        relayLock = ['RS', 'RB', 'RE'].any((e) => id.startsWith(e)) ? 'O' : '';
+
+  factory ExcelResponseData.fromJson(Map<String, dynamic> json) =>
+      _$ExcelResponseDataFromJson(json);
+
   Map<String, dynamic> toJson() => _$ExcelResponseDataToJson(this);
 }
+
+

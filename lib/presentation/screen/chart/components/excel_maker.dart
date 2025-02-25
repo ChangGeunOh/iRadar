@@ -1,17 +1,19 @@
 import 'package:collection/collection.dart';
 import 'package:excel/excel.dart';
+import 'package:googlemap/domain/model/chart/excel_data.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 
 import '../../../../common/const/constants.dart';
 import '../../../../domain/model/excel_response_data.dart';
 
 class ExcelMaker {
-  final PlaceData placeData;
-  final List<ExcelResponseData> excelResponseList;
+  final AreaData areaData;
+  final List<ExcelData> excelDataList;
 
   ExcelMaker({
-    required this.placeData,
-    required this.excelResponseList,
+    required this.areaData,
+    required this.excelDataList,
   });
 
   final excelCellWidths = [
@@ -35,7 +37,7 @@ class ExcelMaker {
     16.71,
   ];
 
-  CellStyle _cellStyle(String background) => CellStyle(
+  CellStyle _cellStyle(ExcelColor background) => CellStyle(
         horizontalAlign: HorizontalAlign.Center,
         bold: true,
         backgroundColorHex: background,
@@ -46,7 +48,7 @@ class ExcelMaker {
       );
 
   void makeExcel({String? fileName}) {
-    var saveFileName = fileName ?? placeData.name;
+    var saveFileName = fileName ?? 'Scenario_${areaData.name}_${areaData.type?.name}';
     var excel = Excel.createExcel();
     Sheet sheet = excel['Sheet1'];
     _makeRowTitle(sheet);
@@ -65,7 +67,7 @@ class ExcelMaker {
       sheet.cell(
         CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0),
       )
-        ..value = TextCellValue(placeData.link)
+        ..value = TextCellValue(areaData.name)
         ..cellStyle = CellStyle(
           bold: true,
           underline: Underline.Single,
@@ -77,13 +79,13 @@ class ExcelMaker {
       );
       sheet.setColumnWidth(index, excelCellWidths[index]); // setColWidth(index, excelCellWidths[index]);
       cell.value = TextCellValue(element.toString()); // element.toString(
-      cell.cellStyle = _cellStyle('#D4D4D4');
+      cell.cellStyle = _cellStyle(ExcelColor.fromHexString('#D4D4D4'));
     });
   }
 
   void _makeRowData(Sheet sheet) {
-    excelResponseList.forEachIndexed((row, e) {
-      final background = e.hasColor ? '#fffd54' : 'none';
+    excelDataList.forEachIndexed((row, e) {
+      final background = e.hasColor ? ExcelColor.fromHexString('#fffd54'): ExcelColor.none;
       final cellValues = [
         e.division,
         e.sido,
@@ -102,7 +104,7 @@ class ExcelMaker {
         e.relayLock,
         e.pci,
         e.scenario,
-        e.regDate.split(' ').first,
+        e.regDate,
       ];
 
       cellValues.forEachIndexed((column, value) {
@@ -122,7 +124,7 @@ class ExcelMaker {
     required int row,
     required int column,
     required String value,
-    String background = 'none',
+    ExcelColor background = ExcelColor.none,
   }) {
     sheet.cell(
       CellIndex.indexByColumnRow(

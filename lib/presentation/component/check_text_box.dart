@@ -6,7 +6,7 @@ class CheckTextBox extends StatelessWidget {
   final ValueChanged? onChanged;
   final Color? checkColor;
 
-  const CheckTextBox({
+  const  CheckTextBox({
     required this.value,
     this.onChanged,
     this.text,

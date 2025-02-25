@@ -1,26 +1,36 @@
-import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/table_data.dart';
 
-class NpciState {
-  final PlaceData? placeData;
-  final List<TableData>? tableList;
-  final bool isCheck;
+import '../../../../domain/model/chart/measure_data.dart';
+import '../../../../domain/model/map/area_data.dart';
+
+class NpciState  {
+  final AreaData areaData;
+  final String pci;
+  final List<MeasureData> measureDataList;
+  final bool isLoading;
+  final String message;
 
   NpciState({
-    this.placeData,
-    this.tableList,
-    bool? isCheck,
-  }) : isCheck = isCheck ?? false;
+    required this.areaData,
+    required this.pci,
+    required this.measureDataList,
+    this.isLoading = false,
+    this.message = '',
+  });
 
   NpciState copyWith({
-    PlaceData? placeData,
-    List<TableData>? tableList,
-    bool? isCheck,
+    bool? isLoading,
+    String? message,
+    AreaData? areaData,
+    String? pci,
+    List<MeasureData>? measureDataList,
   }) {
     return NpciState(
-      placeData: placeData ?? this.placeData,
-      tableList: tableList ?? this.tableList,
-      isCheck: isCheck ?? this.isCheck,
+      isLoading: isLoading ?? this.isLoading,
+      message: message ?? this.message,
+      areaData: areaData ?? this.areaData,
+      pci: pci ?? this.pci,
+      measureDataList: measureDataList ?? this.measureDataList,
     );
   }
+
 }

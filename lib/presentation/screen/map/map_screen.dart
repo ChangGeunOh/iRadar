@@ -1,34 +1,44 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
+import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
+import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_bloc.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_state.dart';
-import 'package:intl/intl.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import '../../../common/const/constants.dart';
-import '../../../domain/bloc/bloc_layout.dart';
-import '../../../domain/model/location_type.dart';
-import '../../../domain/model/place_data.dart';
+import '../../../common/utils/mixin.dart';
+import '../../../domain/model/enum/location_type.dart';
+import '../../../domain/model/enum/wireless_type.dart';
 import '../../component/dropdown_box.dart';
 import '../../component/edit_text.dart';
-import '../../component/password_field.dart';
+import '../../component/iradar_dialog.dart';
 import 'component/statefull_slider.dart';
 import 'viewmodel/map_event.dart';
 
-class MapScreen extends StatelessWidget {
-  final Set<PlaceData> placeDataSet;
+class MapScreen extends StatelessWidget with ShowMessageMixin {
+  final Set<AreaData> areaDataSet;
   final bool isRemove;
+  final WirelessType wirelessType;
+  final Function onReloadArea;
 
-  const MapScreen({
-    required this.placeDataSet,
+  MapScreen({
+    required this.areaDataSet,
     required this.isRemove,
+    required this.wirelessType,
+    required this.onReloadArea,
     super.key,
-  });
+  }) {
+    // print('MapScreen> areaDataSet: $areaDataSet');
+    // print('MapScreen> isRemove: $isRemove');
+    // print('MapScreen> wirelessType: $wirelessType');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,36 +46,54 @@ class MapScreen extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox box = context.findRenderObject() as RenderBox;
       final screenSize = MediaQuery.of(context).size;
-      print('box>${box.size.width} : ScreenSize>${screenSize.width}');
-      print("point>${screenSize.width - box.size.width}");
       mapLeftMargin = screenSize.width.toInt() - box.size.width.toInt();
     });
 
-    return BlocLayout<MapBloc, MapState>(
+    return BlocScaffold<MapBloc, MapState>(
+      extendBodyBehindAppBar: true,
+      appBarBuilder: (context, bloc, state) =>
+          _appBar(context, bloc, state, onReloadArea),
       create: (context) {
         return MapBloc(
           context,
-          MapState(),
+          MapState(
+            areaDataSet: areaDataSet,
+            wirelessType: wirelessType,
+          ),
         );
       },
       builder: (context, bloc, state) {
-        print(
-            'MapScreen::: ${state.placeDataList.length} : ${placeDataSet.length}');
-        if (placeDataSet.difference(state.placeDataList.toSet()).isNotEmpty ||
-            state.placeDataList.toSet().difference(placeDataSet).isNotEmpty) {
-          print('MapScreen::: ${placeDataSet != state.placeDataList.toSet()}');
-          bloc.add(BlocEvent(MapEvent.onInit, extra: placeDataSet));
+        if (wirelessType != state.wirelessType) {
+          bloc.add(
+              BlocEvent(MapEvent.onChangeWirelessType, extra: wirelessType));
         }
-        if (state.isLoading) {
-          bloc.add(BlocEvent(MapEvent.onDataLoading));
+        if (areaDataSet != state.areaDataSet) {
+          bloc.add(BlocEvent(MapEvent.onChangeAreaDataSet, extra: areaDataSet));
         }
+
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+          if (state.message.isNotEmpty) {
+            showDialog(
+              context: context,
+              builder: (context) => IradarDialog(
+                title: state.message,
+                onConfirm: () {
+                  if (state.showingDialog) {
+                    context.pop();
+                  }
+                },
+              ),
+            );
+            bloc.add(BlocEvent(MapEvent.onMessage, extra: ''));
+          }
+        });
+
         return Stack(
           children: [
             Listener(
               onPointerDown: (event) async {
                 if (event.kind == PointerDeviceKind.mouse &&
                     event.buttons == kSecondaryMouseButton) {
-                  print("Right Mouse Button Clicked....");
                   final RenderBox box = context.findRenderObject() as RenderBox;
                   final offset = box.localToGlobal(Offset.zero);
                   final relativeRect = RelativeRect.fromLTRB(
@@ -84,9 +112,14 @@ class MapScreen extends StatelessWidget {
                     (value) => bloc.add(
                       BlocEvent(MapEvent.onChangeRadius, extra: value),
                     ),
-                    (value) => bloc.add(
-                      BlocEvent(MapEvent.onChangeCursorState, extra: value),
-                    ),
+                    (value) {
+                      bloc.add(
+                        BlocEvent(
+                          MapEvent.onChangeCursorState,
+                          extra: value,
+                        ),
+                      );
+                    },
                     state.cursorState,
                   );
                 }
@@ -109,61 +142,36 @@ class MapScreen extends StatelessWidget {
                   initialCameraPosition: bloc.initCameraPosition(),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
-                  markers: (state.baseMarkers + state.measureMarkers).toSet(),
+                  markers: state.mapBaseMarkerSet
+                      .union(state.measureMarkerSet)
+                      .union(state.otherBaseMarkerSet)
+                      .union(state.isShowBestPoint ? state.bestPointMarkerSet : {}),
                   onMapCreated: (GoogleMapController controller) {
                     bloc.setGoogleMapController(controller);
                     bloc.controller = controller;
                   },
                   onTap: (value) {
-                    print('google map> onTap');
                     bloc.add(BlocEvent(MapEvent.onTapMap, extra: value));
                   },
                   polygons: state.polygonSet,
                   circles: state.circleSet,
-                  onCameraMove: (value) {
-                    bloc.setCameraPosition(value);
+                  onCameraMove: (cameraPosition) {
+                    bloc.setCameraPosition(cameraPosition);
+                  },
+                  onCameraIdle: () {
+                    bloc.add(BlocEvent(MapEvent.onCameraIdle));
                   },
                 ),
               ),
             ),
-            if (placeDataSet.isNotEmpty)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: AppBar(
-                  backgroundColor: Colors.transparent,
-                  centerTitle: true,
-                  title: Text(
-                    placeDataSet.map((e) => e.name).join(', '),
-                  ),
-                ),
+            Positioned(
+              left: 16,
+              bottom: 24,
+              child: Image.asset(
+                'assets/images/img_legend.png',
+                scale: 2,
               ),
-            if (placeDataSet.length > 1)
-              Positioned(
-                right: 24,
-                bottom: 130,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.red,
-                  onPressed: () {
-                    _showMergeDialog(
-                      context: context,
-                      placeDataList: state.placeDataList,
-                      onMergeData: (PlaceData placeData) {
-                        bloc.add(
-                          BlocEvent(
-                            MapEvent.onMergeData,
-                            extra: placeData,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: const Icon(
-                    Icons.merge_rounded,
-                  ),
-                ),
-              ),
+            ),
             if (state.isLoading)
               Positioned.fill(
                 child: Container(
@@ -175,6 +183,93 @@ class MapScreen extends StatelessWidget {
                   ),
                 ),
               ),
+            Positioned(
+              top: 82,
+              right: 8,
+              child: Column(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      bloc.add(BlocEvent(MapEvent.onShowBase));
+                    },
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.cell_tower_rounded,
+                          size: 32,
+                          color:
+                              state.isShowBase ? Colors.black : Colors.black38,
+                        ),
+                        Text(
+                          'ALL',
+                          style: TextStyle(
+                            color: state.isShowBase
+                                ? Colors.black
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () {
+                      bloc.add(BlocEvent(MapEvent.onShowCaption));
+                    },
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.cell_tower_rounded,
+                          size: 32,
+                          color: state.isShowCaption
+                              ? Colors.black
+                              : Colors.black38,
+                        ),
+                        Text(
+                          'Label',
+                          style: TextStyle(
+                            color: state.isShowCaption
+                                ? Colors.black
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  IconButton(
+                    onPressed: () {
+                      bloc.add(BlocEvent(MapEvent.onShowBestPoint));
+                    },
+                    icon: Column(
+                      children: [
+                        Icon(
+                          Icons.recommend_outlined,
+                          size: 32,
+                          color: state.isShowBestPoint
+                              ? Colors.red
+                              : Colors.black38,
+                        ),
+                        Text(
+                          'Best Point',
+                          style: TextStyle(
+                            color: state.isShowBestPoint
+                                ? Colors.red
+                                : Colors.black38,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },
@@ -206,15 +301,16 @@ class MapScreen extends StatelessWidget {
           onTap: () => onTapMenuItem(MapCursorState.remove),
           child: const Row(
             children: [
+              SizedBox(width: 16),
               Icon(
-                Icons.remove_circle,
+                Icons.remove_circle_outline,
                 color: Colors.red,
               ),
               SizedBox(
                 width: 16,
               ),
               Text(
-                '데이터 제거하기',
+                '루트 제거 하기',
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -227,6 +323,59 @@ class MapScreen extends StatelessWidget {
           onTap: () => onTapMenuItem(MapCursorState.add),
           child: const Row(
             children: [
+              SizedBox(width: 16),
+              Icon(
+                Icons.add_circle_outline,
+                color: Colors.blue,
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Text(
+                '루트 추가 하기',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          height: 16,
+          child: Divider(
+            indent: 16,
+            endIndent: 16,
+            height: 1,
+          ),
+        ),
+        PopupMenuItem(
+          enabled: true,
+          onTap: () => onTapMenuItem(MapCursorState.removeAll),
+          child: const Row(
+            children: [
+              SizedBox(width: 16),
+              Icon(
+                Icons.remove_circle,
+                color: Colors.red,
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              Text(
+                '루트 전체 제거',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          enabled: true,
+          onTap: () => onTapMenuItem(MapCursorState.addAll),
+          child: const Row(
+            children: [
+              SizedBox(width: 16),
               Icon(
                 Icons.add_circle,
                 color: Colors.blue,
@@ -235,7 +384,7 @@ class MapScreen extends StatelessWidget {
                 width: 16,
               ),
               Text(
-                '데이터 추가하기',
+                '루트 전체 추가',
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -253,13 +402,13 @@ class MapScreen extends StatelessWidget {
                 height: 40,
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                     ),
-                    backgroundColor: MaterialStateProperty.resolveWith((state) {
-                      if (!state.contains(MaterialState.disabled)) {
+                    backgroundColor: WidgetStateProperty.resolveWith((state) {
+                      if (!state.contains(WidgetState.disabled)) {
                         return Colors.blue;
                       }
                       return Colors.grey.withAlpha(64);
@@ -288,60 +437,60 @@ class MapScreen extends StatelessWidget {
   }
 }
 
-void _showMergeDialog({
+Future<void> _showMergeDialog({
   required BuildContext context,
-  required List<PlaceData> placeDataList,
-  required Function(PlaceData) onMergeData,
-}) {
-  var name = '[Merge] ${placeDataList.map((e) => e.name).join(', ')}';
-  var locationType = placeDataList.first.division;
-  var password = '';
+  required MapBloc bloc,
+  required Set<AreaData> areaDataSet,
+  required Function(Map<String, dynamic>) onMergeData,
+}) async {
+  final prefix = areaDataSet.length > 1 ? '[병합] ' : '[수정]';
+  var name = '$prefix ${areaDataSet.map((e) => e.name).join(', ')}';
+  var locationType = areaDataSet.first.division;
+  AreaData mostRecent = areaDataSet.reduce((current, next) {
+    return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
+  });
 
-  showDialog(
+  await showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text("병합하기"),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        titlePadding: const EdgeInsets.all(0),
+        title: Container(
+          color: Colors.red,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(
+              child: Text(
+                areaDataSet.length > 1 ? "병합하기" : '수정하기',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ),
         content: SizedBox(
           height: 200,
+          width: 500,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 150,
-                    child: EditText(
-                      onChanged: (value) {},
-                      label: '지역',
-                      value: placeDataList.first.group,
-                      enabled: false,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 200,
-                    child: DropdownBox(
-                      value: locationType.name,
-                      onChanged: (value) {
-                        locationType = LocationType.values
-                            .firstWhere((element) => element.name == value);
-                      },
-                      hint: '구분선택',
-                      label: '구분',
-                      items: divisionList,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  SizedBox(
-                    width: 200,
-                    child: PasswordField(
-                      onChanged: (value) {
-                        password = value;
-                      },
-                    ),
-                  ),
-                ],
+              SizedBox(
+                width: 200,
+                child: DropdownBox(
+                  value: locationType!.name,
+                  onChanged: (value) {
+                    locationType = LocationType.values
+                        .firstWhere((element) => element.name == value);
+                  },
+                  hint: '구분선택',
+                  label: '구분',
+                  items: divisionList,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -358,31 +507,24 @@ void _showMergeDialog({
         ),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              print('병합하기 :: ${locationType.name} : $name} : $password');
-              if (name.isEmpty || name.length < 5 || password.length < 5) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('측정장소나 비밀번호를 입력해주세요.'),
-                  ),
-                );
-                return;
-              }
-              _onMergeData(
-                locationType: locationType,
-                name: name,
-                placeDataList: placeDataList,
-                onMergeData: onMergeData,
-                password: password,
-              );
-            },
-            child: const Text("병합"),
-          ),
-          TextButton(
             child: const Text("취소"),
             onPressed: () {
               Navigator.of(context).pop();
             },
+          ),
+          TextButton(
+            onPressed: () {
+              if (name.isEmpty) {
+                return;
+              }
+              onMergeData({
+                'name': name,
+                'locationType': locationType,
+                'measuredAt': mostRecent.measuredAt,
+              });
+              // Navigator.of(context).pop();
+            },
+            child: const Text("저장"),
           ),
         ],
       );
@@ -390,34 +532,59 @@ void _showMergeDialog({
   );
 }
 
-void _onMergeData({
-  required LocationType locationType,
-  required String name,
-  required List<PlaceData> placeDataList,
-  required Function(PlaceData) onMergeData,
-  required String password,
-}) {
-  print('병합하기 :: ${locationType.name} : $name}');
-  final latitude = placeDataList
-          .map((e) => e.latitude)
-          .reduce((value, element) => value + element) /
-      placeDataList.length;
-  final longitude = placeDataList
-          .map((e) => e.longitude)
-          .reduce((value, element) => value + element) /
-      placeDataList.length;
-  final String formattedDate =
-      DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-  final placeData = PlaceData(
-    idx: -1,
-    type: placeDataList.first.type,
-    group: placeDataList.first.group,
-    name: name,
-    division: locationType,
-    latitude: latitude,
-    longitude: longitude,
-    dateTime: formattedDate,
-    password: password,
+AppBar? _appBar(context, bloc, state, onReloadArea) {
+  if (state.areaDataSet.isEmpty) {
+    return null;
+  }
+  final title = state.areaDataSet.map((e) => e.name).join(', ');
+  final type = state.areaDataSet.first.type;
+  return AppBar(
+    backgroundColor: Colors.white.withOpacity(0.7),
+    title: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SvgPicture.asset(type == WirelessType.wLte
+            ? 'assets/icons/ic_lte.svg'
+            : 'assets/icons/ic_5g.svg'),
+        const SizedBox(width: 16),
+        Text(title),
+      ],
+    ),
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.red[400],
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            iconSize: 32,
+            icon: const Icon(
+              Icons.upload,
+              color: Colors.white,
+            ),
+            onPressed: () async {
+              bloc.add(BlocEvent(MapEvent.onShowDialog, extra: true));
+              await _showMergeDialog(
+                context: context,
+                bloc: bloc,
+                areaDataSet: state.areaDataSet,
+                onMergeData: (value) {
+                  bloc.add(
+                    BlocEvent(
+                      MapEvent.onMergeData,
+                      extra: value,
+                    ),
+                  );
+                },
+              );
+              onReloadArea();
+            },
+          ),
+        ),
+      ),
+    ],
   );
-  onMergeData(placeData);
 }
