@@ -113,7 +113,7 @@ class BaseCsvFile {
       return doubleLatLng;
     }
 
-    List<String> parts = coordinate.split(RegExp(r"[:\s]+"));
+    List<String> parts = coordinate.split(RegExp(r"[-:\s]+"));
     print('coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}');
     if (parts.length != 4 && parts.length != 3) {
       return 0.0;

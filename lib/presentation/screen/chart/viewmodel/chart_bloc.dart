@@ -150,7 +150,9 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         makeChartExcel();
         break;
       case ChartEvent.onTapDeduplication:
-        emit(state.copyWith(isDeduplication: !state.isDeduplication));
+        emit(state.copyWith(
+          isDeduplication: event.extra as bool? ?? !state.isDeduplication,
+        ));
         await _loadMeasureDataList(state.areaData, emit);
         break;
     }

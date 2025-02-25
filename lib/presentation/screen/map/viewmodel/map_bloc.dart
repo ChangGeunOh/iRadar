@@ -67,6 +67,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     BlocEvent<MapEvent> event,
     Emitter<MapState> emit,
   ) async {
+
     switch (event.type) {
       case MapEvent.onInit:
         await _changedAreaData(
@@ -136,6 +137,18 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         );
         break;
       case MapEvent.onChangeCursorState:
+        if (event.extra == MapCursorState.none) {
+          // hide base...
+          emit(state.copyWith(
+            mapBaseMarkerSet: state.baseMarkers.toSet(),
+          ));
+        } else {
+          // show base...
+          print('show base...>${state.baseMarkers.toSet()}');
+          emit(state.copyWith(
+            mapBaseMarkerSet: const {},
+          ));
+        }
         _onChangeCursorState(event, emit);
         break;
       case MapEvent.onCameraIdle:
@@ -225,6 +238,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
             isLoading: false,
             mapBaseMarkerSet: mapBaseMarkerSet,
             isShowCaption: isShowCaption,
+            baseMarkers: mapBaseMarkerSet.toList(),
           ));
           break;
         }
@@ -330,7 +344,10 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     return markers;
   }
 
-  void _onChangeCursorState(BlocEvent<MapEvent> event, Emitter<MapState> emit) {
+  void _onChangeCursorState(
+    BlocEvent<MapEvent> event,
+    Emitter<MapState> emit,
+  ) {
     switch (event.extra) {
       case MapCursorState.add:
         emit(state.copyWith(
@@ -483,6 +500,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
       areaDataSet: areaDataSet,
       mapBaseMarkerSet: mapBaseMarkerSet,
       measureMarkerSet: measureMarkerSet,
+      baseMarkers: mapBaseMarkerSet.toList(),
       message: message,
     ));
   }
