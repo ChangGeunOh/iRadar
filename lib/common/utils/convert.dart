@@ -1,11 +1,12 @@
+import 'package:collection/collection.dart';
 import 'package:googlemap/domain/model/enum/location_type.dart';
 
 import '../../domain/model/enum/wireless_type.dart';
 
 class Convert {
   static WirelessType dynamicToWirelessType(dynamic value) {
-    final type = WirelessType.values.firstWhere((e) => e.name.toLowerCase() == value.toString().toLowerCase());
-    return type;
+    final type = WirelessType.values.firstWhereOrNull((e) => e.name.toLowerCase() == value.toString().toLowerCase());
+    return type ?? WirelessType.undefined;
   }
 
   static dynamic wirelessTypeToDynamic(WirelessType? value) {

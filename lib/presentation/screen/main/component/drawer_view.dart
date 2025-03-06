@@ -79,7 +79,7 @@ class DrawerView extends StatelessWidget {
             const SizedBox(height: 32),
             const DrawerListHeader(text: 'UPLOAD BASIC DATA'),
             DrawerListItem(
-                title: "업로드 파일 샘플 다운로드",
+                title: "업로드 샘플 파일 다운로드",
                 iconData: Icons.file_copy_outlined,
                 onTap: () {
                   _downloadExampleFile("iradar_upload_example_file.zip");

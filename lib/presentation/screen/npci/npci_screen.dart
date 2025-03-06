@@ -100,11 +100,13 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
                     left: 24.0,
                     bottom: 8.0,
                   ),
-                  child: Text(
-                    '※ 전체 루트 (참조용)',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  child: Center(
+                    child: Text(
+                      '※ 전체 루트 (참조용) : Serving Time ~ DL Mac T/P',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../const/network.dart';
+import 'dart:html' as html;
+
 
 // 문자열 중에서 숫자만 추출
 String getNumbersFromString(String inputString) {
@@ -42,4 +45,17 @@ String hashPassword(String password, String secretKey) {
 String get baseUrl {
   const isDebug = bool.fromEnvironment("dart.vm.product") == false;
   return isDebug ? kNetworkDebugBaseUrl : kNetworkReleaseBaseUrl;
+}
+
+Future<void> downloadFile(String fileName) async {
+  ByteData data =
+  await rootBundle.load('assets/files/$fileName');
+  final buffer = data.buffer;
+  final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  final blob = html.Blob([bytes]);
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  html.AnchorElement(href: url)
+    ..setAttribute("download", fileName)
+    ..click();
+  html.Url.revokeObjectUrl(url);
 }

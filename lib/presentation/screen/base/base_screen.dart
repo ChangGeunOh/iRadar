@@ -7,6 +7,7 @@ import 'package:googlemap/presentation/component/iradar_dialog.dart';
 import 'package:googlemap/presentation/screen/base/bloc/base_event.dart';
 
 import '../../../common/utils/mixin.dart';
+import '../../../common/utils/utils.dart' as Utils;
 import '../../../domain/bloc/bloc_scaffold.dart';
 import '../../../domain/model/base/base_data.dart';
 import 'bloc/base_bloc.dart';
@@ -39,13 +40,53 @@ class BaseScreen extends StatelessWidget with ShowMessageMixin {
             children: [
               Row(
                 children: [
-                  const Text(
-                    '기지국/중계기 정보 등록',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 24,
-                      color: Colors.black87,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '기지국/중계기 정보 등록',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 24,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Text(
+                            '※ CSV 파일(',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black45,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Utils.downloadFile("iradar_upload_example_file.zip");
+                            },
+                            child: const Text(
+                              '업로드 샘플 파일 다운로드',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: primaryColor,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            ')로 업로드 해 주세요.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black45,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   CustomElevatedButton(

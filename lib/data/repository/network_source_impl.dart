@@ -132,7 +132,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @Headers({'access_token': false})
+  @Headers({'access_token': true})
   @GET(kNpciDataPath)
   Future<ResponseData<List<MeasureData>>> loadNpciList({
     @Path('type') required String type,
@@ -141,7 +141,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @Headers({'access_token': false})
+  @Headers({'access_token': true})
   @GET(kMapBaseDataPath)
   Future<ResponseData<List<BaseData>>> getBaseList({
     @Query('type') required String type,
@@ -152,7 +152,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @Headers({'access_token': false})
+  @Headers({'access_token': true})
   @GET(kSearchAreaDataPath)
   Future<ResponseData<List<AreaData>>> getSearchAreaList();
 
