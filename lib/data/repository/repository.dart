@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/common/utils/utils.dart';
+import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
@@ -399,5 +400,9 @@ class Repository {
       idxList: idxs,
     );
     return response.data ?? [];
+  }
+
+  Future<ResponseData> postRenameArea(AreaRenameData areaRenameData) {
+    return _networkSource.postRenameArea(areaRenameData);
   }
 }

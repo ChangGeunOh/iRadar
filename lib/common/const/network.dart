@@ -7,6 +7,7 @@ const kTokenPath = 'auth/token';
 const kAuthChangePath = 'auth/change';
 
 const kAreaDataPath = 'area';
+const kRenameAreaPath = 'area/rename';
 const kSearchAreaDataPath = 'area/search';
 
 const kUploadDataPath = 'upload';

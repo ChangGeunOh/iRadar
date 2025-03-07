@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
+import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
@@ -169,6 +170,24 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         await _downloadExcelBaseData();
         emit(state.copyWith(isLoading: false));
         break;
+      case MainEvent.onAreaRename:
+        print('MainEvent.onAreaRename');
+        final areaRenameData = event.extra as AreaRenameData;
+        final response = await repository.postRenameArea(areaRenameData);
+        if (response.meta.code == 200) {
+          emit(state.copyWith(
+            message: '측정 이름을 변경 하였습니다.',
+          ));
+          await _getAreaList(emit, state);
+        } else {
+          emit(state.copyWith(
+            message: '측정 이름 변경 중 오류가 발생 했습니다.',
+          ));
+        }
+        break;
+      case MainEvent.onMessage:
+        emit(state.copyWith(message: event.extra));
+        break;
     }
   }
 
@@ -185,8 +204,7 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         responseData.data,
         state.search,
         state.type,
-      ),
-      isLoading: false,
+      ),  isLoading: false,
     ));
   }
 

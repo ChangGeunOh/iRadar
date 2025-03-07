@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
+import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/presentation/screen/main/component/remove_dialog.dart';
+import 'package:googlemap/presentation/screen/main/component/rename_dialog.dart';
 import 'package:googlemap/presentation/screen/main/component/side_header.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_bloc.dart';
 import 'package:googlemap/presentation/screen/main/viewmodel/main_event.dart';
@@ -50,8 +52,8 @@ class SideMenuView extends StatelessWidget {
                 onTapRefresh: () => bloc.add(BlocEvent(
                   MainEvent.onTapRefresh,
                 )),
-                onTapMenu:
-                    onTapMenu, // () => bloc.add(BlocEvent(MainEvent.onTapMenu)),
+                onTapMenu: onTapMenu,
+                // () => bloc.add(BlocEvent(MainEvent.onTapMenu)),
                 group: state.userData?.userId ?? '',
               ),
               Expanded(
@@ -112,6 +114,28 @@ class SideMenuView extends StatelessWidget {
                         },
                       );
                     },
+                    onAreaRename: (areaData) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return RenameDialog(
+                              oldAreaName: areaData.name,
+                              onRename: (newName) {
+                                if (newName != areaData.name) {
+                                  final areaRenameData = AreaRenameData(
+                                    idx: areaData.idx,
+                                    oldName: areaData.name,
+                                    newName: newName,
+                                  );
+                                  bloc.add(BlocEvent(
+                                    MainEvent.onAreaRename,
+                                    extra: areaRenameData,
+                                  ));
+                                }
+                              },
+                            );
+                          });
+                    },
                     type: state.type,
                   ),
                 ),
@@ -136,6 +160,10 @@ class SideMenuView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _showAreaRenameDialog() {
+    return '';
   }
 }
 

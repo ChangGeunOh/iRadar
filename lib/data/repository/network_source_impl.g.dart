@@ -626,7 +626,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'pci': spci};
-    final _headers = <String, dynamic>{r'access_token': false};
+    final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<ResponseData<List<MeasureData>>>(Options(
@@ -680,7 +680,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       r'south_west_longitude': southWestLongitude,
       r'south_west_latitude': southWestLatitude,
     };
-    final _headers = <String, dynamic>{r'access_token': false};
+    final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<ResponseData<List<BaseData>>>(Options(
@@ -722,7 +722,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   Future<ResponseData<List<AreaData>>> getSearchAreaList() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{r'access_token': false};
+    final _headers = <String, dynamic>{r'access_token': true};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<ResponseData<List<AreaData>>>(Options(
@@ -876,6 +876,45 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
                     (i) => BestPointData.fromJson(i as Map<String, dynamic>))
                 .toList()
             : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<dynamic>> postRenameArea(
+      AreaRenameData areaRenameData) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    _data.addAll(areaRenameData.toJson());
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'area/rename',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

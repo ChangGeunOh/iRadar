@@ -11,9 +11,10 @@ import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 import 'package:googlemap/presentation/screen/map/map_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../common/utils/mixin.dart';
 import 'component/side_menu_view.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatelessWidget with ShowMessageMixin {
   static String get routeName => 'main';
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -37,6 +38,10 @@ class MainScreen extends StatelessWidget {
         );
       },
       builder: (context, bloc, state) {
+        if (state.message.isNotEmpty) {
+          showToast(state.message);
+          bloc.add(BlocEvent(MainEvent.onMessage, extra: ''));
+        }
         return DefaultTabController(
           initialIndex: 0,
           length: state.selectedAreaDataSet.length == 1 ? 1 : 2,

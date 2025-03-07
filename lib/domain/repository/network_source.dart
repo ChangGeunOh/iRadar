@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter_platform_interface/src/types/location.dart';
+import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/map/best_point_data.dart';
@@ -84,4 +85,8 @@ abstract class NetworkSource {
     required String type,
     required String idxList,
   });
+
+  Future<ResponseData> postRenameArea(
+    AreaRenameData areaRenameData,
+  );
 }

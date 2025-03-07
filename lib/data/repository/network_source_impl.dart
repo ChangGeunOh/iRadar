@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/common/const/network.dart';
+import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -173,5 +174,12 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Path('type') required String type,
     @Path('idx') required String idxList,
   });
+
+  @override
+  @Headers({'access_token': true})
+  @POST(kRenameAreaPath)
+  Future<ResponseData> postRenameArea(
+    @Body() AreaRenameData areaRenameData,
+  );
 
 }

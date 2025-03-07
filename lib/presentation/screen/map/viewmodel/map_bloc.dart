@@ -67,7 +67,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     BlocEvent<MapEvent> event,
     Emitter<MapState> emit,
   ) async {
-
     switch (event.type) {
       case MapEvent.onInit:
         await _changedAreaData(
@@ -334,6 +333,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           markerId: MarkerId('OTHER_BASE${e.code}'),
           position: LatLng(e.latitude, e.longitude),
           icon: iconImage,
+          anchor: const Offset(0.5, 0),
           infoWindow: InfoWindow(
             title: "${e.code} (${e.pci})",
             snippet: e.rnm,
@@ -630,6 +630,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         markerId: MarkerId('BASE${mapBaseData.code}'),
         position: LatLng(mapBaseData.latitude, mapBaseData.longitude),
         icon: markerIcon,
+        anchor: const Offset(0.5, 0),
         infoWindow: InfoWindow(
           title: "${mapBaseData.code} (${mapBaseData.pci})",
           snippet: mapBaseData.name,
@@ -804,7 +805,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     emit(state.copyWith(isLoading: false, message: response.meta.message));
   }
 
-  Future<BitmapDescriptor> _createCustomMarker(
+  Future<BitmapDescriptor> _createCustomMarkerBottom(
     String? markerPath,
     String caption, {
     bool isCaption = true,
@@ -850,7 +851,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
       text: caption,
       style: TextStyle(
         fontSize: 14,
-        color: isCaption ? Colors.black : Colors.transparent,
+        color: isCaption ? Colors.black : Colors.white,
         fontWeight: FontWeight.w500,
         fontFamily: 'NotoSansKR',
       ),
@@ -863,6 +864,73 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     textPainter.paint(canvas, Offset(textOffsetX, textOffsetY));
 
     // 이미지와 텍스트가 그려진 캔버스를 BitmapDescriptor로 변환
+    final ui.Image markerImage =
+        await pictureRecorder.endRecording().toImage(width, height);
+    final ByteData? byteData =
+        await markerImage.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List uint8List = byteData!.buffer.asUint8List();
+
+    return BitmapDescriptor.bytes(uint8List);
+  }
+
+  Future<BitmapDescriptor> _createCustomMarker(
+    String? markerPath,
+    String caption, {
+    bool isCaption = true,
+  }) async {
+    final lines = caption.split('\n').length;
+    const int width = 400;
+    const int imageSize = 14;
+    final int height = 24 * (lines + 1) + imageSize; // ✅ 이미지 높이 추가
+
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+
+    final Paint paint = Paint()..color = Colors.transparent;
+    canvas.drawRect(
+      Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+      paint,
+    );
+
+    // ✅ 텍스트 추가 (이미지 위)
+    final TextPainter textPainter = TextPainter(
+      textDirection: ui.TextDirection.ltr,
+    );
+    textPainter.text = TextSpan(
+      text: caption,
+      style: TextStyle(
+        fontSize: 14,
+        color: isCaption ? Colors.black : Colors.transparent,
+        fontWeight: FontWeight.w500,
+        fontFamily: 'NotoSansKR',
+      ),
+    );
+    textPainter.layout();
+
+    // ✅ 텍스트를 중앙 상단에 배치
+    final double textOffsetX = (width - textPainter.width) / 2;
+    const double textOffsetY = 0; // 텍스트는 상단에 배치
+    textPainter.paint(canvas, Offset(textOffsetX, textOffsetY));
+
+    if (markerPath != null) {
+      final ByteData data = await rootBundle.load(markerPath);
+      final ui.Codec codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(),
+      );
+      final ui.FrameInfo fi = await codec.getNextFrame();
+      final ui.Image image = fi.image;
+
+      // ✅ 이미지를 하단 중앙에 배치
+      const double imageOffsetX = (width - imageSize) / 2;
+      final double imageOffsetY = (height - image.height) as double; // ✅ 텍스트 아래에 위치
+      canvas.drawImage(
+        image,
+        Offset(imageOffsetX, imageOffsetY),
+        Paint(),
+      );
+    }
+
+    // ✅ 이미지와 텍스트가 그려진 캔버스를 BitmapDescriptor로 변환
     final ui.Image markerImage =
         await pictureRecorder.endRecording().toImage(width, height);
     final ByteData? byteData =

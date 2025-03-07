@@ -18,6 +18,7 @@ class SideBody extends StatelessWidget {
   final ValueChanged onTapAll;
   final ValueChanged onTapRemove;
   final ValueChanged<AreaData> onLongPress;
+  final ValueChanged<AreaData> onAreaRename;
   final ValueChanged onTapWithShift;
   final WirelessType type;
 
@@ -29,6 +30,7 @@ class SideBody extends StatelessWidget {
     required this.onTapRemove,
     required this.onLongPress,
     required this.onTapWithShift,
+    required this.onAreaRename,
     required this.type,
     super.key,
   });
@@ -39,7 +41,9 @@ class SideBody extends StatelessWidget {
     return ListView.separated(
       itemBuilder: (context, index) {
         final areaData = areaDataList[index];
-        final hasDivision = index > 0 ?  areaDataList[index - 1].division != areaData.division : true;
+        final hasDivision = index > 0
+            ? areaDataList[index - 1].division != areaData.division
+            : true;
         return AreaDataCard(
           areaData: areaData,
           onTapItem: () {
@@ -53,6 +57,9 @@ class SideBody extends StatelessWidget {
           },
           onLongPress: () {
             onLongPress(areaData);
+          },
+          onAreaRename: () {
+            onAreaRename(areaData);
           },
           isSelected: selectedPlaceSet.contains(areaData),
           type: type,
@@ -70,5 +77,3 @@ class SideBody extends StatelessWidget {
     );
   }
 }
-
-
