@@ -13,6 +13,7 @@ MapMeasuredData _$MapMeasuredDataFromJson(Map<String, dynamic> json) =>
       longitude: (json['lng'] as num).toDouble(),
       pci: Convert.dynamicToInt(json['pci']),
       rsrp: Convert.dynamicToDouble(json['rp']),
+      dltp: Convert.dynamicToDouble(json['dltp']),
     );
 
 Map<String, dynamic> _$MapMeasuredDataToJson(MapMeasuredData instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$MapMeasuredDataToJson(MapMeasuredData instance) =>
       'lng': instance.longitude,
       'pci': instance.pci,
       'rp': instance.rsrp,
+      'dltp': instance.dltp,
     };

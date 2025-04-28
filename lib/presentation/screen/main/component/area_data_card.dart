@@ -14,6 +14,7 @@ class AreaDataCard extends StatelessWidget {
   final VoidCallback onTapRemove;
   final VoidCallback onLongPress;
   final VoidCallback onAreaRename;
+  final Function onTapClear;
   final bool isSelected;
   final WirelessType type;
   final bool hasDivision;
@@ -26,6 +27,7 @@ class AreaDataCard extends StatelessWidget {
     required this.onLongPress,
     required this.onAreaRename,
     required this.isSelected,
+    required this.onTapClear,
     required this.type,
     this.hasDivision = false,
     super.key,
@@ -78,6 +80,15 @@ class AreaDataCard extends StatelessWidget {
                 ),
               ],
             ),
+            endActionPane: ActionPane(motion: const ScrollMotion(), children: [
+              SlidableAction(
+                onPressed: (_) => onTapClear(),
+                icon: Icons.cleaning_services_rounded,
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                label: '캐시삭제',
+              ),
+            ]),
             child: Container(
               width: 400,
               color: isSelected ? const Color(0xffe6f7ff) : Colors.white,

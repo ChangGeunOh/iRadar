@@ -103,16 +103,6 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
           },
         );
         break;
-      case ChartEvent.onTapWeb:
-        final excelRequestData = ExcelRequestData(
-          areaData: state.areaData,
-          measureDataList: state.measureDataList,
-        );
-        context.pushNamed(
-          WebScreen.routeName,
-          extra: excelRequestData,
-        );
-        break;
       case ChartEvent.onTapExcel:
         ExcelMaker(
           areaData: state.areaData,

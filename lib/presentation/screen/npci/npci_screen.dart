@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/common/utils/mixin.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
@@ -11,7 +12,9 @@ import 'package:googlemap/presentation/screen/chart/components/chart_view.dart';
 import 'package:googlemap/presentation/screen/npci/viewmodel/npci_bloc.dart';
 import 'package:googlemap/presentation/screen/npci/viewmodel/npci_event.dart';
 import 'package:googlemap/presentation/screen/npci/viewmodel/npci_state.dart';
+import 'package:googlemap/presentation/screen/web/web_screen.dart';
 
+import '../../../domain/model/excel_request_data.dart';
 import '../chart/components/table_view.dart';
 
 class NpciScreen extends StatelessWidget with ShowMessageMixin {
@@ -41,6 +44,8 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
         return AppBar(
           centerTitle: true,
           automaticallyImplyLeading: false,
+          leading: IconButton(
+              onPressed: () => context.pop(), icon: Icon(Icons.arrow_back)),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -60,7 +65,18 @@ class NpciScreen extends StatelessWidget with ShowMessageMixin {
           ),
           actions: [
             IconButton(
-              onPressed: () => bloc.add(BlocEvent(NpciEvent.onTapWeb)),
+              onPressed: () {
+                final excelRequestData = ExcelRequestData(
+                  areaData: state.areaData,
+                  measureDataList: state.measureDataList,
+                );
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: WebScreen(excelRequestData: excelRequestData),
+                  ),
+                );
+              },
               icon: const Icon(
                 Icons.web,
                 color: Colors.black87,

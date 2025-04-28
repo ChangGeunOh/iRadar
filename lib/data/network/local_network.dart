@@ -25,7 +25,7 @@ class LocalNetwork {
       ),
     );
     dio.options.responseType = ResponseType.json;
-    dio.options.baseUrl = baseUrl;
+    dio.options.baseUrl = Utils.baseUrl;
 
     return dio;
   }

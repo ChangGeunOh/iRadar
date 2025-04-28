@@ -21,6 +21,7 @@ const kGetMeasureListPath = 'chart/{type}/{idx}';
 
 const kBaseDataPath = 'base/';
 const kBaseLastDatePath = 'base/version';
+const kBaseDataRemovePath = 'base/remove';
 
 const kPciDataPath = 'pci/{type}/{idx}';
 

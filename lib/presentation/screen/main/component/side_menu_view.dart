@@ -90,6 +90,10 @@ class SideMenuView extends StatelessWidget {
                     onTapRemove: (value) => bloc.add(
                       BlocEvent(MainEvent.onTapItemRemove, extra: value),
                     ),
+                    onTapCacheClear: (value) => bloc.add(BlocEvent(
+                      MainEvent.onTapCacheClear,
+                      extra: value,
+                    )),
                     onTapWithShift: (value) {
                       bloc.add(
                         BlocEvent(
@@ -166,34 +170,3 @@ class SideMenuView extends StatelessWidget {
     return '';
   }
 }
-
-// AlertDialog(
-//                             title: const Text(
-//                               '자료삭제를 하시겠습니까?',
-//                               style: TextStyle(
-//                                 fontWeight: FontWeight.bold,
-//                                 fontSize: 22,
-//                               ),
-//                             ),
-//                             content: Text(
-//                               '"${value.name}" 자료가 삭제 됩니다.',
-//                               style: const TextStyle(
-//                                 fontSize: 16,
-//                               ),
-//                             ),
-//                             actions: [
-//                               TextButton(
-//                                 onPressed: () => Navigator.of(context).pop(),
-//                                 child: const Text('취소'),
-//                               ),
-//                               TextButton(
-//                                 onPressed: () {
-//                                   bloc.add(BlocEvent(
-//                                     MainEvent.onDelete,
-//                                     extra: value,
-//                                   ));
-//                                 },
-//                                 child: const Text('삭제'),
-//                               ),
-//                             ],
-//                           );

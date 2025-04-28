@@ -63,28 +63,24 @@ class _TableViewState extends State<TableView> {
     if (measureDataList.isEmpty) {
       return const SizedBox();
     }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: constraints.maxWidth
+    return LayoutBuilder(builder: (context, constraints) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+          child: Table(
+            border: TableBorder.all(
+              color: Colors.grey,
             ),
-            child: Table(
-              border: TableBorder.all(
-                color: Colors.grey,
-              ),
-              columnWidths: headerWidth,
-              children: [
-                buildTableTitle(),
-                ...getMeasuredRows(),
-              ],
-            ),
+            columnWidths: headerWidth,
+            children: [
+              buildTableTitle(),
+              ...getMeasuredRows(widget.isNpci),
+            ],
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 
   TableRow buildTableTitle() {
@@ -203,7 +199,7 @@ class _TableViewState extends State<TableView> {
     setState(() {});
   }
 
-  List<TableRow> getMeasuredRows() {
+  List<TableRow> getMeasuredRows(bool isNpci) {
     return measureDataList.mapIndexed((measureIndex, measureData) {
       return TableRow(
         decoration: BoxDecoration(
@@ -220,8 +216,10 @@ class _TableViewState extends State<TableView> {
                 child: Center(
                   child: Text(
                     measureData.pci,
-                    style: const TextStyle(
-                      decoration: TextDecoration.underline,
+                    style: TextStyle(
+                      decoration: isNpci
+                          ? TextDecoration.none
+                          : TextDecoration.underline,
                     ),
                   ),
                 ),
@@ -244,8 +242,10 @@ class _TableViewState extends State<TableView> {
                     widget.isNpci
                         ? measureData.mw?.toStringAsFixed(15) ?? ''
                         : measureData.nPci,
-                    style: const TextStyle(
-                      decoration: TextDecoration.underline,
+                    style: TextStyle(
+                      decoration: isNpci
+                          ? TextDecoration.none
+                          : TextDecoration.underline,
                     ),
                   ),
                 ),

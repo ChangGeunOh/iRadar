@@ -62,4 +62,9 @@ class LocalDataStore {
       }
     });
   }
+
+  Future<void> clearCache(String key) async {
+    final dataStore = await getSharedPreferences();
+    dataStore.remove(key);
+  }
 }

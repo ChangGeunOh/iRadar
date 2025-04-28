@@ -7,6 +7,7 @@ import '../../../../common/const/color.dart';
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../app_info/app_info_screen.dart';
 import '../../base/base_screen.dart';
+import '../../base_remove/base_remove_screen.dart';
 import '../../notice/notice_screen.dart';
 import '../../open_source/open_source_screen.dart';
 import '../../password/password_screen.dart';
@@ -99,6 +100,19 @@ class DrawerView extends StatelessWidget {
                   'Last Update: ${state.baseLastDate.isEmpty ? '자료 없음' : state.baseLastDate}',
             ),
             DrawerListItem(
+              title: "기지국/중계기 정보 삭제",
+              iconData: Icons.delete_forever_outlined,
+              onTap: () {
+                _showDialog(
+                  context,
+                  '기지국/중계기 정보 삭제',
+                  bloc,
+                  const BaseRemoveScreen(),
+                  hasAppBar: true,
+                );
+              },
+            ),
+            DrawerListItem(
                 title: "기지국/중계기 정보 다운로드",
                 iconData: Icons.file_download,
                 onTap: () {
@@ -108,7 +122,7 @@ class DrawerView extends StatelessWidget {
                 }),
             DrawerListItem(
               title: "KDM Fav 파일 다운로드",
-                iconData: Icons.arrow_circle_down,
+              iconData: Icons.arrow_circle_down,
               onTap: () {
                 _downloadExampleFile('i-Radar Pro_v1.0_Table.kfav');
               },
@@ -179,13 +193,14 @@ class DrawerView extends StatelessWidget {
   }
 
   void _showDialog(
-      BuildContext context,
-      String title,
-      MainBloc bloc,
-      Widget child,
-      ) async {
+    BuildContext context,
+    String title,
+    MainBloc bloc,
+    Widget child, {
+    bool hasAppBar = false,
+  }) async {
     bloc.add(BlocEvent(MainEvent.onShowDialog, extra: true));
-    final height = MediaQuery.of(context).size.height;
+    final size = MediaQuery.of(context).size;
     await showDialog(
         context: context,
         builder: (context) {
@@ -195,11 +210,21 @@ class DrawerView extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 32.0, right: 32, top: 32, bottom: 16),
+              padding: hasAppBar
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.only(
+                      left: 32.0,
+                      right: 32,
+                      top: 32,
+                      bottom: 16,
+                    ),
               child: SizedBox(
-                width: 800,
-                height: height > 798 ? 798 : height * 0.9,
+                width: hasAppBar ? size.width * 0.8 : 800,
+                height: hasAppBar
+                    ? size.height * 0.8
+                    : size.height > 798
+                        ? 798
+                        : size.height * 0.9,
                 child: child,
               ),
             ),
@@ -209,8 +234,7 @@ class DrawerView extends StatelessWidget {
   }
 
   Future<void> _downloadExampleFile(String fileName) async {
-    ByteData data =
-    await rootBundle.load('assets/files/$fileName');
+    ByteData data = await rootBundle.load('assets/files/$fileName');
     final buffer = data.buffer;
     final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     final blob = html.Blob([bytes]);
@@ -221,4 +245,3 @@ class DrawerView extends StatelessWidget {
     html.Url.revokeObjectUrl(url);
   }
 }
-

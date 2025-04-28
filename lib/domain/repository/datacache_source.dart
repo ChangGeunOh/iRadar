@@ -37,9 +37,20 @@ abstract class DataCacheSource {
   Set<Marker>? getNoLabelBaseMarkers(int idx, WirelessType wirelessType);
 
   void setMeasureMarkers(
-      int idx, Set<Marker> markers, WirelessType wirelessType);
+    int idx,
+    Set<Marker> markers,
+    WirelessType wirelessType,
+  );
 
   Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType);
+
+  void setMeasureMarkersSpeed(
+    int idx,
+    Set<Marker> markers,
+    WirelessType wirelessType,
+  );
+
+  Set<Marker>? getMeasureMarkersSpeed(int idx, WirelessType wirelessType);
 
   void setMetaData(WirelessType type, MetaData metaData);
 
@@ -58,11 +69,18 @@ abstract class DataCacheSource {
 
   UserData? getUserData();
 
-  void setCustomMeasureMarker(
-    String pci,
-    String iconPath,
-    BitmapDescriptor bitmapDescriptor,
-  );
+  void setCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required BitmapDescriptor bitmapDescriptor,
+    required bool isLabel,
+    required bool isSpeed,
+  });
 
-  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath);
+  BitmapDescriptor? getCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required bool isLabel,
+    required bool isSpeed,
+  });
 }

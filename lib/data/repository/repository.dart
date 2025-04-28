@@ -6,6 +6,7 @@ import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/common/utils/utils.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
+import 'package:googlemap/domain/model/base/base_remove_request.dart';
 import 'package:googlemap/domain/model/chart/measure_data.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
@@ -192,6 +193,22 @@ class Repository {
     return _dataCacheSource.getMeasureMarkers(idx, wirelessType);
   }
 
+  Set<Marker>? getMeasureMarkersSpeed(int idx, WirelessType wirelessType) {
+    return _dataCacheSource.getMeasureMarkersSpeed(idx, wirelessType);
+  }
+
+  void setMeasureMarkersSpeed(
+    PlaceData placeData,
+    Set<Marker> markers,
+    WirelessType wirelessType,
+  ) {
+    _dataCacheSource.setMeasureMarkersSpeed(
+      placeData.idx,
+      markers,
+      wirelessType,
+    );
+  }
+
   void setBaseMarkers(int idx, Set<Marker> markers, WirelessType wirelessType) {
     _dataCacheSource.setBaseMarkers(idx, markers, wirelessType);
   }
@@ -307,8 +324,8 @@ class Repository {
     String newPassword,
   ) async {
     return _networkSource.postPassword(
-      hashPassword(oldPassword, kSecreteKey),
-      hashPassword(newPassword, kSecreteKey),
+      Utils.hashPassword(oldPassword, kSecreteKey),
+      Utils.hashPassword(newPassword, kSecreteKey),
     );
   }
 
@@ -375,17 +392,63 @@ class Repository {
     return _networkSource.getBaseDataList();
   }
 
-  void setCustomMeasureMarker(
-    String pci,
-    String iconPath,
-    BitmapDescriptor bitmapDescriptor,
-  ) {
-    _dataCacheSource.setCustomMeasureMarker(pci, iconPath, bitmapDescriptor);
+  void setCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required BitmapDescriptor bitmapDescriptor,
+    required bool isLabel,
+    required bool isSpeed,
+  }) {
+    _dataCacheSource.setCustomMeasureMarker(
+      pci: pci,
+      iconPath: iconPath,
+      bitmapDescriptor: bitmapDescriptor,
+      isLabel: isLabel,
+      isSpeed: isSpeed,
+    );
   }
 
-  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
-    return _dataCacheSource.getCustomMeasureMarker(pci, iconPath);
+  BitmapDescriptor? getCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required bool isLabel,
+    required bool isSpeed,
+  }) {
+    return _dataCacheSource.getCustomMeasureMarker(
+      pci: pci,
+      iconPath: iconPath,
+      isLabel: isLabel,
+      isSpeed: isSpeed,
+    );
   }
+
+  // void setCustomMeasureMarkerSpeed(
+  //   String pci,
+  //   String iconPath,
+  //   BitmapDescriptor bitmapDescriptor, {
+  //   bool isLabel = false,
+  // }) {
+  //   _dataCacheSource.setCustomMeasureMarker(
+  //     pci: pci,
+  //     iconPath: iconPath,
+  //     bitmapDescriptor: bitmapDescriptor,
+  //     isLabel: isLabel,
+  //     isSpeed: true,
+  //   );
+  // }
+  //
+  // BitmapDescriptor? getCustomMeasureMarkerSpeed(
+  //   String pci,
+  //   String iconPath, {
+  //   bool isLabel = false,
+  // }) {
+  //   return _dataCacheSource.getCustomMeasureMarker(
+  //     pci: pci,
+  //     iconPath: iconPath,
+  //     isLabel: isLabel,
+  //     isSpeed: true,
+  //   );
+  // }
 
   Future<String> getBaseLastDate() async {
     final response = await _networkSource.getBaseLastDate();
@@ -404,5 +467,23 @@ class Repository {
 
   Future<ResponseData> postRenameArea(AreaRenameData areaRenameData) {
     return _networkSource.postRenameArea(areaRenameData);
+  }
+
+  Future<void> onClearCache(AreaData areaData) async {
+    await _dataStoreSource.clearCacheData(areaData.idx, areaData.type!);
+    await _networkSource.getClearChartCache(
+      type: areaData.type!.name,
+      idx: areaData.idx,
+    );
+    await _networkSource.getClearMapCache(
+      type: areaData.type!.name,
+      idx: areaData.idx,
+    );
+  }
+
+  Future<ResponseData> deleteBaseDataList(List<int> list) async {
+    return await _networkSource.postRemoveBaseDataList(
+      BaseRemoveRequest(idList: list),
+    );
   }
 }

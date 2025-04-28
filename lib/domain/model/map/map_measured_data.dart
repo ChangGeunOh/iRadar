@@ -21,12 +21,19 @@ class MapMeasuredData {
   )
   final double rsrp;
 
+  @JsonKey(
+    name: 'dltp',
+    fromJson: Convert.dynamicToDouble,
+  )
+  final double dltp;
+
   MapMeasuredData({
     required this.idx,
     required this.latitude,
     required this.longitude,
     required this.pci,
     required this.rsrp,
+    required this.dltp,
   });
 
   factory MapMeasuredData.fromJson(Map<String, dynamic> json) {

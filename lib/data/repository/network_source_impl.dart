@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
+import 'package:googlemap/domain/model/base/base_remove_request.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -23,7 +24,7 @@ part 'network_source_impl.g.dart';
 @RestApi()
 abstract class NetworkSourceImpl extends NetworkSource {
   factory NetworkSourceImpl(Dio dio) {
-    return _NetworkSourceImpl(dio, baseUrl: baseUrl);
+    return _NetworkSourceImpl(dio, baseUrl: Utils.baseUrl);
   }
 
   @override
@@ -182,4 +183,31 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Body() AreaRenameData areaRenameData,
   );
 
+  @override
+  @GET(kGetMapDataPath)
+  @Headers({'access_token': true})
+  Future<ResponseData> getClearMapCache({
+    @Path('type') required String type,
+    @Path('idx') required int idx,
+    @Query('clear') bool isClear = true,
+  });
+
+  @override
+  @GET(kGetMeasureListPath)
+  @Headers({'access_token': true})
+  Future<ResponseData<List<MeasureData>>> getClearChartCache({
+    @Path('idx') required int idx,
+    @Path('type') required String type,
+    @Query('clear') bool isClear = true,
+  });
+
+  @override
+  @Headers({
+    'access_token': true,
+    'content-type': 'application/json'
+  })
+  @POST(kBaseDataRemovePath)
+  Future<ResponseData> postRemoveBaseDataList(
+    @Body() BaseRemoveRequest request,
+  );
 }

@@ -59,8 +59,14 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     final latLng = widget.position == null
         ? const LatLng(37.42796133580664, -122.085749655962)
         : LatLng(widget.position!.latitude, widget.position!.longitude);
-    return Stack(
-      children: [
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: widget.isService,
+        title: Text(
+          '${widget.isService ? 'Serving Cell' : 'Neighbor Cell'} (${widget.pci})',
+        ),
+      ),
+      body:
         GoogleMap(
           markers: markers,
           initialCameraPosition: CameraPosition(
@@ -72,26 +78,6 @@ class _GoogleMapViewState extends State<GoogleMapView> {
           onCameraMoveStarted: widget.onCameraMoveStarted,
           onCameraIdle: widget.onCameraIdle,
         ),
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: 48,
-            color: Colors.white.withOpacity(0.8),
-            child: Center(
-              child: Text(
-                '${widget.isService ? 'Serving Cell' : 'Neighbor Cell'} (${widget.pci})',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-          ),
-        )
-      ],
     );
   }
 
@@ -157,22 +143,21 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     }
     return mapPins[pinIndices.last];
   }
-  
-  
-  String _getMapPinFiles(double rsrp) {
 
-    final filenames = List.generate(12, (index) => 'assets/icons/pin$index.jpg');
-    
+  String _getMapPinFiles(double rsrp) {
+    final filenames =
+        List.generate(12, (index) => 'assets/icons/pin$index.jpg');
+
     List<double> rsrpThresholds = [-120, -110, -100, -90, -80, -70];
     List<int> pinIndices = [0, 1, 2, 4, 7, 8, 10];
-    
+
     int index = pinIndices.last;
     for (int i = 0; i < rsrpThresholds.length; i++) {
       if (rsrp <= rsrpThresholds[i]) {
         return filenames[pinIndices[i]];
       }
     }
-    
+
     return filenames.last;
   }
 
@@ -197,7 +182,8 @@ class _GoogleMapViewState extends State<GoogleMapView> {
 
     // 배경을 흰색으로 채우기 (선택사항)
     final Paint paint = Paint()..color = Colors.transparent;
-    canvas.drawRect(Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()), paint);
+    canvas.drawRect(
+        Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()), paint);
 
     // 상단 가운데에 이미지를 배치
     const double imageOffsetX = (width - imageSize) / 2;
@@ -224,8 +210,10 @@ class _GoogleMapViewState extends State<GoogleMapView> {
     textPainter.paint(canvas, Offset(textOffsetX, textOffsetY));
 
     // 이미지와 텍스트가 그려진 캔버스를 BitmapDescriptor로 변환
-    final ui.Image markerImage = await pictureRecorder.endRecording().toImage(width, height);
-    final ByteData? byteData = await markerImage.toByteData(format: ui.ImageByteFormat.png);
+    final ui.Image markerImage =
+        await pictureRecorder.endRecording().toImage(width, height);
+    final ByteData? byteData =
+        await markerImage.toByteData(format: ui.ImageByteFormat.png);
     final Uint8List uint8List = byteData!.buffer.asUint8List();
 
     return BitmapDescriptor.bytes(uint8List);

@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:googlemap/common/const/color.dart';
 import 'package:googlemap/domain/bloc/bloc_event.dart';
@@ -7,7 +6,7 @@ import 'package:googlemap/presentation/component/iradar_dialog.dart';
 import 'package:googlemap/presentation/screen/base/bloc/base_event.dart';
 
 import '../../../common/utils/mixin.dart';
-import '../../../common/utils/utils.dart' as Utils;
+import '../../../common/utils/utils.dart';
 import '../../../domain/bloc/bloc_scaffold.dart';
 import '../../../domain/model/base/base_data.dart';
 import 'bloc/base_bloc.dart';

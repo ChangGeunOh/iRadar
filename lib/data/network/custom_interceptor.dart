@@ -41,7 +41,7 @@ class CustomInterceptor extends Interceptor {
         final tokenData = await dataStoreSource.getTokenData();
         final refreshToken = tokenData?.refreshToken;
         var response = await dio.get(
-          '$baseUrl$kTokenPath',
+          '${Utils.baseUrl}$kTokenPath',
           options: Options(
             headers: {
               'authorization': 'Bearer $refreshToken',

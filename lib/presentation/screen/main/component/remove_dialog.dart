@@ -21,8 +21,7 @@ class RemoveDialog extends StatelessWidget {
       title: const Column(
         children: <Widget>[
           Icon(
-            Icons.delete_forever,
-            color: Colors.red,
+            Icons.delete_forever,          color: Colors.red,
             size: 56,
           ),
           SizedBox(height: 16),

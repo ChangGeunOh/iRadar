@@ -188,6 +188,13 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       case MainEvent.onMessage:
         emit(state.copyWith(message: event.extra));
         break;
+      case MainEvent.onTapCacheClear:
+        emit(state.copyWith(isLoading: true));
+        await repository.onClearCache(event.extra as AreaData);
+        emit(state.copyWith(
+          isLoading: false,
+        ));
+        break;
     }
   }
 
@@ -204,7 +211,8 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         responseData.data,
         state.search,
         state.type,
-      ),  isLoading: false,
+      ),
+      isLoading: false,
     ));
   }
 

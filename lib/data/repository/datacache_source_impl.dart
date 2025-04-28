@@ -80,12 +80,33 @@ class DataCacheSourceImpl extends DataCacheSource {
 
   @override
   void setMeasureMarkers(
-      int idx, Set<Marker> markers, WirelessType wirelessType) {
-    if (wirelessType == WirelessType.w5G) {
-      _dataCache.cache5GMeasureMarkers[idx] = markers;
-    } else {
-      _dataCache.cacheLTEMeasureMarkers[idx] = markers;
-    }
+    int idx,
+    Set<Marker> markers,
+    WirelessType wirelessType,
+  ) {
+    _dataCache.cacheMeasureMarkers['RSRP${wirelessType.name}:$idx'] = markers;
+  }
+
+  @override
+  Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType) {
+    return _dataCache.cacheMeasureMarkers['RSRP:${wirelessType.name}:$idx'];
+  }
+
+  @override
+  void setMeasureMarkersSpeed(
+    int idx,
+    Set<Marker> markers,
+    WirelessType wirelessType,
+  ) {
+    _dataCache.cacheMeasureMarkers['Speed${wirelessType.name}:$idx'] = markers;
+  }
+
+  @override
+  Set<Marker>? getMeasureMarkersSpeed(
+    int idx,
+    WirelessType wirelessType,
+  ) {
+    return _dataCache.cacheMeasureMarkers['Speed:${wirelessType.name}:$idx'];
   }
 
   @override
@@ -104,15 +125,6 @@ class DataCacheSourceImpl extends DataCacheSource {
       return _dataCache.cache5GNoLabelMeasureMarkers[idx];
     } else {
       return _dataCache.cacheLTENoLabelMeasureMarkers[idx];
-    }
-  }
-
-  @override
-  Set<Marker>? getMeasureMarkers(int idx, WirelessType wirelessType) {
-    if (wirelessType == WirelessType.w5G) {
-      return _dataCache.cache5GMeasureMarkers[idx];
-    } else {
-      return _dataCache.cacheLTEMeasureMarkers[idx];
     }
   }
 
@@ -158,16 +170,25 @@ class DataCacheSourceImpl extends DataCacheSource {
   }
 
   @override
-  void setCustomMeasureMarker(
-    String pci,
-    String iconPath,
-    BitmapDescriptor bitmapDescriptor,
-  ) {
-    _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'] = bitmapDescriptor;
+  void setCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required BitmapDescriptor bitmapDescriptor,
+    required bool isLabel,
+    required bool isSpeed,
+  }) {
+    _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath$isLabel$isSpeed'] =
+        bitmapDescriptor;
   }
 
   @override
-  BitmapDescriptor? getCustomMeasureMarker(String pci, String iconPath) {
-    return _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath'];
+  BitmapDescriptor? getCustomMeasureMarker({
+    required String pci,
+    required String iconPath,
+    required bool isLabel,
+    required bool isSpeed,
+  }) {
+    return _dataCache.cacheMeasureMarkerIcon['$pci:$iconPath$isLabel$isSpeed'];
   }
+
 }

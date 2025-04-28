@@ -9,6 +9,7 @@ import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 
+import '../model/base/base_remove_request.dart';
 import '../model/chart/measure_data.dart';
 import '../model/map/area_data.dart';
 import '../model/map/map_data.dart';
@@ -89,4 +90,19 @@ abstract class NetworkSource {
   Future<ResponseData> postRenameArea(
     AreaRenameData areaRenameData,
   );
+
+  Future<ResponseData> getClearMapCache({
+    required String type,
+    required int idx,
+    bool isClear = true,
+  });
+
+  Future<ResponseData> getClearChartCache({
+    required String type,
+    required int idx,
+    bool isClear = true,
+  });
+
+  Future<ResponseData> postRemoveBaseDataList(BaseRemoveRequest request);
+
 }

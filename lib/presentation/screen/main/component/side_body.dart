@@ -19,6 +19,7 @@ class SideBody extends StatelessWidget {
   final ValueChanged onTapRemove;
   final ValueChanged<AreaData> onLongPress;
   final ValueChanged<AreaData> onAreaRename;
+  final Function(AreaData) onTapCacheClear;
   final ValueChanged onTapWithShift;
   final WirelessType type;
 
@@ -32,6 +33,7 @@ class SideBody extends StatelessWidget {
     required this.onTapWithShift,
     required this.onAreaRename,
     required this.type,
+    required this.onTapCacheClear,
     super.key,
   });
 
@@ -61,6 +63,7 @@ class SideBody extends StatelessWidget {
           onAreaRename: () {
             onAreaRename(areaData);
           },
+          onTapClear: ()=>onTapCacheClear(areaData),
           isSelected: selectedPlaceSet.contains(areaData),
           type: type,
           hasDivision: hasDivision,

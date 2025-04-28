@@ -73,16 +73,6 @@ class NpciBloc extends BlocBloc<BlocEvent<NpciEvent>, NpciState> {
           excelDataList: _getExcelDataList(),
         ).makeExcel();
         break;
-      case NpciEvent.onTapWeb:
-        final excelRequestData = ExcelRequestData(
-          areaData: state.areaData,
-          measureDataList: state.measureDataList,
-        );
-        context.pushNamed(
-          WebScreen.routeName,
-          extra: excelRequestData,
-        );
-        break;
       case NpciEvent.onMessage:
         emit(state.copyWith(message: event.extra));
         break;

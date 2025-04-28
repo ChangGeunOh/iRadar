@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +11,12 @@ import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/enum/location_type.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
-import 'package:googlemap/domain/model/map/map_measured_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_event.dart';
 import 'dart:ui' as ui;
 
+import '../../../../common/utils/utils.dart';
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/base/base_data.dart';
 import '../../../../domain/model/map/area_data.dart';
@@ -41,6 +40,9 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     (index) => 'assets/icons/pin$index.jpg',
     growable: false,
   );
+
+  final List<double> speedLteThresholds = [300, 200, 100, 50, 0];
+  final List<double> speed5GThresholds = [850, 650, 450, 250, 150, 0];
 
   late List<BitmapDescriptor> bestBitmapDescriptor;
 
@@ -143,7 +145,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           ));
         } else {
           // show base...
-          print('show base...>${state.baseMarkers.toSet()}');
           emit(state.copyWith(
             mapBaseMarkerSet: const {},
           ));
@@ -226,21 +227,31 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           );
           if (responseData.data != null) {
             final data = responseData.data!;
-            mapBaseMarkerSet = await _getBaseMarkers(
+            mapBaseMarkerSet = await Utils.getBaseMarkers(
               idx: areaData.idx,
               mapBaseDataSet: data.baseData,
               type: state.wirelessType,
               isLabelEnabled: isShowCaption,
+              repository: repository,
             );
           }
-          emit(state.copyWith(
-            isLoading: false,
-            mapBaseMarkerSet: mapBaseMarkerSet,
-            isShowCaption: isShowCaption,
-            baseMarkers: mapBaseMarkerSet.toList(),
-          ));
-          break;
         }
+        final measureMarkerSet = await Utils.makeMeasureMarkerByAreaSet(
+          areaDataSet: state.areaDataSet,
+          type: state.wirelessType,
+          isSpeed: state.isShowSpeed,
+          isLabel: isShowCaption,
+          repository: repository,
+        );
+
+        emit(state.copyWith(
+          isLoading: false,
+          mapBaseMarkerSet: mapBaseMarkerSet,
+          isShowCaption: isShowCaption,
+          baseMarkers: mapBaseMarkerSet.toList(),
+          measureMarkerSet: measureMarkerSet,
+        ));
+        break;
       case MapEvent.onShowBestPoint:
         if (state.areaDataSet.isEmpty) return;
         if (state.bestPointList.isNotEmpty || state.isShowBestPoint) {
@@ -273,6 +284,22 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
           bestPointMarkerSet: makers,
           isLoading: false,
           isShowBestPoint: !state.isShowBestPoint,
+        ));
+        break;
+      case MapEvent.onShowSpeed:
+        final isSpeed = !state.isShowSpeed;
+        print('isSpeed: $isSpeed :: isLabel: ${state.isShowCaption}');
+        Set<Marker> measureMarkerSet = await Utils.makeMeasureMarkerByAreaSet(
+            areaDataSet: state.areaDataSet,
+            type: state.wirelessType,
+            isSpeed: isSpeed,
+            isLabel: state.isShowCaption,
+            repository: repository);
+        emit(state.copyWith(
+          isShowSpeed: !state.isShowSpeed,
+          measureMarkerSet: measureMarkerSet,
+          dltpMarkerSet: isSpeed ? measureMarkerSet : null,
+          respMarkerSet: isSpeed ? null : measureMarkerSet,
         ));
         break;
     }
@@ -466,7 +493,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
       return;
     }
     Set<Marker> mapBaseMarkerSet = {};
-    Set<Marker> measureMarkerSet = {};
     String message = '';
     emit(state.copyWith(isLoading: true));
 
@@ -475,31 +501,31 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
 
       if (responseData.data != null) {
         final data = responseData.data!;
-        // final mapBaseMarkers = await _getMapBaseMarkers(
-        //   areaData.idx,
-        //   data.baseData,
-        //   state.wirelessType,
-        // );
-        final mapBaseMarkers = await _getBaseMarkers(
+        final mapBaseMarkers = await Utils.getBaseMarkers(
           idx: areaData.idx,
           mapBaseDataSet: data.baseData,
           type: state.wirelessType,
           isLabelEnabled: state.isShowCaption,
+          repository: repository,
         );
         mapBaseMarkerSet.addAll(mapBaseMarkers);
-        final measureMarkers = await _getMeasureMarkers(
-          state.wirelessType,
-          areaData.idx,
-          data.measuredData,
-        );
-        measureMarkerSet.addAll(measureMarkers);
       }
     }
+    final measureMarkerSet = await Utils.makeMeasureMarkerByAreaSet(
+      areaDataSet: areaDataSet,
+      type: state.wirelessType,
+      isSpeed: state.isShowSpeed,
+      isLabel: state.isShowCaption,
+      repository: repository,
+    );
+
     emit(state.copyWith(
       isLoading: false,
       areaDataSet: areaDataSet,
       mapBaseMarkerSet: mapBaseMarkerSet,
       measureMarkerSet: measureMarkerSet,
+      respMarkerSet: state.isShowSpeed ? null : measureMarkerSet,
+      dltpMarkerSet: state.isShowSpeed ? measureMarkerSet : null,
       baseMarkers: mapBaseMarkerSet.toList(),
       message: message,
     ));
@@ -540,141 +566,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     repository.setCameraPosition(value);
   }
 
-  Future<Set<Marker>> _getMeasureMarkers(
-    WirelessType type,
-    int idx,
-    List<MapMeasuredData> measureList,
-  ) async {
-    var markers = repository.getMeasureMarkers(idx, type);
-    if (markers != null) {
-      return markers;
-    }
-    markers = {};
-    for (var measure in measureList) {
-      final icon = await makeMeasureMarkerWithPCI(
-        measure.pci.toString(),
-        createMeasureImagePath(measure.rsrp),
-      );
-      markers.add(
-        Marker(
-          markerId: MarkerId('M${measure.idx}'),
-          icon: icon,
-          position: LatLng(measure.latitude, measure.longitude),
-          infoWindow: InfoWindow(
-            title: "${measure.pci}/${measure.rsrp}",
-            snippet: measure.idx.toString(),
-          ),
-        ),
-      );
-    }
-    // markers = measureList.map(
-    //   (e) async {
-    //     final icon = await makeMeasureMarkerWithPCI(e.pci.toString(), e.rsrp);
-    //     return Marker(
-    //       markerId: MarkerId('M${e.idx}'),
-    //       // icon: getRsrpMarker(e.rsrp),
-    //       icon: icon,
-    //       position: LatLng(e.latitude, e.longitude),
-    //       infoWindow: InfoWindow(snippet: "${e.pci}/${e.rsrp}"),
-    //     );
-    //   },
-    // ).toSet();
-
-    return markers;
-  }
-
-  Future<Set<Marker>> _getBaseMarkers({
-    required int idx,
-    required List<MapBaseData> mapBaseDataSet,
-    required WirelessType type,
-    bool isLabelEnabled = true,
-  }) async {
-    Set<Marker>? markers = isLabelEnabled
-        ? repository.getBaseMarkers(idx, type)
-        : repository.getNoLabelBaseMarkers(idx, type);
-
-    if (markers != null) {
-      return markers;
-    }
-
-    markers = {};
-    Map<double, MapBaseData> latBaseMap = {};
-
-    if (isLabelEnabled) {
-      for (var mapBaseData in mapBaseDataSet) {
-        if (latBaseMap.containsKey(mapBaseData.latitude)) {
-          var baseData = latBaseMap[mapBaseData.latitude];
-          baseData = baseData!.copyWith(
-              name:
-                  '${baseData.name}\n(${mapBaseData.pci}) ${mapBaseData.name}');
-          latBaseMap[mapBaseData.latitude] = baseData;
-        } else {
-          latBaseMap[mapBaseData.latitude] = mapBaseData.copyWith(
-              name: "(${mapBaseData.pci}) ${mapBaseData.name}");
-        }
-      }
-    } else {
-      for (var mapBaseData in mapBaseDataSet) {
-        latBaseMap[mapBaseData.latitude] = mapBaseData;
-      }
-    }
-
-    for (var mapBaseData in latBaseMap.values) {
-      var markerIcon = await _createCustomMarker(
-        mapBaseData.iconPath(type),
-        mapBaseData.name,
-        isCaption: isLabelEnabled,
-      );
-
-      markers.add(Marker(
-        markerId: MarkerId('BASE${mapBaseData.code}'),
-        position: LatLng(mapBaseData.latitude, mapBaseData.longitude),
-        icon: markerIcon,
-        anchor: const Offset(0.5, 0),
-        infoWindow: InfoWindow(
-          title: "${mapBaseData.code} (${mapBaseData.pci})",
-          snippet: mapBaseData.name,
-        ),
-      ));
-    }
-
-    // 중계기기 RS/RB/RE 앞 2자리로 주로 구분됨
-
-    if (isLabelEnabled) {
-      repository.setBaseMarkers(idx, markers, type);
-    } else {
-      repository.setNoLabelBaseMarkers(idx, markers, type);
-    }
-
-    return markers;
-  }
-
-  Future<Set<Marker>> _getMapBaseMarkers(
-    int idx,
-    List<MapBaseData> mapBaseDataSet,
-    WirelessType type,
-  ) {
-    return _getBaseMarkers(
-      idx: idx,
-      mapBaseDataSet: mapBaseDataSet,
-      type: type,
-      isLabelEnabled: true,
-    );
-  }
-
-  Future<Set<Marker>> _getNoLabelMapBaseMarkers(
-    int idx,
-    List<MapBaseData> mapBaseDataSet,
-    WirelessType type,
-  ) {
-    return _getBaseMarkers(
-      idx: idx,
-      mapBaseDataSet: mapBaseDataSet,
-      type: type,
-      isLabelEnabled: false,
-    );
-  }
-
   Future<void> _makeMapPins() async {
     final filenames = List.generate(12, (index) => 'assets/icons/pin$index.jpg',
         growable: false);
@@ -708,63 +599,6 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         return BitmapDescriptor.bytes(image.buffer.asUint8List());
       }),
     );
-  }
-
-  String createMeasureImagePath(double rsrp) {
-    final index = rsrpThresholds.indexWhere((threshold) => rsrp <= threshold);
-    final pinIndex = (index != -1) ? pinIndices[index] : pinIndices.last;
-    return filenames[pinIndex];
-  }
-
-  Future<BitmapDescriptor> makeMeasureMarkerWithPCI(
-    String pci,
-    String iconPath,
-  ) async {
-    if (repository.getCustomMeasureMarker(pci, iconPath) != null) {
-      return repository.getCustomMeasureMarker(pci, iconPath)!;
-    }
-
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    const size = Size(30, 30); // 마커 크기 설정
-
-    // 로컬 이미지 불러오기
-    final ByteData data = await rootBundle.load(iconPath);
-    final Uint8List bytes = data.buffer.asUint8List();
-    final ui.Codec codec =
-        await ui.instantiateImageCodec(bytes, targetWidth: 10);
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-
-    // 캔버스에 이미지 그리기
-    final paint = Paint();
-    canvas.drawImage(frameInfo.image, Offset(size.width / 2 - 5, 0), paint);
-
-    // PCI 텍스트 추가
-    const textStyle = TextStyle(
-      color: Colors.black,
-      fontSize: 12,
-      fontWeight: FontWeight.w500,
-    );
-    final textPainter = TextPainter(
-      text: TextSpan(text: pci, style: textStyle),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset((size.width - textPainter.width) / 2, size.height - 13),
-    );
-
-    // 캔버스 내용을 Bitmap으로 변환
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(size.width.toInt(), size.height.toInt());
-    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
-    final Uint8List markerBytes = byteData!.buffer.asUint8List();
-
-    final bitmapDescriptor = BitmapDescriptor.bytes(markerBytes);
-    repository.setCustomMeasureMarker(pci, iconPath, bitmapDescriptor);
-    return bitmapDescriptor;
   }
 
   Future<void> _onMergeData(
@@ -805,138 +639,54 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     emit(state.copyWith(isLoading: false, message: response.meta.message));
   }
 
-  Future<BitmapDescriptor> _createCustomMarkerBottom(
-    String? markerPath,
-    String caption, {
-    bool isCaption = true,
-  }) async {
-    final lines = caption.split('\n').length;
-    const int width = 400;
-    const int imageSize = 14;
-    final int height = 24 * (lines + 1);
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-
-    final Paint paint = Paint()..color = Colors.transparent;
-    canvas.drawRect(
-      Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
-      paint,
-    );
-
-    if (markerPath != null) {
-      final ByteData data = await rootBundle.load(markerPath);
-      final ui.Codec codec = await ui.instantiateImageCodec(
-        data.buffer.asUint8List(),
-        // targetWidth: imageSize,
-      );
-      final ui.FrameInfo fi = await codec.getNextFrame();
-      final ui.Image image = fi.image;
-
-      // 상단 가운데에 이미지를 배치
-      const double imageOffsetX = (width - imageSize) / 2;
-      const double imageOffsetY = 0;
-      canvas.drawImage(
-        image,
-        const Offset(imageOffsetX, imageOffsetY),
-        Paint(),
-      );
-    }
-
-    // 텍스트 추가
-    final TextPainter textPainter = TextPainter(
-      textDirection: ui.TextDirection.ltr,
-    );
-    textPainter.text = TextSpan(
-      text: caption,
-      style: TextStyle(
-        fontSize: 14,
-        color: isCaption ? Colors.black : Colors.white,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'NotoSansKR',
-      ),
-    );
-    textPainter.layout();
-
-    // 텍스트를 이미지 하단에 중앙에 배치
-    final double textOffsetX = (width - textPainter.width) / 2;
-    final double textOffsetY = imageSize.toDouble() + 14; // 이미지 바로 아래
-    textPainter.paint(canvas, Offset(textOffsetX, textOffsetY));
-
-    // 이미지와 텍스트가 그려진 캔버스를 BitmapDescriptor로 변환
-    final ui.Image markerImage =
-        await pictureRecorder.endRecording().toImage(width, height);
-    final ByteData? byteData =
-        await markerImage.toByteData(format: ui.ImageByteFormat.png);
-    final Uint8List uint8List = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.bytes(uint8List);
-  }
-
-  Future<BitmapDescriptor> _createCustomMarker(
-    String? markerPath,
-    String caption, {
-    bool isCaption = true,
-  }) async {
-    final lines = caption.split('\n').length;
-    const int width = 400;
-    const int imageSize = 14;
-    final int height = 24 * (lines + 1) + imageSize; // ✅ 이미지 높이 추가
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-
-    final Paint paint = Paint()..color = Colors.transparent;
-    canvas.drawRect(
-      Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
-      paint,
-    );
-
-    // ✅ 텍스트 추가 (이미지 위)
-    final TextPainter textPainter = TextPainter(
-      textDirection: ui.TextDirection.ltr,
-    );
-    textPainter.text = TextSpan(
-      text: caption,
-      style: TextStyle(
-        fontSize: 14,
-        color: isCaption ? Colors.black : Colors.transparent,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'NotoSansKR',
-      ),
-    );
-    textPainter.layout();
-
-    // ✅ 텍스트를 중앙 상단에 배치
-    final double textOffsetX = (width - textPainter.width) / 2;
-    const double textOffsetY = 0; // 텍스트는 상단에 배치
-    textPainter.paint(canvas, Offset(textOffsetX, textOffsetY));
-
-    if (markerPath != null) {
-      final ByteData data = await rootBundle.load(markerPath);
-      final ui.Codec codec = await ui.instantiateImageCodec(
-        data.buffer.asUint8List(),
-      );
-      final ui.FrameInfo fi = await codec.getNextFrame();
-      final ui.Image image = fi.image;
-
-      // ✅ 이미지를 하단 중앙에 배치
-      const double imageOffsetX = (width - imageSize) / 2;
-      final double imageOffsetY = (height - image.height) as double; // ✅ 텍스트 아래에 위치
-      canvas.drawImage(
-        image,
-        Offset(imageOffsetX, imageOffsetY),
-        Paint(),
-      );
-    }
-
-    // ✅ 이미지와 텍스트가 그려진 캔버스를 BitmapDescriptor로 변환
-    final ui.Image markerImage =
-        await pictureRecorder.endRecording().toImage(width, height);
-    final ByteData? byteData =
-        await markerImage.toByteData(format: ui.ImageByteFormat.png);
-    final Uint8List uint8List = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.bytes(uint8List);
-  }
+// Future<BitmapDescriptor> makeMeasureMarkerWithPCI(
+//   String pci,
+//   String iconPath,
+// ) async {
+//   if (repository.getCustomMeasureMarker(pci, iconPath) != null) {
+//     return repository.getCustomMeasureMarker(pci, iconPath)!;
+//   }
+//
+//   final recorder = ui.PictureRecorder();
+//   final canvas = Canvas(recorder);
+//   const size = Size(30, 30); // 마커 크기 설정
+//
+//   // 로컬 이미지 불러오기
+//   final ByteData data = await rootBundle.load(iconPath);
+//   final Uint8List bytes = data.buffer.asUint8List();
+//   final ui.Codec codec =
+//       await ui.instantiateImageCodec(bytes, targetWidth: 10);
+//   final ui.FrameInfo frameInfo = await codec.getNextFrame();
+//
+//   // 캔버스에 이미지 그리기
+//   final paint = Paint();
+//   canvas.drawImage(frameInfo.image, Offset(size.width / 2 - 5, 0), paint);
+//
+//   // PCI 텍스트 추가
+//   const textStyle = TextStyle(
+//     color: Colors.black,
+//     fontSize: 12,
+//     fontWeight: FontWeight.w500,
+//   );
+//   final textPainter = TextPainter(
+//     text: TextSpan(text: pci, style: textStyle),
+//     textAlign: TextAlign.center,
+//     textDirection: TextDirection.ltr,
+//   );
+//   textPainter.layout();
+//   textPainter.paint(
+//     canvas,
+//     Offset((size.width - textPainter.width) / 2, size.height - 13),
+//   );
+//
+//   // 캔버스 내용을 Bitmap으로 변환
+//   final picture = recorder.endRecording();
+//   final img = await picture.toImage(size.width.toInt(), size.height.toInt());
+//   final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+//   final Uint8List markerBytes = byteData!.buffer.asUint8List();
+//
+//   final bitmapDescriptor = BitmapDescriptor.bytes(markerBytes);
+//   repository.setCustomMeasureMarker(pci, iconPath, bitmapDescriptor);
+//   return bitmapDescriptor;
+// }
 }

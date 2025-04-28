@@ -57,21 +57,11 @@ class DataStoreSourceImpl extends DataStoreSource {
       if (data == null) {
         return null;
       }
-      print('-------------------> $idx :: ${type.name}');
-      data['measured_data'].forEach((element) {
-        print(element);
-      });
-      print('$idx :: ${type.name} <-------------------');
       final measuredData = (data['measured_data'] as List).map((e) => MapMeasuredData.fromJson(e as Map<String, dynamic>)).toList();
       final baseData = (data['base_data'] as List).map((e) => MapBaseData.fromJson(e as Map<String, dynamic>)).toList();
-      print('$idx :: ${type.name} <-------------------> Finished : ${baseData.length}');
       final mapData = MapData(measuredData: measuredData, baseData: baseData);
-      print('-------------------> $idx :: ${type.name} <-------------------');
-      // return MapData(measuredData: measuredData, baseData: baseData);
       return mapData;
     } catch (e, stackTrace) {
-      print('Error loading map data: $e');
-      print('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -134,5 +124,10 @@ class DataStoreSourceImpl extends DataStoreSource {
     return _dataStore.remove(keyUserData);
   }
 
+  @override
+  Future<void> clearCacheData(int idx, WirelessType type)async {
+    final keyMapData = 'map_data_${type}_$idx';
+    await _dataStore.clearCache(keyMapData);
+  }
 
 }

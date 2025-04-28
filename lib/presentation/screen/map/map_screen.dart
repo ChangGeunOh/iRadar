@@ -8,6 +8,8 @@ import 'package:googlemap/domain/bloc/bloc_event.dart';
 import 'package:googlemap/domain/bloc/bloc_scaffold.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/map_cursor_state.dart';
+import 'package:googlemap/presentation/screen/compare/compare_screen.dart';
+import 'package:googlemap/presentation/screen/map/component/map_side_menus.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_bloc.dart';
 import 'package:googlemap/presentation/screen/map/viewmodel/map_state.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
@@ -145,7 +147,9 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
                   markers: state.mapBaseMarkerSet
                       .union(state.measureMarkerSet)
                       .union(state.otherBaseMarkerSet)
-                      .union(state.isShowBestPoint ? state.bestPointMarkerSet : {}),
+                      .union(state.isShowBestPoint
+                          ? state.bestPointMarkerSet
+                          : {}),
                   onMapCreated: (GoogleMapController controller) {
                     bloc.setGoogleMapController(controller);
                     bloc.controller = controller;
@@ -168,7 +172,11 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
               left: 16,
               bottom: 24,
               child: Image.asset(
-                'assets/images/img_legend.png',
+                state.isShowSpeed
+                    ? state.wirelessType == WirelessType.w5G
+                        ? 'assets/images/img_legend_5g.png'
+                        : 'assets/images/img_legend_lte.png'
+                    : 'assets/images/img_legend.png',
                 scale: 2,
               ),
             ),
@@ -186,88 +194,9 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
             Positioned(
               top: 82,
               right: 8,
-              child: Column(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      bloc.add(BlocEvent(MapEvent.onShowBase));
-                    },
-                    icon: Column(
-                      children: [
-                        Icon(
-                          Icons.cell_tower_rounded,
-                          size: 32,
-                          color:
-                              state.isShowBase ? Colors.black : Colors.black38,
-                        ),
-                        Text(
-                          'ALL',
-                          style: TextStyle(
-                            color: state.isShowBase
-                                ? Colors.black
-                                : Colors.black38,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  IconButton(
-                    onPressed: () {
-                      bloc.add(BlocEvent(MapEvent.onShowCaption));
-                    },
-                    icon: Column(
-                      children: [
-                        Icon(
-                          Icons.cell_tower_rounded,
-                          size: 32,
-                          color: state.isShowCaption
-                              ? Colors.black
-                              : Colors.black38,
-                        ),
-                        Text(
-                          'Label',
-                          style: TextStyle(
-                            color: state.isShowCaption
-                                ? Colors.black
-                                : Colors.black38,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  IconButton(
-                    onPressed: () {
-                      bloc.add(BlocEvent(MapEvent.onShowBestPoint));
-                    },
-                    icon: Column(
-                      children: [
-                        Icon(
-                          Icons.recommend_outlined,
-                          size: 32,
-                          color: state.isShowBestPoint
-                              ? Colors.red
-                              : Colors.black38,
-                        ),
-                        Text(
-                          'Best Point',
-                          style: TextStyle(
-                            color: state.isShowBestPoint
-                                ? Colors.red
-                                : Colors.black38,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: MapSideMenus(
+                onTap: (mapEvent) => bloc.add(BlocEvent(mapEvent)),
+                state: state,
               ),
             ),
           ],
@@ -435,156 +364,195 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
       ],
     );
   }
-}
 
-Future<void> _showMergeDialog({
-  required BuildContext context,
-  required MapBloc bloc,
-  required Set<AreaData> areaDataSet,
-  required Function(Map<String, dynamic>) onMergeData,
-}) async {
-  final prefix = areaDataSet.length > 1 ? '[병합] ' : '[수정]';
-  var name = '$prefix ${areaDataSet.map((e) => e.name).join(', ')}';
-  var locationType = areaDataSet.first.division;
-  AreaData mostRecent = areaDataSet.reduce((current, next) {
-    return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
-  });
-
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        titlePadding: const EdgeInsets.all(0),
-        title: Container(
-          color: Colors.red,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Center(
-              child: Text(
-                areaDataSet.length > 1 ? "병합하기" : '수정하기',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ),
-        content: SizedBox(
-          height: 200,
-          width: 500,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 200,
-                child: DropdownBox(
-                  value: locationType!.name,
-                  onChanged: (value) {
-                    locationType = LocationType.values
-                        .firstWhere((element) => element.name == value);
-                  },
-                  hint: '구분선택',
-                  label: '구분',
-                  items: divisionList,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: EditText(
-                  onChanged: (value) {
-                    name = value;
-                  },
-                  label: '측정장소',
-                  value: name,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("취소"),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            onPressed: () {
-              if (name.isEmpty) {
-                return;
-              }
-              onMergeData({
-                'name': name,
-                'locationType': locationType,
-                'measuredAt': mostRecent.measuredAt,
-              });
-              // Navigator.of(context).pop();
-            },
-            child: const Text("저장"),
-          ),
+  AppBar? _appBar(context, bloc, MapState state, onReloadArea) {
+    if (state.areaDataSet.isEmpty) {
+      return null;
+    }
+    final title = state.areaDataSet.map((e) => e.name).join(', ');
+    final type = state.areaDataSet.first.type;
+    return AppBar(
+      backgroundColor: Colors.white.withOpacity(0.7),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SvgPicture.asset(type == WirelessType.wLte
+              ? 'assets/icons/ic_lte.svg'
+              : 'assets/icons/ic_5g.svg'),
+          const SizedBox(width: 16),
+          Text(title),
         ],
-      );
-    },
-  );
-}
-
-AppBar? _appBar(context, bloc, state, onReloadArea) {
-  if (state.areaDataSet.isEmpty) {
-    return null;
-  }
-  final title = state.areaDataSet.map((e) => e.name).join(', ');
-  final type = state.areaDataSet.first.type;
-  return AppBar(
-    backgroundColor: Colors.white.withOpacity(0.7),
-    title: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SvgPicture.asset(type == WirelessType.wLte
-            ? 'assets/icons/ic_lte.svg'
-            : 'assets/icons/ic_5g.svg'),
-        const SizedBox(width: 16),
-        Text(title),
-      ],
-    ),
-    actions: [
-      Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.red[400],
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            iconSize: 32,
-            icon: const Icon(
-              Icons.upload,
-              color: Colors.white,
-            ),
-            onPressed: () async {
-              bloc.add(BlocEvent(MapEvent.onShowDialog, extra: true));
-              await _showMergeDialog(
-                context: context,
-                bloc: bloc,
-                areaDataSet: state.areaDataSet,
-                onMergeData: (value) {
-                  bloc.add(
-                    BlocEvent(
-                      MapEvent.onMergeData,
-                      extra: value,
-                    ),
-                  );
-                },
-              );
-              onReloadArea();
-            },
-          ),
-        ),
       ),
-    ],
-  );
+      actions: [
+        IconButton(
+          onPressed: () {
+            _showMapCompareDialog(
+              context: context,
+              type: state.wirelessType,
+              areaDataSet: state.areaDataSet,
+              baseMarkers: state.mapBaseMarkerSet,
+              rsrpMarkers: state.respMarkerSet,
+              speedMarkers: state.dltpMarkerSet,
+            );
+          },
+          icon: const Icon(Icons.compare_rounded),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          iconSize: 32,
+          icon: const Icon(
+            Icons.upload,
+          ),
+          onPressed: () async {
+            bloc.add(BlocEvent(MapEvent.onShowDialog, extra: true));
+            await _showMergeDialog(
+              context: context,
+              bloc: bloc,
+              areaDataSet: state.areaDataSet,
+              onMergeData: (value) {
+                bloc.add(
+                  BlocEvent(
+                    MapEvent.onMergeData,
+                    extra: value,
+                  ),
+                );
+              },
+            );
+            onReloadArea();
+          },
+        ),
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  Future<void> _showMergeDialog({
+    required BuildContext context,
+    required MapBloc bloc,
+    required Set<AreaData> areaDataSet,
+    required Function(Map<String, dynamic>) onMergeData,
+  }) async {
+    final prefix = areaDataSet.length > 1 ? '[병합] ' : '[수정]';
+    var name = '$prefix ${areaDataSet.map((e) => e.name).join(', ')}';
+    var locationType = areaDataSet.first.division;
+    AreaData mostRecent = areaDataSet.reduce((current, next) {
+      return current.measuredAt!.isAfter(next.measuredAt!) ? current : next;
+    });
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          titlePadding: const EdgeInsets.all(0),
+          title: Container(
+            color: Colors.red,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Center(
+                child: Text(
+                  areaDataSet.length > 1 ? "병합하기" : '수정하기',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          content: SizedBox(
+            height: 200,
+            width: 500,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 200,
+                  child: DropdownBox(
+                    value: locationType!.name,
+                    onChanged: (value) {
+                      locationType = LocationType.values
+                          .firstWhere((element) => element.name == value);
+                    },
+                    hint: '구분선택',
+                    label: '구분',
+                    items: divisionList,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: EditText(
+                    onChanged: (value) {
+                      name = value;
+                    },
+                    label: '측정장소',
+                    value: name,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("취소"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                if (name.isEmpty) {
+                  return;
+                }
+                onMergeData({
+                  'name': name,
+                  'locationType': locationType,
+                  'measuredAt': mostRecent.measuredAt,
+                });
+                // Navigator.of(context).pop();
+              },
+              child: const Text("저장"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showMapCompareDialog({
+    required BuildContext context,
+    required WirelessType type,
+    required Set<AreaData> areaDataSet,
+    required Set<Marker> baseMarkers,
+    required Set<Marker> rsrpMarkers,
+    required Set<Marker> speedMarkers,
+  }) async {
+
+;
+
+
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: CompareScreen(
+                type: type,
+                areaDataSet: areaDataSet,
+                baseMarkers: baseMarkers,
+                rsrpMarkers: rsrpMarkers,
+                speedMarkers: speedMarkers,
+              ),
+            ),
+          );
+        });
+  }
 }

@@ -923,6 +923,136 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
     return _value;
   }
 
+  @override
+  Future<ResponseData<dynamic>> getClearMapCache({
+    required String type,
+    required int idx,
+    bool isClear = true,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'clear': isClear};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'map/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<List<MeasureData>>> getClearChartCache({
+    required int idx,
+    required String type,
+    bool isClear = true,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'clear': isClear};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<List<MeasureData>>>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          'chart/${type}/${idx}',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<List<MeasureData>> _value;
+    try {
+      _value = ResponseData<List<MeasureData>>.fromJson(
+        _result.data!,
+        (json) => json is List<dynamic>
+            ? json
+                .map<MeasureData>(
+                    (i) => MeasureData.fromJson(i as Map<String, dynamic>))
+                .toList()
+            : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<dynamic>> postRemoveBaseDataList(
+      BaseRemoveRequest request) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'access_token': true,
+      r'content-type': 'application/json',
+    };
+    _headers.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    _data.addAll(request.toJson());
+    final _options = _setStreamType<ResponseData<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/json',
+    )
+        .compose(
+          _dio.options,
+          'base/remove',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        )));
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||

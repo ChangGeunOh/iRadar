@@ -38,6 +38,9 @@ class MainScreen extends StatelessWidget with ShowMessageMixin {
         );
       },
       builder: (context, bloc, state) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          print('MainScreen state: ${bloc.pageController.page}');
+        });
         if (state.message.isNotEmpty) {
           showToast(state.message);
           bloc.add(BlocEvent(MainEvent.onMessage, extra: ''));

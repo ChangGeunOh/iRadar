@@ -11,9 +11,7 @@ import 'package:googlemap/domain/model/enum/wireless_type.dart';
 
 class LocalDataCache {
   final Map<int, MapBaseData> cacheMapData = {};
-  final Map<int, Set<Marker>> cache5GMeasureMarkers = {};
   final Map<int, Set<Marker>> cache5GBaseMarkers = {};
-  final Map<int, Set<Marker>> cacheLTEMeasureMarkers = {};
   final Map<int, Set<Marker>> cacheLTEBaseMarkers = {};
   final Map<int, ChartTableData> cacheChartTableData = {};
   final Map<WirelessType, MetaData> cacheMetaData = {};
@@ -21,6 +19,8 @@ class LocalDataCache {
   final Map<int, Set<Marker>> cache5GNoLabelMeasureMarkers = {};
   final Map<int, Set<Marker>> cacheLTENoLabelMeasureMarkers = {};
   final Map<String, BitmapDescriptor> cacheMeasureMarkerIcon = {};
+
+  final Map<String, Set<Marker>> cacheMeasureMarkers = {};
 
   CameraPosition? cameraPosition;
   GoogleMapController? googleMapController;

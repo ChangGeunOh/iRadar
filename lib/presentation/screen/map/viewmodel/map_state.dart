@@ -18,6 +18,8 @@ class MapState {
   final List<Marker> baseMarkers;
   final Set<Marker> mapBaseMarkerSet;
   final Set<Marker> measureMarkerSet;
+  final Set<Marker> respMarkerSet;
+  final Set<Marker> dltpMarkerSet;
 
   final List<Marker> measureMarkers;
   final Set<Circle> circleSet;
@@ -39,6 +41,7 @@ class MapState {
 
   final bool isShowCaption;
   final bool isShowBestPoint;
+  final bool isShowSpeed;
 
   final List<BestPointData> bestPointList;
   final Set<Marker> bestPointMarkerSet;
@@ -72,6 +75,9 @@ class MapState {
     this.isShowBestPoint = false,
     this.bestPointList = const [],
     this.bestPointMarkerSet = const {},
+    this.isShowSpeed = false,
+    this.respMarkerSet = const {},
+    this.dltpMarkerSet = const {},
   });
 
   MapState copyWith({
@@ -105,6 +111,9 @@ class MapState {
     bool? isShowBestPoint,
     List<BestPointData>? bestPointList,
     Set<Marker>? bestPointMarkerSet,
+    bool? isShowSpeed,
+    Set<Marker>? respMarkerSet,
+    Set<Marker>? dltpMarkerSet,
   }) {
     return MapState(
       areaDataSet: areaDataSet ?? this.areaDataSet,
@@ -134,6 +143,9 @@ class MapState {
       noLabelBaseMarkerSet: noLabelBaseMarkerSet ?? this.noLabelBaseMarkerSet,
       isShowBestPoint: isShowBestPoint ?? this.isShowBestPoint,
       bestPointMarkerSet: bestPointMarkerSet ?? this.bestPointMarkerSet,
+      isShowSpeed: isShowSpeed ?? this.isShowSpeed,
+      respMarkerSet: respMarkerSet ?? this.respMarkerSet,
+      dltpMarkerSet: dltpMarkerSet ?? this.dltpMarkerSet,
     );
   }
 
