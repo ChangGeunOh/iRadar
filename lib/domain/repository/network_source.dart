@@ -105,4 +105,9 @@ abstract class NetworkSource {
 
   Future<ResponseData> postRemoveBaseDataList(BaseRemoveRequest request);
 
+  Future<ResponseData> getWorstCellList({
+    required String division,
+    required String type,
+    required int count,
+  });
 }

@@ -31,4 +31,5 @@ const kNoticePath = 'notice';
 const kNoticeDetailPath = 'notice/{idx}';
 
 const kBestPointListPath = 'best/{type}/{idx}';
+const kChartPath = 'chart';
 

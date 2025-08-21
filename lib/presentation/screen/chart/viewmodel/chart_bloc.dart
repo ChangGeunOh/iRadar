@@ -18,7 +18,7 @@ import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/enum/wireless_type.dart';
 import '../../../../domain/model/map/area_data.dart';
 import '../../web/web_screen.dart';
-import '../components/excel_maker.dart';
+import '../../../../common/utils/excel_maker.dart';
 import 'chart_state.dart';
 
 class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
@@ -41,6 +41,11 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
           state.areaData,
           emit,
         );
+        if (!state.areaData.isChartCached) {
+          state.onChangeAreaData?.call(state.areaData.copyWith(
+            isChartCached: true,
+          ));
+        }
         break;
       // case ChartEvent.onPlaceData:
       //   emit(state.copyWith(placeData: event.extra, isLoading: true));
@@ -134,7 +139,7 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
 
       // emit(state.copyWith(areaDataSet: areaDataSet));
       case ChartEvent.onChangedMeasureList:
-        emit(state.copyWith(measureDataList: event.extra));
+        emit(state.copyWith(filteredMeasureDataList: event.extra));
         break;
       case ChartEvent.onTapExcelDownload:
         makeChartExcel();
@@ -153,7 +158,6 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     Emitter<ChartState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, areaData: areaData));
-    print('areaData: ${areaData.toJson()}');
     try {
       final response = await repository.loadMeasureList(
         areaData,
@@ -165,6 +169,7 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       emit(state.copyWith(
         isLoading: false,
         measureDataList: sortedMeasureDataList,
+        filteredMeasureDataList: sortedMeasureDataList,
         message: response.meta.message,
       ));
     } catch (e) {
@@ -174,7 +179,7 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
 
   List<ExcelData> _getExcelDataList() {
     List<ExcelData> excelDataList = [];
-    for (var element in state.measureDataList) {
+    for (var element in state.filteredMeasureDataList) {
       for (var base in element.baseList) {
         if (base.isChecked) {
           excelDataList.add(ExcelData(
@@ -201,7 +206,7 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     sheetObject.merge(
       CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0),
       CellIndex.indexByColumnRow(
-          columnIndex: state.measureDataList.first
+          columnIndex: state.filteredMeasureDataList.first
                   .getRowValues(state.areaData.type!)
                   .length -
               1,
@@ -221,7 +226,10 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
       );
 
     sheetObject.setColumnWidth(
-      state.measureDataList.first.getRowValues(state.areaData.type!).length - 2,
+      state.filteredMeasureDataList.first
+              .getRowValues(state.areaData.type!)
+              .length -
+          2,
       50,
     );
     sheetObject.cell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: 0))
@@ -248,7 +256,7 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
     }
 
     var index = 1;
-    for (var measureData in state.measureDataList) {
+    for (var measureData in state.filteredMeasureDataList) {
       measureData.getRowValues(state.areaData.type!).forEachIndexed((i, value) {
         sheetObject.cell(
             CellIndex.indexByColumnRow(rowIndex: index + 1, columnIndex: i))
@@ -274,4 +282,6 @@ class ChartBloc extends BlocBloc<BlocEvent<ChartEvent>, ChartState> {
         topBorder: Border(borderStyle: BorderStyle.Thin),
         bottomBorder: Border(borderStyle: BorderStyle.Thin),
       );
+
+  // e.hasColor ? ExcelColor.fromHexString('#fffd54'): ExcelColor.none
 }

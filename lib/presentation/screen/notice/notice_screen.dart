@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 
 import '../../../domain/bloc/bloc_scaffold.dart';

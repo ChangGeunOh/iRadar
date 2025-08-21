@@ -19,5 +19,7 @@ enum MainEvent {
   onPassword,
   onDownloadBaseData,
   onAreaRename,
-  onMessage, onTapCacheClear,
+  onMessage,
+  onTapCacheClear,
+  onChangeCache, onDownloadExcel,
 }

@@ -23,11 +23,13 @@ import 'viewmodel/chart_state.dart';
 class ChartScreen extends StatefulWidget {
   final AreaData areaData;
   final bool isNpci;
+  Function(AreaData) onChangeAreaData;
 
-  const ChartScreen({
+  ChartScreen({
     super.key,
     required this.areaData,
     this.isNpci = false,
+    required this.onChangeAreaData,
   });
 
   @override
@@ -52,6 +54,7 @@ class _ChartScreenState extends State<ChartScreen> {
         context,
         ChartState(
           areaData: widget.areaData,
+          onChangeAreaData: widget.onChangeAreaData,
         ),
       );
     }, appBarBuilder: (context, bloc, state) {
@@ -87,7 +90,7 @@ class _ChartScreenState extends State<ChartScreen> {
             onPressed: () async {
               final excelRequestData = ExcelRequestData(
                 areaData: state.areaData,
-                measureDataList: state.measureDataList,
+                measureDataList: state.filteredMeasureDataList,
               );
               showDialog(context: context, builder: (context) {
                 return Dialog(
@@ -137,21 +140,21 @@ class _ChartScreenState extends State<ChartScreen> {
           ListView(
             children: [
               const SizedBox(height: 24),
-              if (state.measureDataList.isNotEmpty)
+              if (state.filteredMeasureDataList.isNotEmpty)
                 SizedBox(
                   height: 350,
                   child: ChartView(
-                    measureDataList: state.measureDataList,
+                    measureDataList: state.filteredMeasureDataList,
                   ),
                 ),
               const SizedBox(height: 24),
-              if (state.measureDataList.isNotEmpty)
+              if (state.filteredMeasureDataList.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Center(
                     child: TableView(
                         type: state.areaData.type!,
-                        measureDataList: state.measureDataList,
+                        measureDataList: state.filteredMeasureDataList,
                         onChange: (measureDataList) => bloc.add(BlocEvent(
                               ChartEvent.onChangedMeasureList,
                               extra: measureDataList,
@@ -172,7 +175,7 @@ class _ChartScreenState extends State<ChartScreen> {
                             type: widget.areaData.type!,
                             idx: widget.areaData.idx,
                             spci: npci,
-                            measureDataList: state.measureDataList,
+                            measureDataList: state.filteredMeasureDataList,
                           );
                         }),
                   ),

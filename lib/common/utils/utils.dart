@@ -276,7 +276,7 @@ class Utils {
           infoWindow: InfoWindow(
             title:
                 "${measure.pci}/${measure.rsrp}/${measure.dltp.toStringAsFixed(1)}M",
-            snippet: measure.idx.toString(),
+            snippet: measure.getCells(),
           ),
         ),
       );

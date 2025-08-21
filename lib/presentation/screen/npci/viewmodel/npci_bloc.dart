@@ -10,7 +10,7 @@ import 'package:googlemap/presentation/screen/npci/viewmodel/npci_event.dart';
 
 import '../../../../domain/model/chart/excel_data.dart';
 import '../../../../domain/model/excel_request_data.dart';
-import '../../chart/components/excel_maker.dart';
+import '../../../../common/utils/excel_maker.dart';
 import '../../web/web_screen.dart';
 import 'npci_state.dart';
 

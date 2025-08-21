@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/domain/bloc/bloc_bloc.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
@@ -18,7 +19,9 @@ import 'package:googlemap/presentation/screen/main/viewmodel/main_state.dart';
 import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../common/utils/worst_excel_maker.dart';
 import '../../../../domain/bloc/bloc_event.dart';
+import '../../../../domain/model/enum/location_type.dart';
 
 class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
   final PageController pageController = PageController(
@@ -190,10 +193,56 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
         break;
       case MainEvent.onTapCacheClear:
         emit(state.copyWith(isLoading: true));
-        await repository.onClearCache(event.extra as AreaData);
-        emit(state.copyWith(
-          isLoading: false,
+        final areaData = event.extra as AreaData;
+        await repository.onClearCache(areaData);
+        add(BlocEvent(
+          MainEvent.onChangeCache,
+          extra: areaData.copyWith(
+            isChartCached: false,
+            isMapCached: false,
+          ),
         ));
+        emit(state.copyWith(isLoading: false));
+        break;
+      case MainEvent.onChangeCache:
+        final areaData = event.extra as AreaData;
+        final updateAreaDataList = state.areaDataList
+            .map(
+              (e) => e.idx == areaData.idx && e.type == areaData.type
+                  ? areaData.copyWith(
+                      isMapCached:
+                          e.isMapCached ? e.isMapCached : areaData.isMapCached,
+                      isChartCached: e.isChartCached
+                          ? e.isChartCached
+                          : areaData.isChartCached,
+                    )
+                  : e,
+            )
+            .toList();
+
+        final filteredAreaDataList = _getFilteredAreaDataList(
+          updateAreaDataList,
+          state.search,
+          state.type,
+        );
+        emit(state.copyWith(
+          areaDataList: updateAreaDataList,
+          filteredAreaDataList: filteredAreaDataList,
+        ));
+        break;
+      case MainEvent.onDownloadExcel:
+        final extra = event.extra as Map<String, dynamic>;
+        final division = extra['division'] as String;
+        final type = extra['type'] as String;
+        final count = extra['count'] as int;
+        emit(state.copyWith(isLoading: true));
+        await _downloadExcelWorstCell(
+          state.userData?.userId ?? '',
+          division,
+          type,
+          count,
+        );
+        emit(state.copyWith(isLoading: false));
         break;
     }
   }
@@ -283,5 +332,29 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
       ..download = fileName
       ..click();
     html.Url.revokeObjectUrl(url); // 메모리 해제
+  }
+
+  Future<void> _downloadExcelWorstCell(
+    String group,
+    String division,
+    String type,
+    int count,
+  ) async {
+    final response = await repository.getWorstCellList(division, type, count);
+    final locationType =
+        LocationType.values.firstWhere((element) => element.name == division);
+    final wirelessType =
+        WirelessType.values.firstWhere((element) => element.name == type);
+
+    final worstExcelMaker = WorstExcelMaker(
+      worstChartDataList: response.data,
+      division: locationType,
+      type: wirelessType,
+    );
+
+    final excel = worstExcelMaker.makeChartExcel();
+    final fileName =
+        '(${DateTime.now().toDateString(format: "yyyyMMdd")}_$division) Worst_Cell 대상 ($group).xlsx';
+    excel.save(fileName: fileName);
   }
 }

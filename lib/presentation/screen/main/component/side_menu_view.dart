@@ -141,6 +141,20 @@ class SideMenuView extends StatelessWidget {
                           });
                     },
                     type: state.type,
+                    onDownloadExcel: (
+                      String division,
+                      String type,
+                      int count,
+                    ) {
+                      bloc.add(BlocEvent(
+                        MainEvent.onDownloadExcel,
+                        extra: {
+                          'division': division,
+                          'type': type,
+                          'count': count,
+                        },
+                      ));
+                    },
                   ),
                 ),
               ),

@@ -18,6 +18,7 @@ class AreaDataCard extends StatelessWidget {
   final bool isSelected;
   final WirelessType type;
   final bool hasDivision;
+  final Function(String divison, String type, int count) onDownloadExcel;
 
   const AreaDataCard({
     required this.areaData,
@@ -29,6 +30,7 @@ class AreaDataCard extends StatelessWidget {
     required this.isSelected,
     required this.onTapClear,
     required this.type,
+    required this.onDownloadExcel,
     this.hasDivision = false,
     super.key,
   });
@@ -40,18 +42,57 @@ class AreaDataCard extends StatelessWidget {
         if (hasDivision)
           Container(
             width: double.infinity,
-            color: primaryColor.withOpacity(0.3),
+            color: primaryColor.withAlpha(300),
             child: Padding(
               padding: const EdgeInsets.symmetric(
-                vertical: 4.0,
-                horizontal: 8.0,
+                vertical: 8.0,
+                horizontal: 12.0,
               ),
-              child: Text(
-                areaData.division?.name ?? "",
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w500,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    areaData.division?.name ?? "",
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Spacer(),
+                  PopupMenuButton<int>(
+                    tooltip: 'Worst Cells',
+                    onSelected: (value) {
+                      onDownloadExcel(
+                        areaData.division?.name ?? "",
+                        type.name,
+                        value,
+                      );
+                    },
+                    itemBuilder: (context) => List.generate(
+                      9,
+                      (index) => PopupMenuItem(
+                        value: index + 1,
+                        child: Center(
+                          child: Text(
+                            (index + 1).toString(),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Text('Worst Cells'),
+                        const SizedBox(width: 8),
+                        Image.asset(
+                          "assets/icons/ic_excel.png",
+                          height: 24,
+                          color: Colors.black54,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -118,7 +159,20 @@ class AreaDataCard extends StatelessWidget {
                                     color: textColor,
                                   ),
                                 ),
-                              )
+                              ),
+                              Icon(
+                                Icons.map_outlined,
+                                color: areaData.isMapCached
+                                    ? primaryColor
+                                    : Colors.grey[200],
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.bar_chart,
+                                color: areaData.isChartCached
+                                    ? primaryColor
+                                    : Colors.grey[200],
+                              ),
                             ],
                           ),
                           Row(

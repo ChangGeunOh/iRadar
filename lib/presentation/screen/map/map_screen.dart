@@ -29,12 +29,14 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
   final bool isRemove;
   final WirelessType wirelessType;
   final Function onReloadArea;
+  final Function(AreaData) onChangeAreaData;
 
   MapScreen({
     required this.areaDataSet,
     required this.isRemove,
     required this.wirelessType,
     required this.onReloadArea,
+    required this.onChangeAreaData,
     super.key,
   }) {
     // print('MapScreen> areaDataSet: $areaDataSet');
@@ -61,6 +63,7 @@ class MapScreen extends StatelessWidget with ShowMessageMixin {
           MapState(
             areaDataSet: areaDataSet,
             wirelessType: wirelessType,
+            onChangeAreaData: onChangeAreaData,
           ),
         );
       },

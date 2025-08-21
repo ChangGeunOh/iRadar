@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
           ),
           primaryColor: primaryColor,
           fontFamily: 'NotoSansKR',
-          tabBarTheme: const TabBarTheme(
+          tabBarTheme: const TabBarThemeData(
             indicatorColor: Colors.white,
             indicatorSize: TabBarIndicatorSize.label,
             labelStyle: TextStyle(

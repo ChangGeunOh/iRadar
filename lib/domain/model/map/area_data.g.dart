@@ -13,6 +13,8 @@ AreaData _$AreaDataFromJson(Map<String, dynamic> json) => AreaData(
       type: Convert.dynamicToWirelessType(json['type']),
       latitude: (json['lat'] as num?)?.toDouble(),
       longitude: (json['lng'] as num?)?.toDouble(),
+      isChartCached: json['is_chart_cached'] as bool? ?? false,
+      isMapCached: json['is_map_cached'] as bool? ?? false,
       createdAt: Convert.dynamicToDateTime(json['create_at']),
       measuredAt: Convert.dynamicToDateTime(json['dt']),
     );
@@ -24,6 +26,8 @@ Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
       'division': _$LocationTypeEnumMap[instance.division],
       'lat': instance.latitude,
       'lng': instance.longitude,
+      'is_chart_cached': instance.isChartCached,
+      'is_map_cached': instance.isMapCached,
       'create_at': Convert.dateTimeToDynamic(instance.createdAt),
       'dt': Convert.dateTimeToDynamic(instance.measuredAt),
     };

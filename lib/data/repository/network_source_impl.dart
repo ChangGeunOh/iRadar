@@ -2,6 +2,7 @@ import 'package:dio/dio.dart' hide Headers;
 import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_remove_request.dart';
+import 'package:googlemap/domain/model/chart/worst_chart_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -202,12 +203,18 @@ abstract class NetworkSourceImpl extends NetworkSource {
   });
 
   @override
-  @Headers({
-    'access_token': true,
-    'content-type': 'application/json'
-  })
+  @Headers({'access_token': true, 'content-type': 'application/json'})
   @POST(kBaseDataRemovePath)
   Future<ResponseData> postRemoveBaseDataList(
     @Body() BaseRemoveRequest request,
   );
+
+  @override
+  @Headers({'access_token': true})
+  @GET('$kChartPath/worst/{type}')
+  Future<ResponseData<List<WorstChartData>>> getWorstCellList({
+    @Path('type') required String type,
+    @Query('division') required String division,
+    @Query('count') required int count,
+  });
 }

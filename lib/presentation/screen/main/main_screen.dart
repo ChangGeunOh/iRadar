@@ -67,10 +67,22 @@ class MainScreen extends StatelessWidget with ShowMessageMixin {
                         onReloadArea: () {
                           bloc.add(BlocEvent(MainEvent.onTapRefresh));
                         },
+                        onChangeAreaData: (areaData) {
+                          bloc.add(BlocEvent(
+                            MainEvent.onChangeCache,
+                            extra: areaData,
+                          ));
+                        },
                       ),
                     if (state.selectedAreaDataSet.length == 1)
                       ChartScreen(
                         areaData: state.selectedAreaDataSet.first,
+                        onChangeAreaData: (areaData) {
+                          bloc.add(BlocEvent(
+                            MainEvent.onChangeCache,
+                            extra: areaData,
+                          ));
+                        },
                       ),
                   ],
                 ),

@@ -31,10 +31,11 @@ class TableView extends StatefulWidget {
 }
 
 class _TableViewState extends State<TableView> {
-  late List<MeasureData> measureDataList;
-  late Map<int, TableColumnWidth> headerWidth;
-  late List<String> headerTitle;
-  var servingTime = "6";
+  late List<MeasureData> _measureDataList;
+  late Map<int, TableColumnWidth> _headerWidth;
+  late List<String> _headerTitle;
+  var _servingTime = "6";
+  String _distanceLimit = "2";
 
   @override
   void initState() {
@@ -43,11 +44,25 @@ class _TableViewState extends State<TableView> {
   }
 
   void init() {
-    measureDataList = widget.measureDataList;
-    headerWidth =
+    print('TableView init ----> ${widget.measureDataList.length}');
+    _measureDataList = widget.measureDataList;
+    _headerWidth =
         widget.type == WirelessType.wLte ? headerLteWidth : header5gWidth;
-    headerTitle =
+    _headerTitle =
         widget.type == WirelessType.wLte ? headerLteTitle : header5gTitle;
+  }
+
+  void onChangeDistanceLimit(String distanceLimit) {
+    _distanceLimit = distanceLimit;
+    _measureDataList = widget.measureDataList.map((measureData) {
+      return measureData.copyWith(
+        baseList: measureData.baseList.where((baseData) {
+          return baseData.distance <= double.parse(distanceLimit);
+        }).toList(),
+      );
+    }).toList();
+    widget.onChange(_measureDataList);
+    setState(() {});
   }
 
   @override
@@ -60,7 +75,7 @@ class _TableViewState extends State<TableView> {
 
   @override
   Widget build(BuildContext context) {
-    if (measureDataList.isEmpty) {
+    if (_measureDataList.isEmpty) {
       return const SizedBox();
     }
     return LayoutBuilder(builder: (context, constraints) {
@@ -72,7 +87,7 @@ class _TableViewState extends State<TableView> {
             border: TableBorder.all(
               color: Colors.grey,
             ),
-            columnWidths: headerWidth,
+            columnWidths: _headerWidth,
             children: [
               buildTableTitle(),
               ...getMeasuredRows(widget.isNpci),
@@ -88,7 +103,7 @@ class _TableViewState extends State<TableView> {
       decoration: BoxDecoration(
         color: Colors.grey[300],
       ),
-      children: headerTitle.map((e) {
+      children: _headerTitle.map((e) {
         final text = widget.isNpci ? 'PCI mW' : e;
         return TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
@@ -98,7 +113,7 @@ class _TableViewState extends State<TableView> {
               vertical: 4.0,
             ),
             child: Center(
-              child: headerTitle.last == e
+              child: _headerTitle.last == e
                   ? Stack(
                       children: [
                         Row(
@@ -111,7 +126,7 @@ class _TableViewState extends State<TableView> {
                                 onChanged: (value) {
                                   if (value != null) {
                                     onChangeSelected(value ? 99999 : -1);
-                                    servingTime = "-";
+                                    _servingTime = "-";
                                   }
                                 },
                               ),
@@ -132,40 +147,94 @@ class _TableViewState extends State<TableView> {
                           bottom: 0,
                           child: Row(
                             children: [
-                              const Text(
-                                'Serving\nTime',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                    color: Colors.black54),
+                              Column(
+                                children: [
+                                  const Text(
+                                    'Distance Limit',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                        color: Colors.black54),
+                                  ),
+                                  SizedBox(
+                                    height: 24,
+                                    child: DropdownButton<String>(
+                                      value: _distanceLimit,
+                                      onChanged: (String? newValue) {
+                                        if (newValue != null) {
+                                          onChangeDistanceLimit(newValue);
+                                        }
+                                        setState(() {});
+                                      },
+                                      items: List.generate(
+                                        9,
+                                        (index) =>
+                                            (1.0 + index * 0.5).toString(),
+                                      ).map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Center(
+                                            child: Text(
+                                              value,
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      icon: const Icon(
+                                          Icons.arrow_drop_down_rounded),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(width: 16),
-                              DropdownButton<String>(
-                                value: servingTime,
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    servingTime = newValue;
-                                    onChangeSelected(int.parse(servingTime));
-                                  }
-                                  setState(() {});
-                                },
-                                items: List.generate(
-                                        11,
-                                        (index) =>
-                                            index == 0 ? "-" : index.toString())
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(
-                                      value,
-                                      style: const TextStyle(fontSize: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Serving Time',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                        color: Colors.black54),
+                                  ),
+                                  SizedBox(
+                                    height: 26,
+                                    child: DropdownButton<String>(
+                                      value: _servingTime,
+                                      onChanged: (String? newValue) {
+                                        if (newValue != null) {
+                                          _servingTime = newValue;
+                                          onChangeSelected(
+                                              int.parse(_servingTime));
+                                        }
+                                        setState(() {});
+                                      },
+                                      items: List.generate(
+                                              11,
+                                              (index) => index == 0
+                                                  ? "-"
+                                                  : index.toString())
+                                          .map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Center(
+                                            child: Text(
+                                              value,
+                                              style:
+                                                  const TextStyle(fontSize: 16),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      icon: Icon(Icons.arrow_drop_down_rounded),
                                     ),
-                                  );
-                                }).toList(),
-                                icon: const SizedBox.shrink(),
+                                  ),
+                                ],
                               ),
-                              const Icon(Icons.arrow_drop_down_rounded),
                             ],
                           ),
                         ),
@@ -186,7 +255,7 @@ class _TableViewState extends State<TableView> {
   }
 
   void onChangeSelected(int servingTime) {
-    measureDataList = measureDataList.map((measureData) {
+    _measureDataList = _measureDataList.map((measureData) {
       return measureData.copyWith(
         baseList: measureData.baseList.map((baseData) {
           return baseData.copyWith(
@@ -195,12 +264,12 @@ class _TableViewState extends State<TableView> {
         }).toList(),
       );
     }).toList();
-    widget.onChange(measureDataList);
+    widget.onChange(_measureDataList);
     setState(() {});
   }
 
   List<TableRow> getMeasuredRows(bool isNpci) {
-    return measureDataList.mapIndexed((measureIndex, measureData) {
+    return _measureDataList.mapIndexed((measureIndex, measureData) {
       return TableRow(
         decoration: BoxDecoration(
           color: measureData.hasColor ? Colors.yellowAccent : Colors.white,
@@ -273,9 +342,9 @@ class _TableViewState extends State<TableView> {
                   baseList: measureData.baseList,
                   onChanged: (baseDataList) {
                     setState(() {
-                      measureDataList[measureIndex] =
+                      _measureDataList[measureIndex] =
                           measureData.copyWith(baseList: baseDataList);
-                      widget.onChange(measureDataList);
+                      widget.onChange(_measureDataList);
                     });
                   },
                 ),
@@ -288,7 +357,7 @@ class _TableViewState extends State<TableView> {
   }
 
   bool get isNeighborCheck {
-    return measureDataList
+    return _measureDataList
         .map((measureData) => measureData.baseList)
         .expand((element) => element)
         .every((baseData) => baseData.isChecked);

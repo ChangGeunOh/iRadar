@@ -11,7 +11,7 @@ import 'package:googlemap/presentation/screen/web/viewmodel/web_state.dart';
 
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/chart/excel_data.dart';
-import '../../chart/components/excel_maker.dart';
+import '../../../../common/utils/excel_maker.dart';
 
 class WebBloc extends BlocBloc<BlocEvent<WebEvent>, WebState> {
   WebBloc(super.context, super.initialState) {

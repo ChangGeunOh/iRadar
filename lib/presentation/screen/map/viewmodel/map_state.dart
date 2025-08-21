@@ -45,6 +45,7 @@ class MapState {
 
   final List<BestPointData> bestPointList;
   final Set<Marker> bestPointMarkerSet;
+  final Function(AreaData)? onChangeAreaData;
 
   MapState({
     this.areaDataSet = const {},
@@ -78,6 +79,7 @@ class MapState {
     this.isShowSpeed = false,
     this.respMarkerSet = const {},
     this.dltpMarkerSet = const {},
+    this.onChangeAreaData,
   });
 
   MapState copyWith({
@@ -146,6 +148,7 @@ class MapState {
       isShowSpeed: isShowSpeed ?? this.isShowSpeed,
       respMarkerSet: respMarkerSet ?? this.respMarkerSet,
       dltpMarkerSet: dltpMarkerSet ?? this.dltpMarkerSet,
+      onChangeAreaData: onChangeAreaData,
     );
   }
 

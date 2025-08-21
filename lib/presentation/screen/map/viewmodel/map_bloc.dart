@@ -510,6 +510,9 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         );
         mapBaseMarkerSet.addAll(mapBaseMarkers);
       }
+      if (!areaData.isMapCached) {
+        state.onChangeAreaData?.call(areaData.copyWith(isMapCached: true));
+      }
     }
     final measureMarkerSet = await Utils.makeMeasureMarkerByAreaSet(
       areaDataSet: areaDataSet,
@@ -540,6 +543,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
             (previousValue, element) => previousValue + element.longitude!) /
         areaDataSet.length;
     if (controller == null && repository.getGoogleMapController() != null) {
+      print('---------------> controller is null');
       controller = repository.getGoogleMapController();
       await Future.delayed(const Duration(milliseconds: 300));
     }

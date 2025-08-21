@@ -22,6 +22,7 @@ class SideBody extends StatelessWidget {
   final Function(AreaData) onTapCacheClear;
   final ValueChanged onTapWithShift;
   final WirelessType type;
+  final Function(String division, String type, int count) onDownloadExcel;
 
   const SideBody({
     required this.selectedPlaceSet,
@@ -34,6 +35,7 @@ class SideBody extends StatelessWidget {
     required this.onAreaRename,
     required this.type,
     required this.onTapCacheClear,
+    required this.onDownloadExcel,
     super.key,
   });
 
@@ -67,6 +69,7 @@ class SideBody extends StatelessWidget {
           isSelected: selectedPlaceSet.contains(areaData),
           type: type,
           hasDivision: hasDivision,
+          onDownloadExcel: onDownloadExcel,
         );
       },
       separatorBuilder: (context, index) {

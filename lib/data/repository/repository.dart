@@ -486,4 +486,12 @@ class Repository {
       BaseRemoveRequest(idList: list),
     );
   }
+
+  Future<ResponseData> getWorstCellList(String division, String type, int count) async {
+    return await _networkSource.getWorstCellList(
+      division: division,
+      type: type,
+      count: count,
+    );
+  }
 }

@@ -27,6 +27,8 @@ class MapMeasuredData {
   )
   final double dltp;
 
+  final String cells;
+
   MapMeasuredData({
     required this.idx,
     required this.latitude,
@@ -34,6 +36,7 @@ class MapMeasuredData {
     required this.pci,
     required this.rsrp,
     required this.dltp,
+    this.cells = '',
   });
 
   factory MapMeasuredData.fromJson(Map<String, dynamic> json) {
@@ -41,4 +44,16 @@ class MapMeasuredData {
   }
 
   Map<String, dynamic> toJson() => _$MapMeasuredDataToJson(this);
+
+  String getCells() {
+    if (cells.isEmpty) return '';
+    final regex = RegExp(r'\((-?\d+\.\d+)\)');
+    return cells.replaceAllMapped(regex, (match) {
+      final numStr = match.group(1); // 괄호 안 숫자 문자열
+      if (numStr == null) return match.group(0)!;
+      final numValue = double.parse(numStr);
+      final rounded = (numValue * 10).round() / 10;
+      return '(${rounded.toStringAsFixed(1)})';
+    });
+  }
 }

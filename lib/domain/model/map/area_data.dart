@@ -25,6 +25,19 @@ class AreaData {
     name: 'lng',
   )
   final double? longitude;
+
+  @JsonKey(
+    defaultValue: false,
+    name: 'is_chart_cached',
+  )
+  final bool isChartCached;
+
+  @JsonKey(
+    defaultValue: false,
+    name: 'is_map_cached',
+  )
+  final bool isMapCached;
+
   @JsonKey(
     name: 'create_at',
     fromJson: Convert.dynamicToDateTime,
@@ -45,6 +58,8 @@ class AreaData {
     this.type,
     this.latitude,
     this.longitude,
+    this.isChartCached = false,
+    this.isMapCached = false,
     this.createdAt,
     this.measuredAt,
   });
@@ -57,6 +72,8 @@ class AreaData {
     WirelessType? type,
     double? latitude,
     double? longitude,
+    bool? isChartCached,
+    bool? isMapCached,
     DateTime? measuredAt,
   }) {
     return AreaData(
@@ -67,6 +84,8 @@ class AreaData {
       type: type ?? this.type,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      isChartCached: isChartCached ?? this.isChartCached,
+      isMapCached: isMapCached ?? this.isMapCached,
       measuredAt: measuredAt ?? this.measuredAt,
     );
   }
@@ -75,10 +94,7 @@ class AreaData {
       _$AreaDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$AreaDataToJson(this);
-
-
 }
-
 
 // class AreaData(BaseModel):
 //     idx: int
