@@ -46,8 +46,8 @@ class WorstExcelMaker {
 
     var headerTitle =
         List.from(type == WirelessType.wLte ? headerLteTitle : header5gTitle);
-    headerTitle.insert(0, '측정장소');
-    headerTitle.insert(1, '측정날짜');
+    headerTitle.insert(0, '측정날짜');
+    headerTitle.insert(1, '측정장소');
 
     headerTitle.removeLast();
     headerTitle.add('거리\n(km)');

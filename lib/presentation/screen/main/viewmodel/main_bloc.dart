@@ -354,7 +354,7 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
 
     final excel = worstExcelMaker.makeChartExcel();
     final fileName =
-        '(${DateTime.now().toDateString(format: "yyyyMMdd")}_$division) Worst_Cell 대상 ($group).xlsx';
+        '(${DateTime.now().toDateString(format: "yyyyMMdd")}_$division) $type Worst_Cell 대상 ($group).xlsx';
     excel.save(fileName: fileName);
   }
 }
