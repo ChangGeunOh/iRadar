@@ -396,9 +396,11 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
         ));
       case MapCursorState.addAll:
         final mapPinSet = state.measureMarkerSet.map((e) {
+          final value = double.parse(e.infoWindow.title!.split("/")[1]);
           return e.copyWith(
             iconParam: getRsrpMarker(
-              double.parse(e.infoWindow.snippet!.split("/").last),
+              value,
+              // double.parse(e.infoWindow.snippet!.split("/").last),
             ),
           );
         }).toSet();
@@ -449,9 +451,10 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
             break;
           case MapCursorState.add:
             if (e.icon == removePin) {
+              final rsrp = e.infoWindow.title!.split("/")[1];
               return e.copyWith(
                 iconParam: getRsrpMarker(
-                  double.parse(e.infoWindow.snippet!.split("/").last),
+                  double.parse(rsrp),
                 ),
               );
             }
@@ -558,6 +561,9 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
   }
 
   BitmapDescriptor getRsrpMarker(double rsrp) {
+    final index = lowerBound(rsrpThresholds, rsrp);
+    final i = index < pinIndices.length ? index : pinIndices.length - 1;
+    return mapPins![pinIndices[i]];
     for (int i = 0; i < rsrpThresholds.length; i++) {
       if (rsrp <= rsrpThresholds[i]) {
         return mapPins![pinIndices[i]];
@@ -576,7 +582,7 @@ class MapBloc extends BlocBloc<BlocEvent<MapEvent>, MapState> {
     mapPins = await Future.wait(filenames.map((e) async {
       final image = await rootBundle.load(e);
       final bytes = image.buffer.asUint8List();
-      return BitmapDescriptor.bytes(bytes);
+      return BitmapDescriptor.bytes(bytes, width: 10, height: 10);
     }).toList());
 
     var image = await rootBundle.load('assets/icons/pin_base_lte.png');
