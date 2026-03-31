@@ -124,7 +124,7 @@ class DrawerView extends StatelessWidget {
               title: "KDM Fav 파일 다운로드",
               iconData: Icons.arrow_circle_down,
               onTap: () {
-                _downloadExampleFile('i-Radar Pro_v1.0_Table.kfav');
+                _downloadExampleFile('KDM_Fav_Files.zip');
               },
             ),
             const SizedBox(height: 32),

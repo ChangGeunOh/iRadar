@@ -1,5 +1,9 @@
-const kNetworkReleaseBaseUrl = 'http://59.20.175.135/iradar/';
+const kNetworkReleaseBaseUrl = 'http://59.20.175.135/iradar/';    // '/api/'
 const kNetworkDebugBaseUrl = 'http://59.20.175.135/iradar/';
+// const kNetworkDebugBaseUrl = 'http://localhost/api/iradar/';
+// http://iradar.ddns.net/api/auth/login
+// http://59.20.175.135/iradar/auth/login
+
 
 const kUserPath = 'auth/user';
 const kLoginPath = 'auth/login';
