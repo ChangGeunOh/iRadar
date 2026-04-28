@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -51,7 +52,10 @@ class CustomInterceptor extends Interceptor {
 
         final accessToken = getTokenData(response)?.accessToken;
         if (accessToken != null) {
-          print('new accessToken>$accessToken');
+          if (kDebugMode) {
+            // ignore: avoid_print
+            print('new accessToken>$accessToken');
+          }
           final options = err.requestOptions;
           options.headers.addAll({'authorization': 'Bearer $accessToken'});
           await dataStoreSource.setTokenData(
@@ -130,7 +134,10 @@ class CustomInterceptor extends Interceptor {
     super.onResponse(response, handler);
     if (response.requestOptions.path.contains(kLoginPath)) {
       final tokenData = getTokenData(response);
-      print('tokenData>$tokenData');
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('tokenData>$tokenData');
+      }
       if (tokenData != null) {
         await dataStoreSource.setTokenData(tokenData);
       }

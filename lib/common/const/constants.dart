@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../domain/model/base/base_data.dart';
 
 const List<String> tabTitles = ['차트', '지도'];
 const kWebHeaders = [

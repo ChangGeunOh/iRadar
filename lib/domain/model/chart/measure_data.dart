@@ -1,4 +1,3 @@
-import 'package:flutter/animation.dart';
 import 'package:googlemap/domain/model/chart/base_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:json_annotation/json_annotation.dart';

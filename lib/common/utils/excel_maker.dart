@@ -2,10 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:excel/excel.dart';
 import 'package:googlemap/domain/model/chart/excel_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
-import 'package:googlemap/domain/model/place_data.dart';
 
 import '../const/constants.dart';
-import '../../domain/model/excel_response_data.dart';
 
 class ExcelMaker {
   final AreaData areaData;

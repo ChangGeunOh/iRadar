@@ -7,10 +7,10 @@ class BlocLayout<B extends StateStreamableSource<S>, S>
   final Widget Function(BuildContext context, B bloc, S state) builder;
 
   const BlocLayout({
+    super.key,
     required this.create,
     required this.builder,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -13,7 +13,8 @@ import '../../domain/model/map/area_data.dart';
 import '../../domain/model/map/map_base_data.dart';
 import '../../domain/model/map/map_measured_data.dart';
 import '../const/network.dart';
-import 'dart:html' as html;
+
+import 'web_download.dart';
 
 // 문자열 중에서 숫자만 추출
 class Utils {
@@ -58,12 +59,11 @@ class Utils {
     ByteData data = await rootBundle.load('assets/files/$fileName');
     final buffer = data.buffer;
     final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute("download", fileName)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+
+    WebDownload.saveBytes(
+      bytes,
+      fileName: fileName,
+    );
   }
 
   static Future<Set<Marker>> getMeasureMarkerByAreaSet({
@@ -196,7 +196,7 @@ class Utils {
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     final markerBytes = byteData!.buffer.asUint8List();
 
-    final bitmap = BitmapDescriptor.fromBytes(markerBytes);
+    final bitmap = BitmapDescriptor.bytes(markerBytes);
 
     setCache(
       pci: pci,

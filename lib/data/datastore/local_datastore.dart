@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:googlemap/domain/model/place_data.dart';
-import 'package:googlemap/domain/model/enum/wireless_type.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const keyFunctionMenuList = "function_menu_list";
@@ -34,8 +33,12 @@ class LocalDataStore {
   Future<List?> loadListData(String key) async {
     final dataStore = await getSharedPreferences();
     final list = dataStore.getStringList(key);
-    print("Load List -----------------------$key");
-    print("::$list");
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print("Load List -----------------------$key");
+      // ignore: avoid_print
+      print("::$list");
+    }
     return list?.map((e) => jsonDecode(e)).toList();
   }
 

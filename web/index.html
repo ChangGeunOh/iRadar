@@ -33,7 +33,28 @@
     <link rel="manifest" href="manifest.json">
 <!--    <link rel="stylesheet" type="text/css" href="./style.css" />-->
 <!--    <script type="module" src="./index.js"></script>-->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmdcnrZHvLkuwEI4AxmeVGGtSxK9byncA&libraries=drawing">
+    <!-- Runtime env (provide GOOGLE_MAPS_API_KEY at deploy time) -->
+    <script src="env.js"></script>
+    <!-- Download helper (used by Dart via JS interop; avoids dart:html) -->
+    <script src="download.js"></script>
+    <script>
+      (function () {
+        // Load Google Maps JS API without hardcoding the key in index.html.
+        // NOTE: Web API keys are always visible to end-users. Restrict the key
+        // in Google Cloud Console via HTTP referrer restrictions.
+        var env = window.__ENV__ || {};
+        var key = env.GOOGLE_MAPS_API_KEY;
+        if (!key) {
+          console.warn('[iRadar] GOOGLE_MAPS_API_KEY is empty. Google Maps JS API will not be loaded.');
+          return;
+        }
+
+        var script = document.createElement('script');
+        script.async = true;
+        script.defer = true;
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(key) + '&libraries=drawing';
+        document.head.appendChild(script);
+      })();
     </script>
 
 

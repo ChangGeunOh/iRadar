@@ -1,23 +1,18 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:googlemap/common/const/constants.dart';
 import 'package:googlemap/common/utils/utils.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
 import 'package:googlemap/domain/model/base/base_remove_request.dart';
-import 'package:googlemap/domain/model/chart/measure_data.dart';
-import 'package:googlemap/domain/model/chart_table_data.dart';
 import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/login_data.dart';
 import 'package:googlemap/domain/model/map/best_point_data.dart';
-import 'package:googlemap/domain/model/map/map_base_data.dart';
 import 'package:googlemap/domain/model/map/map_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
-import 'package:googlemap/domain/model/notice/notice_data.dart';
-import 'package:googlemap/domain/model/notice/notice_list_data.dart';
 import 'package:googlemap/domain/model/place_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
@@ -26,26 +21,21 @@ import 'package:googlemap/domain/model/user_data.dart';
 import '../../domain/model/excel_response_data.dart';
 import '../../domain/model/map/area_data.dart';
 import '../../domain/model/response/meta_data.dart';
-import '../../domain/model/table_data.dart';
 import '../../domain/model/upload/measure_upload_data.dart';
-import '../../domain/repository/database_source.dart';
 import '../../domain/repository/datacache_source.dart';
 import '../../domain/repository/datastore_source.dart';
 import '../../domain/repository/network_source.dart';
 
 class Repository {
   final DataCacheSource _dataCacheSource;
-  final DatabaseSource _databaseSource;
   final DataStoreSource _dataStoreSource;
   final NetworkSource _networkSource;
 
   Repository({
-    required DatabaseSource databaseSource,
     required DataStoreSource dataStoreSource,
     required NetworkSource networkSource,
     required DataCacheSource dataCacheSource,
-  })  : _databaseSource = databaseSource,
-        _dataStoreSource = dataStoreSource,
+  })  : _dataStoreSource = dataStoreSource,
         _networkSource = networkSource,
         _dataCacheSource = dataCacheSource;
 
@@ -152,7 +142,9 @@ class Repository {
   Future<List<ExcelResponseData>?> loadExcelResponseData(
     ExcelRequestData excelRequestData,
   ) async {
-    return null;
+    // TODO: 기존 구현(주석 처리됨)을 다시 살릴 때까지는 명시적으로 "빈 결과"를 반환합니다.
+    // null을 반환하면 호출부에서 nullable 처리 부담/분기 증가로 이어질 수 있습니다.
+    return <ExcelResponseData>[];
 
     // final List<String> bts = excelRequestData.tableList
     //     .where((element) => element.checked)
@@ -244,7 +236,9 @@ class Repository {
     MeasureUploadData measureUploadData,
   ) async {
     final result = await _networkSource.uploadMeasureData(measureUploadData);
-    print('uploadMeasureData>${result.toString()}');
+    if (kDebugMode) {
+      debugPrint('uploadMeasureData>$result');
+    }
     return result;
   }
 
@@ -296,7 +290,6 @@ class Repository {
       }
     } else {
       return ResponseData<MapData>(data: mapData);
-      ;
     }
   }
 

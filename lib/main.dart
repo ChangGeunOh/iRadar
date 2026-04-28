@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'common/const/color.dart';
-import 'common/const/network.dart';
 import 'common/router/router.dart';
-import 'data/database/local_database.dart';
 import 'data/datacache/local_datacache.dart';
 import 'data/datastore/local_datastore.dart';
 import 'data/network/custom_interceptor.dart';
 import 'data/network/local_network.dart';
-import 'data/repository/database_source_impl.dart';
 import 'data/repository/datacache_source_impl.dart';
 import 'data/repository/datastore_source_impl.dart';
 import 'data/repository/network_source_impl.dart';
@@ -48,9 +45,6 @@ class MyApp extends StatelessWidget {
     return RepositoryProvider(
       lazy: false,
       create: (context) {
-        final databaseSource = DatabaseSourceImpl(
-          database: LocalDatabase(),
-        );
         final dataStoreSource = DataStoreSourceImpl(
           dataStore: LocalDataStore(),
         );
@@ -65,7 +59,6 @@ class MyApp extends StatelessWidget {
           dataCache: LocalDataCache(),
         );
         return Repository(
-          databaseSource: databaseSource,
           dataStoreSource: dataStoreSource,
           networkSource: networkSource,
           dataCacheSource: dataCacheSource,

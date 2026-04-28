@@ -46,3 +46,6 @@ app.*.map.json
 /android/app/release
 
 .env
+
+# Runtime-injected web config (contains environment-specific values)
+web/env.js

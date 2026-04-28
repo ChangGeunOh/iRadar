@@ -21,7 +21,7 @@ class BlocScaffold<B extends StateStreamableSource<S>, S>
 
   final GlobalKey<ScaffoldState>? scaffoldKey;
 
-  BlocScaffold({
+  const BlocScaffold({
     super.key,
     required this.create,
     required this.builder,

@@ -2,8 +2,6 @@ import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'chart/measure_data.dart';
-import 'place_data.dart';
-import 'table_data.dart';
 
 part 'excel_request_data.g.dart';
 

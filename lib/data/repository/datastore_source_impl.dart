@@ -1,6 +1,3 @@
-
-import 'dart:convert';
-
 import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/enum/wireless_type.dart';
 import '../../domain/model/map/map_base_data.dart';
@@ -32,7 +29,6 @@ class DataStoreSourceImpl extends DataStoreSource {
 
   @override
   Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-    final key = type == WirelessType.wLte ? keyLTEPlaceList : key5GPlaceList;
     final list = await _dataStore.loadListData(type.name);
     return list?.map((e) => PlaceData.fromJson(e)).toList() ??
         List<PlaceData>.empty();
@@ -61,7 +57,7 @@ class DataStoreSourceImpl extends DataStoreSource {
       final baseData = (data['base_data'] as List).map((e) => MapBaseData.fromJson(e as Map<String, dynamic>)).toList();
       final mapData = MapData(measuredData: measuredData, baseData: baseData);
       return mapData;
-    } catch (e, stackTrace) {
+    } catch (e, _) {
       return null;
     }
   }

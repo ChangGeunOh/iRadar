@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/model/chart_table_data.dart';

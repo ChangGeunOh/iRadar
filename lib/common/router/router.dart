@@ -1,11 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:googlemap/data/repository/repository.dart';
 import 'package:googlemap/domain/model/chart/measure_data.dart';
-import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:googlemap/domain/model/excel_request_data.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
-import 'package:googlemap/domain/model/place_table_data.dart';
 import 'package:googlemap/presentation/screen/main/main_screen.dart';
 import 'package:googlemap/presentation/screen/npci/npci_screen.dart';
 import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
@@ -65,7 +64,10 @@ final routerConfig = GoRouter(
   redirect: (context, state) async {
     final Repository repository = context.read();
     final tokenData = await repository.getTokenData();
-    print('go_router tokenData: $tokenData');
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print('go_router tokenData: $tokenData');
+    }
     if (tokenData == null && state.name != LoginScreen.routeName) {
       return '/login';
     }

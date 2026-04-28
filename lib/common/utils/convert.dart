@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:googlemap/domain/model/enum/location_type.dart';
 
 import '../../domain/model/enum/wireless_type.dart';
 
@@ -54,10 +53,10 @@ class Convert {
   }
 
   static int dynamicToInt(dynamic value) {
-    switch(value.runtimeType) {
-      case const (int):
-        return value as int;
-      case const (String):
+    switch (value) {
+      case int _:
+        return value;
+      case String _:
         final intValue = int.tryParse(value);
         return intValue ?? -1;
       default:
@@ -65,12 +64,12 @@ class Convert {
     }
   }
   static double dynamicToDouble(dynamic value) {
-    switch(value.runtimeType) {
-      case const (double):
-        return value as double;
-      case const (int):
-        return (value as int).toDouble();
-      case const (String):
+    switch (value) {
+      case double _:
+        return value;
+      case int _:
+        return value.toDouble();
+      case String _:
         final doubleValue = double.tryParse(value);
         return doubleValue ?? -1.0;
       default:
@@ -80,15 +79,15 @@ class Convert {
 
   static bool dynamicToBool(dynamic value) {
     var convertedValue = false;
-    switch(value.runtimeType) {
-      case int:
-        convertedValue = (value as int) == 1;
+    switch (value) {
+      case int _:
+        convertedValue = value == 1;
         break;
-      case String:
-        convertedValue = (value as String) == "1";
+      case String _:
+        convertedValue = value == "1";
         break;
-      case bool:
-        convertedValue = value as bool;
+      case bool _:
+        convertedValue = value;
         break;
     }
     return convertedValue;
@@ -98,17 +97,16 @@ class Convert {
     if (value == null) {
       return DateTime.now();
     }
-    switch (value.runtimeType) {
-      case const (DateTime):
-        return value as DateTime;
-      case const (int):
-        value.fromMillisecondsSinceEpoch(value * 1000);
-      case const (String):
+    switch (value) {
+      case DateTime _:
+        return value;
+      case int _:
+        return DateTime.fromMillisecondsSinceEpoch(value * 1000);
+      case String _:
         return DateTime.parse(value);
       default:
         return DateTime.now();
     }
-    return DateTime.now();
   }
 
   static dynamic dateTimeToDynamic(DateTime? value) {

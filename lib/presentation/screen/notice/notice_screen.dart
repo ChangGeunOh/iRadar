@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:googlemap/domain/bloc/bloc_event.dart';
 
 import '../../../domain/bloc/bloc_scaffold.dart';
@@ -18,11 +17,8 @@ class NoticeScreen extends StatefulWidget {
 }
 
 class _NoticeScreenState extends State<NoticeScreen> {
-  final QuillController _controller = QuillController.basic();
-
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 

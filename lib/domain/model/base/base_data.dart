@@ -1,4 +1,3 @@
-import 'package:googlemap/domain/model/enum/wireless_type.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'base_data.g.dart';
@@ -52,9 +51,12 @@ class BaseData {
         longitude == 0.0;
   }
 
-  bool get isRelay => type == WirelessType.w5G
-      ? false
-      : ['RS', 'RB', 'RE'].any((e) => code.startsWith(e));
+  bool get isRelay {
+    // `type` is stored as a String (e.g. "5G", "LTE").
+    // Avoid comparing it with the enum `WirelessType`.
+    final is5G = type.toLowerCase() == '5g';
+    return is5G ? false : ['RS', 'RB', 'RE'].any((e) => code.startsWith(e));
+  }
 }
 
 // class BaseTable(Base):

@@ -1,10 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../domain/model/table_data.dart';
 
 class TableLayout extends StatelessWidget {
-  final List<String> headTitles = [
+  static const List<String> headTitles = [
     'PCI',
     'PCI_mW',
     'Neighbor\nTime',
@@ -26,7 +25,7 @@ class TableLayout extends StatelessWidget {
   final bool isCheck;
 
 
-  TableLayout({
+  const TableLayout({
     required this.tableList,
     required this.isCheck,
     required this.onTapToggle,
@@ -49,7 +48,7 @@ class TableLayout extends StatelessWidget {
           fontSize: 12,
           height: 1.1,
         ),
-        headingRowColor: MaterialStateProperty.resolveWith<Color?>(
+        headingRowColor: WidgetStateProperty.resolveWith<Color?>(
           (states) => const Color(0x10000000),
         ),
         showBottomBorder: true,
@@ -63,10 +62,11 @@ class TableLayout extends StatelessWidget {
         .map(
           (e) => DataRow(
             selected: e.checked,
-            color: MaterialStateProperty.resolveWith((states) {
+            color: WidgetStateProperty.resolveWith<Color?>((states) {
               if (e.hasColor) {
                 return Colors.yellow.withAlpha(64);
               }
+              return null;
             }),
             cells: [
               DataCell(Text(e.pci)),
@@ -103,34 +103,36 @@ class TableLayout extends StatelessWidget {
   }
 
   List<DataColumn> getColumns() {
-    return headTitles.mapIndexed((index, e) {
-      final dataColumn = index == headTitles.length - 1
-          ? DataColumn(
-        label: Row(
-          children: [
-            Transform.scale(
-              scale: 0.7,
-              child: Checkbox(
-                value: isCheck,
-                onChanged: (value) {
-                  onTapToggle();
-                },
+    return List<DataColumn>.generate(headTitles.length, (index) {
+      final title = headTitles[index];
+      if (index == headTitles.length - 1) {
+        return DataColumn(
+          label: Row(
+            children: [
+              Transform.scale(
+                scale: 0.7,
+                child: Checkbox(
+                  value: isCheck,
+                  onChanged: (value) {
+                    onTapToggle();
+                  },
+                ),
               ),
-            ),
-            Text(
-              e,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      )
-          : DataColumn(
+              Text(
+                title,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      }
+
+      return DataColumn(
         label: Text(
-          e,
+          title,
           textAlign: TextAlign.center,
         ),
       );
-      return dataColumn;
-    }).toList();
+    });
   }
 }

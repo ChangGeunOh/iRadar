@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../domain/model/base/base_data.dart';
 
@@ -23,11 +22,15 @@ class BaseCsvFile {
   });
 
   Future<void> process() async {
-    final input = Stream.fromIterable(file.bytes!.map((e) => [e]));
-    final list = await input
-        .transform(const Utf8Decoder())
-        .transform(const CsvToListConverter())
-        .toList();
+    // csv 8.x부터는 스트림 변환용 CsvToListConverter가 제거되어,
+    // 바이트를 문자열로 디코딩 후 fromCsvString으로 파싱한다.
+    final bytes = file.bytes;
+    if (bytes == null) {
+      return;
+    }
+
+    final csvText = const Utf8Decoder().convert(bytes);
+    final list = const CsvDecoder().convert(csvText);
 
     final header = list.first;
     final ruIdIndex = header.indexWhere((element) => ruId.contains(element));
@@ -39,8 +42,14 @@ class BaseCsvFile {
 
     for (var i = 1; i < list.length; i++) {
       final row = list[i];
-      print('row: $row');
-      print('i: $i, ruIdIndex: $ruIdIndex, ruNameIndex: $ruNameIndex, pciIndex: $pciIndex, latIndex: $latIndex, lngIndex: $lngIndex');
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('row: $row');
+        // ignore: avoid_print
+        print(
+          'i: $i, ruIdIndex: $ruIdIndex, ruNameIndex: $ruNameIndex, pciIndex: $pciIndex, latIndex: $latIndex, lngIndex: $lngIndex',
+        );
+      }
       final baseData = _createBaseData(
         i,
         row,
@@ -114,7 +123,12 @@ class BaseCsvFile {
     }
 
     List<String> parts = coordinate.split(RegExp(r"[-:\s]+"));
-    print('coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}');
+    if (kDebugMode) {
+      // ignore: avoid_print
+      print(
+        'coordinate: $coordinate :: parts: $parts :: parts.length: ${parts.length}',
+      );
+    }
     if (parts.length != 4 && parts.length != 3) {
       return 0.0;
     }

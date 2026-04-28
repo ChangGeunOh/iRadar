@@ -1,7 +1,7 @@
-import 'dart:html' as html;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../../../../common/utils/web_download.dart';
 
 import '../../../../common/const/color.dart';
 import '../../../../domain/bloc/bloc_event.dart';
@@ -237,11 +237,10 @@ class DrawerView extends StatelessWidget {
     ByteData data = await rootBundle.load('assets/files/$fileName');
     final buffer = data.buffer;
     final bytes = buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute("download", fileName)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+
+    WebDownload.saveBytes(
+      bytes,
+      fileName: fileName,
+    );
   }
 }

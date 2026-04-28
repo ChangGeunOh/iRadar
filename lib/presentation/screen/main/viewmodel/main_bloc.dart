@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:html' as html;
 import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
@@ -20,6 +19,7 @@ import 'package:googlemap/presentation/screen/upload/upload_screen.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../common/utils/worst_excel_maker.dart';
+import '../../../../common/utils/web_download.dart';
 import '../../../../domain/bloc/bloc_event.dart';
 import '../../../../domain/model/enum/location_type.dart';
 
@@ -325,13 +325,12 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
     String formattedDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String fileName = '($formattedDate) 기지국중계기정보.xlsx';
 
-    final blob = html.Blob([excelBytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..target = 'blank'
-      ..download = fileName
-      ..click();
-    html.Url.revokeObjectUrl(url); // 메모리 해제
+    WebDownload.saveBytes(
+      excelBytes,
+      fileName: fileName,
+      mimeType:
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
   }
 
   Future<void> _downloadExcelWorstCell(

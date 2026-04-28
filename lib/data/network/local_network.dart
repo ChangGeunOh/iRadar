@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
