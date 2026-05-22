@@ -3,6 +3,8 @@ import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_remove_request.dart';
 import 'package:googlemap/domain/model/chart/worst_chart_data.dart';
+import 'package:googlemap/domain/model/upload/intf_tt_data.dart';
+import 'package:googlemap/domain/model/upload/request_storage_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -217,4 +219,24 @@ abstract class NetworkSourceImpl extends NetworkSource {
     @Query('division') required String division,
     @Query('count') required int count,
   });
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kRequestStorageDataPath)
+  Future<ResponseData<List<RequestStorageData>>> getRequestStorageData();
+
+  @override
+  @Headers({'access_token': true})
+  @GET('$kRequestStorageDataPath/{req_sn}')
+  Future<ResponseData<List<IntfTtData>>> getRequestStorageMeasureData({
+    @Path('req_sn') required int requestId,
+  });
+
+  @override
+  @Headers({'access_token': true})
+  @DELETE('$kRequestStorageDataPath/{req_sn}')
+  Future<ResponseData> deleteRequestStorageData({
+    @Path('req_sn') required int requestId,
+  });
+
 }

@@ -89,7 +89,7 @@ class MainBloc extends BlocBloc<BlocEvent<MainEvent>, MainState> {
           await _getAreaList(emit, state);
         }
         emit(state.copyWith(isLoading: false));
-        if (context.mounted) {
+        if (context.mounted && context.canPop()) {
           context.pop();
         }
         break;

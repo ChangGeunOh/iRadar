@@ -1,9 +1,7 @@
 const kNetworkReleaseBaseUrl = 'http://59.20.175.135/iradar/';    // '/api/'
 const kNetworkDebugBaseUrl = 'http://59.20.175.135/iradar/';
-// const kNetworkDebugBaseUrl = 'http://localhost/api/iradar/';
-// http://iradar.ddns.net/api/auth/login
-// http://59.20.175.135/iradar/auth/login
-
+// const kNetworkReleaseBaseUrl = 'http://localhost:8000/api/iradar/';
+// const kNetworkDebugBaseUrl = 'http://localhost:8000/api/iradar/';
 
 const kUserPath = 'auth/user';
 const kLoginPath = 'auth/login';
@@ -37,3 +35,4 @@ const kNoticeDetailPath = 'notice/{idx}';
 const kBestPointListPath = 'best/{type}/{idx}';
 const kChartPath = 'chart';
 
+const kRequestStorageDataPath = 'http://localhost:8000/api/req';

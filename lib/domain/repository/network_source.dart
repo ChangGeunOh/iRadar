@@ -12,7 +12,9 @@ import '../model/chart/measure_data.dart';
 import '../model/map/area_data.dart';
 import '../model/map/map_data.dart';
 import '../model/notice/notice_data.dart';
+import '../model/upload/intf_tt_data.dart';
 import '../model/upload/measure_upload_data.dart';
+import '../model/upload/request_storage_data.dart';
 
 abstract class NetworkSource {
   Future<ResponseData<TokenData?>> loadLogin(
@@ -107,5 +109,15 @@ abstract class NetworkSource {
     required String division,
     required String type,
     required int count,
+  });
+
+  Future<ResponseData<List<RequestStorageData>>> getRequestStorageData();
+
+  Future<ResponseData<List<IntfTtData>>> getRequestStorageMeasureData({
+    required int requestId,
+  });
+
+  Future<ResponseData> deleteRequestStorageData({
+    required int requestId,
   });
 }

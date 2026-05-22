@@ -32,6 +32,8 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
           bloc.add(BlocEvent(UploadEvent.onClearMessage));
         }
 
+        print('isLoading>${state.isLoading} :: measureProcessData>${state.measureProcessData}');
+
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 48.0,
@@ -45,7 +47,7 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
                     onTapUpload: (data) {
                       bloc.add(BlocEvent(UploadEvent.onTapSave, extra: data));
                     },
-                    onChangedData: (data) {
+                    onProcessData: (data) {
                       bloc.add(
                         BlocEvent(
                           UploadEvent.onChangedData,
@@ -61,16 +63,16 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
                     },
                   ),
                   const SizedBox(height: 24),
-                  if (state.excelFile != null)
+                  if (state.measureProcessData != null)
                     Expanded(
                       child: SingleChildScrollView(
                         child: TableLayout(
                           intfTtList:
-                              state.excelFile!.measureUploadData.intfTTList,
+                              state.measureProcessData!.intfTTList,
                         ),
                       ),
                     ),
-                  if (state.excelFile == null) const Spacer(),
+                  if (state.measureProcessData == null) const Spacer(),
                   const SizedBox(height: 16),
                 ],
               ),

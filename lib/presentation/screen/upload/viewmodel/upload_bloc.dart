@@ -1,15 +1,13 @@
 import 'dart:async';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:googlemap/domain/bloc/bloc_bloc.dart';
-import 'package:googlemap/domain/bloc/bloc_event.dart';
-import 'package:googlemap/domain/model/map/area_data.dart';
-import 'package:googlemap/domain/model/excel_file.dart';
-import 'package:googlemap/presentation/screen/upload/viewmodel/upload_event.dart';
-import 'package:googlemap/presentation/screen/upload/viewmodel/upload_state.dart';
+
+import '../../../../domain/bloc/bloc_bloc.dart';
+import '../../../../domain/bloc/bloc_event.dart';
+import 'upload_event.dart';
+import 'upload_state.dart';
 
 
 class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
@@ -30,6 +28,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         emit(state.copyWith(group: userData?.group1));
         break;
       case UploadEvent.onLoading:
+        print('onLoading>${event.extra}');
         emit(state.copyWith(isLoading: event.extra));
         break;
       case UploadEvent.onTapSave:
@@ -50,7 +49,7 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         break;
       case UploadEvent.onChangedData:
         emit(state.copyWith(
-          excelFile: event.extra,
+          measureProcessData: event.extra,
         ));
         break;
     }

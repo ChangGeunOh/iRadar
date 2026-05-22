@@ -25,6 +25,7 @@ const kWebHeaders = [
 ];
 
 const kSecreteKey = '1649aef524be871f5ba53d5790d4e6aa462fa518aa568bc27bf0e37a546d0aa1';
+// const kSecreteKey = 'd8324a477f1498773cfcab67f7d23bcb736b0e0ac66f2dc1ec06f4e32b63e222';
 
 const initCameraPosition = CameraPosition(
   target: LatLng(35.16861, 129.05091),

@@ -1,8 +1,8 @@
-import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:googlemap/domain/model/upload/intf_tt_data.dart';
+import 'package:googlemap/domain/model/upload/measure_process_data.dart';
 
 import '../../../../domain/model/map/area_data.dart';
-import '../../../../domain/model/excel_file.dart';
 
 class UploadState {
   final String message;
@@ -19,12 +19,12 @@ class UploadState {
   final FilePickerResult? filePickerResult;
   final bool enabledSave;
   final String password;
-  final ExcelFile? excelFile;
   final bool isDuplicate;
   final bool isSearch;
   final List<AreaData> areaList;
   final AreaData? areaData;
   final bool enabledAddData;
+  final MeasureProcessData? measureProcessData;
 
   UploadState({
     this.isNoLocation = false,
@@ -42,11 +42,11 @@ class UploadState {
     this.enabledSave = false,
     this.password = '',
     this.message = '',
-    this.excelFile,
     this.isSearch = false,
     this.areaList = const [],
     this.areaData,
     this.enabledAddData = true,
+    this.measureProcessData,
   });
 
   UploadState copyWith({
@@ -63,13 +63,13 @@ class UploadState {
     FilePickerResult? filePickerResult,
     bool? enabledSave,
     String? password,
-    ExcelFile? excelFile,
     String? message,
     bool? isDuplicate,
     bool? isSearch,
     List<AreaData>? areaList,
     AreaData? areaData,
     bool? enabledAddData,
+    MeasureProcessData? measureProcessData,
   }) {
     return UploadState(
       isNoLocation: isNoLocation ?? this.isNoLocation,
@@ -85,13 +85,13 @@ class UploadState {
       filePickerResult: filePickerResult ?? this.filePickerResult,
       enabledSave: enabledSave ?? this.enabledSave,
       password: password ?? this.password,
-      excelFile: excelFile ?? this.excelFile,
       message: message ?? this.message,
       isDuplicate: isDuplicate ?? this.isDuplicate,
       isSearch: isSearch ?? this.isSearch,
       areaList: areaList ?? this.areaList,
       areaData: areaData ?? this.areaData,
       enabledAddData: enabledAddData ?? this.enabledAddData,
+      measureProcessData: measureProcessData ?? this.measureProcessData,
     );
   }
 }

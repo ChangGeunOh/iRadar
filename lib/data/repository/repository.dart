@@ -480,11 +480,25 @@ class Repository {
     );
   }
 
-  Future<ResponseData> getWorstCellList(String division, String type, int count) async {
+  Future<ResponseData> getWorstCellList(
+      String division, String type, int count) async {
     return await _networkSource.getWorstCellList(
       division: division,
       type: type,
       count: count,
     );
+  }
+
+  Future<ResponseData> getRequestStorageData() async {
+    return await _networkSource.getRequestStorageData();
+  }
+
+  Future<ResponseData> getRequestStorageMeasureData(int requestId) async {
+    return await _networkSource.getRequestStorageMeasureData(
+        requestId: requestId);
+  }
+
+  Future<ResponseData> deleteRequestStorageData(int requestId) async {
+    return await _networkSource.deleteRequestStorageData(requestId: requestId);
   }
 }

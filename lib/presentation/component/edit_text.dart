@@ -30,24 +30,25 @@ class _EditTextState extends State<EditText> {
   @override
   void didUpdateWidget(covariant EditText oldWidget) {
     if (oldWidget.value != widget.value) {
-      controller.text = widget.value!;
+      controller.text = widget.value ?? '';
     }
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   void initState() {
-    controller = TextEditingController(text: widget.value);
+    controller = TextEditingController(text: widget.value ?? '');
     super.initState();
   }
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (widget.value != null && controller.text.isEmpty) {
-      setState(() {
-        controller.text = widget.value!;
-      });
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

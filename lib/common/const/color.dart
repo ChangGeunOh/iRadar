@@ -13,3 +13,5 @@ const kFullViewTextColor = Color(0xFFBCBCBC);
 const kFullViewIconColor = Color(0xFF999999);
 
 const strokeColor = Color(0xFF666666);
+const mintColor = Color(0xFF0DCDD6);
+const redColor = Color(0xFFFF0000);
