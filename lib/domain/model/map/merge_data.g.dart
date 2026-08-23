@@ -9,7 +9,7 @@ part of 'merge_data.dart';
 MergeData _$MergeDataFromJson(Map<String, dynamic> json) => MergeData(
       name: json['name'] as String,
       wirelessType: $enumDecode(_$WirelessTypeEnumMap, json['wireless_type']),
-      locationType: $enumDecode(_$LocationTypeEnumMap, json['location_type']),
+      locationType: LocationType.fromJson(json['location_type'] as String),
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
       measuredAt: DateTime.parse(json['dt'] as String),
@@ -21,7 +21,7 @@ MergeData _$MergeDataFromJson(Map<String, dynamic> json) => MergeData(
 Map<String, dynamic> _$MergeDataToJson(MergeData instance) => <String, dynamic>{
       'name': instance.name,
       'wireless_type': _$WirelessTypeEnumMap[instance.wirelessType]!,
-      'location_type': _$LocationTypeEnumMap[instance.locationType]!,
+      'location_type': instance.locationType,
       'lat': instance.latitude,
       'lng': instance.longitude,
       'dt': instance.measuredAt.toIso8601String(),
@@ -33,11 +33,4 @@ const _$WirelessTypeEnumMap = {
   WirelessType.w5G: '5G',
   WirelessType.all: 'ALL',
   WirelessType.undefined: 'undefined',
-};
-
-const _$LocationTypeEnumMap = {
-  LocationType.adminBuilding: '행정동',
-  LocationType.inBuilding: '인빌딩',
-  LocationType.theme: '테마',
-  LocationType.undefined: 'undefined',
 };

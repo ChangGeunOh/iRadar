@@ -10,11 +10,11 @@ UserData _$UserDataFromJson(Map<String, dynamic> json) => UserData(
       userId: json['userid'] as String,
       userName: json['username'] as String,
       phone: json['phone'] as String? ?? '',
-      group1: json['group1'] as String,
-      group2: json['group2'] as String,
-      group3: json['group3'] as String,
-      group4: json['group4'] as String,
-      group5: json['group5'] as String,
+      group1: json['group1'] as String? ?? '',
+      group2: json['group2'] as String? ?? '',
+      group3: json['group3'] as String? ?? '',
+      group4: json['group4'] as String? ?? '',
+      group5: json['group5'] as String? ?? '',
     );
 
 Map<String, dynamic> _$UserDataToJson(UserData instance) => <String, dynamic>{

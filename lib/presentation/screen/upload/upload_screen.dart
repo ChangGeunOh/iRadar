@@ -32,8 +32,6 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
           bloc.add(BlocEvent(UploadEvent.onClearMessage));
         }
 
-        print('isLoading>${state.isLoading} :: measureProcessData>${state.measureProcessData}');
-
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 48.0,
@@ -45,9 +43,9 @@ class UploadScreen extends StatelessWidget with ShowMessageMixin {
                 children: [
                   TopLayout(
                     onTapUpload: (data) {
-                      bloc.add(BlocEvent(UploadEvent.onTapSave, extra: data));
+                      bloc.add(BlocEvent(UploadEvent.onTapSave, extra: data));      // MeasureUploadData
                     },
-                    onProcessData: (data) {
+                    onProcessData: (data) {       // MeasureUploadData
                       bloc.add(
                         BlocEvent(
                           UploadEvent.onChangedData,

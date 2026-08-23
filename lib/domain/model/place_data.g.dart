@@ -11,7 +11,7 @@ PlaceData _$PlaceDataFromJson(Map<String, dynamic> json) => PlaceData(
       type: $enumDecode(_$WirelessTypeEnumMap, json['type']),
       group: json['group'] as String,
       name: json['name'] as String,
-      division: $enumDecode(_$LocationTypeEnumMap, json['division']),
+      division: LocationType.fromJson(json['division'] as String),
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       dateTime: json['dateTime'] as String,
@@ -25,7 +25,7 @@ Map<String, dynamic> _$PlaceDataToJson(PlaceData instance) => <String, dynamic>{
       'type': _$WirelessTypeEnumMap[instance.type]!,
       'group': instance.group,
       'name': instance.name,
-      'division': _$LocationTypeEnumMap[instance.division]!,
+      'division': instance.division,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'dateTime': instance.dateTime,
@@ -39,11 +39,4 @@ const _$WirelessTypeEnumMap = {
   WirelessType.w5G: '5G',
   WirelessType.all: 'ALL',
   WirelessType.undefined: 'undefined',
-};
-
-const _$LocationTypeEnumMap = {
-  LocationType.adminBuilding: '행정동',
-  LocationType.inBuilding: '인빌딩',
-  LocationType.theme: '테마',
-  LocationType.undefined: 'undefined',
 };

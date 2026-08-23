@@ -10,10 +10,15 @@ class UserData {
   final String userName;
   @JsonKey(defaultValue: '')
   final String phone;
+  @JsonKey(defaultValue: '')
   final String group1;
+  @JsonKey(defaultValue: '')
   final String group2;
+  @JsonKey(defaultValue: '')
   final String group3;
+  @JsonKey(defaultValue: '')
   final String group4;
+  @JsonKey(defaultValue: '')
   final String group5;
 
   UserData({

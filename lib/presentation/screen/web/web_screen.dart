@@ -22,6 +22,9 @@ class WebScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(excelRequestData.toJson());
+    excelRequestData.measureDataList.forEach((e) {
+      print(e.toJson());
+    });
     return BlocScaffold<WebBloc, WebState>(
       appBarBuilder: (context, bloc, state) {
         return AppBar(

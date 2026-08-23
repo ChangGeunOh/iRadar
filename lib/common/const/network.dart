@@ -1,7 +1,17 @@
-const kNetworkReleaseBaseUrl = 'http://59.20.175.135/iradar/';    // '/api/'
-const kNetworkDebugBaseUrl = 'http://59.20.175.135/iradar/';
-// const kNetworkReleaseBaseUrl = 'http://localhost:8000/api/iradar/';
-// const kNetworkDebugBaseUrl = 'http://localhost:8000/api/iradar/';
+// const kNetworkReleaseBaseUrl = 'http://59.20.175.135/iradar/';    // '/api/'
+// const kNetworkDebugBaseUrl = 'http://59.20.175.135/iradar/';
+
+// const kNetworkDebugBaseUrl = 'https://nqi.kt.com/iradar/api/';
+
+import 'package:flutter/foundation.dart';
+
+const kNetworkReleaseBaseUrl = 'https://nqi.kt.com/iradar/api/';
+const kNetworkDebugBaseUrl = 'http://localhost:8001/';
+
+final String kNetworkBaseUrl =
+    kDebugMode ? kNetworkDebugBaseUrl : kNetworkReleaseBaseUrl;
+
+
 
 const kUserPath = 'auth/user';
 const kLoginPath = 'auth/login';
@@ -22,7 +32,8 @@ const kPostMergeDataPath = 'map/merge';
 const kGetMeasureListPath = 'chart/{type}/{idx}';
 
 const kBaseDataPath = 'base/';
-const kBaseLastDatePath = 'base/version';
+const kBaseVersionPath = 'base/version';
+const kBaseLatestDatePath = 'base/latest';
 const kBaseDataRemovePath = 'base/remove';
 
 const kPciDataPath = 'pci/{type}/{idx}';
@@ -35,4 +46,4 @@ const kNoticeDetailPath = 'notice/{idx}';
 const kBestPointListPath = 'best/{type}/{idx}';
 const kChartPath = 'chart';
 
-const kRequestStorageDataPath = 'http://localhost:8000/api/req';
+const kRequestStorageDataPath = 'req';

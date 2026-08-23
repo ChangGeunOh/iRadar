@@ -13,7 +13,7 @@ BaseData _$BaseDataFromJson(Map<String, dynamic> json) => BaseData(
       type: json['type'] as String,
       latitude: (json['lat'] as num).toDouble(),
       longitude: (json['lng'] as num).toDouble(),
-      pci: (json['pci'] as num).toInt(),
+      pci: BaseData._pciFromJson(json['pci'] as String),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -27,5 +27,5 @@ Map<String, dynamic> _$BaseDataToJson(BaseData instance) => <String, dynamic>{
       'lat': instance.latitude,
       'lng': instance.longitude,
       'createdAt': instance.createdAt.toIso8601String(),
-      'pci': instance.pci,
+      'pci': BaseData._pciToJson(instance.pci),
     };

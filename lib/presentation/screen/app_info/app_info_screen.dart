@@ -79,7 +79,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
             ),
             const Spacer(),
             const Text(
-              'i-Radar Pro는 Flutter와 fast-api로 제작되었습니다.',
+              'i-Radar Pro는 Flutter와 Fast-api로 제작되었습니다.',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,

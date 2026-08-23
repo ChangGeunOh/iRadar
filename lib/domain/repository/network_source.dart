@@ -1,11 +1,13 @@
 import 'package:googlemap/domain/model/area/area_rename_data.dart';
 import 'package:googlemap/domain/model/base/base_data.dart';
+import 'package:googlemap/domain/model/base/base_version_data.dart';
 import 'package:googlemap/domain/model/map/best_point_data.dart';
 import 'package:googlemap/domain/model/map/merge_data.dart';
 import 'package:googlemap/domain/model/pci/pci_base_data.dart';
 import 'package:googlemap/domain/model/response/response_data.dart';
 import 'package:googlemap/domain/model/token_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
+import 'package:http/http.dart';
 
 import '../model/base/base_remove_request.dart';
 import '../model/chart/measure_data.dart';
@@ -15,6 +17,8 @@ import '../model/notice/notice_data.dart';
 import '../model/upload/intf_tt_data.dart';
 import '../model/upload/measure_upload_data.dart';
 import '../model/upload/request_storage_data.dart';
+import '../model/upload/request_upload_data.dart';
+import '../model/upload/request_upload_result_data.dart';
 
 abstract class NetworkSource {
   Future<ResponseData<TokenData?>> loadLogin(
@@ -24,6 +28,8 @@ abstract class NetworkSource {
   Future<ResponseData> uploadMeasureData(
     MeasureUploadData measureUploadData,
   );
+
+  Future<ResponseData> uploadRequestNumber(String keyDateTime);
 
   Future<ResponseData<TokenData?>> postTokenData(String jsonString);
 
@@ -114,10 +120,19 @@ abstract class NetworkSource {
   Future<ResponseData<List<RequestStorageData>>> getRequestStorageData();
 
   Future<ResponseData<List<IntfTtData>>> getRequestStorageMeasureData({
-    required int requestId,
+    required String keyDateTime,
   });
 
   Future<ResponseData> deleteRequestStorageData({
-    required int requestId,
+    required String keyDateTime,
   });
+
+
+  Future<ResponseData<RequestUploadResultData>> uploadRequestData({
+    required RequestUploadData requestUploadData,
+  });
+
+  Future<ResponseData<BaseVersionData>> getBaseVersion();
+
+  Future<ResponseData<BaseVersionData>> updateBaseData();
 }

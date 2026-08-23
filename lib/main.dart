@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 
         final customInterceptor = CustomInterceptor(
           dataStoreSource: dataStoreSource,
-          context: context,
+          router: routerConfig,
         );
         final LocalNetwork localNetwork = LocalNetwork(customInterceptor);
         final networkSource = NetworkSourceImpl(localNetwork.dio);

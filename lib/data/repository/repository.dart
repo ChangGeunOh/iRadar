@@ -49,7 +49,6 @@ class Repository {
   }
 
   // Future<List<PlaceData>> loadPlaceList(WirelessType type) async {
-  //   var placeList = await _dataStoreSource.loadPlaceList(type);
   //   if (placeList.isEmpty) {
   //     final response = await _networkSource.loadPlaceList(type: type.name);
   //     if (response.meta.code == 200) {
@@ -232,10 +231,18 @@ class Repository {
     return LoginData(userid: 'admin', password: 'admin');
   }
 
-  Future<ResponseData> uploadMeasureData(
-    MeasureUploadData measureUploadData,
-  ) async {
-    final result = await _networkSource.uploadMeasureData(measureUploadData);
+  Future<ResponseData> uploadMeasureData({
+    required String keyDateTime,
+    required MeasureUploadData measureUploadData,
+  }) async {
+    ResponseData result;
+    if (keyDateTime== '') {
+      result = await _networkSource.uploadRequestNumber(
+        keyDateTime,
+      );
+    } else {
+      result = await _networkSource.uploadMeasureData(measureUploadData);
+    }
     if (kDebugMode) {
       debugPrint('uploadMeasureData>$result');
     }
@@ -493,12 +500,24 @@ class Repository {
     return await _networkSource.getRequestStorageData();
   }
 
-  Future<ResponseData> getRequestStorageMeasureData(int requestId) async {
+  Future<ResponseData> getRequestStorageMeasureData(String keyDateTime) async {
     return await _networkSource.getRequestStorageMeasureData(
-        requestId: requestId);
+        keyDateTime: keyDateTime);
   }
 
-  Future<ResponseData> deleteRequestStorageData(int requestId) async {
-    return await _networkSource.deleteRequestStorageData(requestId: requestId);
+  Future<ResponseData> deleteRequestStorageData(String keyDateTime) async {
+    return await _networkSource.deleteRequestStorageData(keyDateTime: keyDateTime);
+  }
+
+  Future<ResponseData> uploadRequestData({required requestUploadData}) async {
+      return await _networkSource.uploadRequestData(requestUploadData: requestUploadData);
+  }
+
+  Future<ResponseData> getBaseVersion() async {
+    return await _networkSource.getBaseVersion();
+  }
+
+  Future<ResponseData> updateBaseData() async {
+    return await _networkSource.updateBaseData();
   }
 }

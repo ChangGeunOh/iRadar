@@ -8,12 +8,12 @@ part of 'request_storage_data.dart';
 
 RequestStorageData _$RequestStorageDataFromJson(Map<String, dynamic> json) =>
     RequestStorageData(
-      requestNumber: (json['request_number'] as num).toInt(),
-      division: $enumDecode(_$LocationTypeEnumMap, json['division']),
+      center: json['center'] as String,
+      keyDateTime: json['fileinfo_m_starttime'] as String,
+      division: LocationType.fromJson(json['division'] as String),
       name: json['name'] as String,
       address: json['address'] as String,
-      startDate: DateTime.parse(json['start_time'] as String),
-      endDate: DateTime.parse(json['end_time'] as String),
+      mobileNumber: json['mobile_number'] as String? ?? '',
       hasLocation: json['has_location'] == null
           ? false
           : Convert.dynamicToBool(json['has_location']),
@@ -24,19 +24,12 @@ RequestStorageData _$RequestStorageDataFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$RequestStorageDataToJson(RequestStorageData instance) =>
     <String, dynamic>{
-      'request_number': instance.requestNumber,
-      'division': _$LocationTypeEnumMap[instance.division]!,
+      'fileinfo_m_starttime': instance.keyDateTime,
+      'division': instance.division,
       'name': instance.name,
       'address': instance.address,
-      'start_time': instance.startDate.toIso8601String(),
-      'end_time': instance.endDate.toIso8601String(),
+      'center': instance.center,
       'has_location': instance.hasLocation,
+      'mobile_number': instance.mobileNumber,
       'is_lte_only': instance.isLteOnly,
     };
-
-const _$LocationTypeEnumMap = {
-  LocationType.adminBuilding: '행정동',
-  LocationType.inBuilding: '인빌딩',
-  LocationType.theme: '테마',
-  LocationType.undefined: 'undefined',
-};

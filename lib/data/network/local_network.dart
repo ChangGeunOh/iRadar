@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:googlemap/common/const/network.dart';
 import 'package:googlemap/common/utils/utils.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
@@ -19,15 +20,17 @@ class LocalNetwork {
         responseBody: true,
         responseHeader: false,
         error: true,
-        compact: true,
+        compact: false,
         maxWidth: 90,
       ),
     );
     dio.options.responseType = ResponseType.json;
-    dio.options.baseUrl = Utils.baseUrl;
+    dio.options.baseUrl = kNetworkBaseUrl;
 
     return dio;
   }
+
+
 }
 
 // class CustomInterceptor extends Interceptor {

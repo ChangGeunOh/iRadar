@@ -37,4 +37,6 @@ abstract class DataStoreSource {
   Future<void> removeUserData();
 
   Future<void> clearCacheData(int idx, WirelessType type);
+
+  Future<void> clearTokenData();
 }

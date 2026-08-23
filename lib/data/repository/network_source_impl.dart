@@ -5,11 +5,13 @@ import 'package:googlemap/domain/model/base/base_remove_request.dart';
 import 'package:googlemap/domain/model/chart/worst_chart_data.dart';
 import 'package:googlemap/domain/model/upload/intf_tt_data.dart';
 import 'package:googlemap/domain/model/upload/request_storage_data.dart';
+import 'package:googlemap/domain/model/upload/request_upload_data.dart';
+import 'package:googlemap/domain/model/upload/request_upload_result_data.dart';
 import 'package:googlemap/domain/model/user_data.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../../common/utils/utils.dart';
 import '../../domain/model/base/base_data.dart';
+import '../../domain/model/base/base_version_data.dart';
 import '../../domain/model/chart/measure_data.dart';
 import '../../domain/model/map/area_data.dart';
 import '../../domain/model/map/best_point_data.dart';
@@ -27,7 +29,7 @@ part 'network_source_impl.g.dart';
 @RestApi()
 abstract class NetworkSourceImpl extends NetworkSource {
   factory NetworkSourceImpl(Dio dio) {
-    return _NetworkSourceImpl(dio, baseUrl: Utils.baseUrl);
+    return _NetworkSourceImpl(dio, baseUrl: kNetworkBaseUrl);
   }
 
   @override
@@ -44,6 +46,13 @@ abstract class NetworkSourceImpl extends NetworkSource {
   @Headers({'access_token': true})
   Future<ResponseData> uploadMeasureData(
     @Body() MeasureUploadData measureUploadData,
+  );
+
+  @override
+  @POST(kRequestStorageDataPath)
+  @Headers({'access_token': true})
+  Future<ResponseData> uploadRequestNumber(
+    @Query('key_date_time') String keyDateTime,
   );
 
   @override
@@ -168,7 +177,7 @@ abstract class NetworkSourceImpl extends NetworkSource {
 
   @override
   @Headers({'access_token': true})
-  @GET(kBaseLastDatePath)
+  @GET(kBaseLatestDatePath)
   Future<ResponseData<String>> getBaseLastDate();
 
   @override
@@ -227,16 +236,32 @@ abstract class NetworkSourceImpl extends NetworkSource {
 
   @override
   @Headers({'access_token': true})
-  @GET('$kRequestStorageDataPath/{req_sn}')
+  @GET('$kRequestStorageDataPath/{key_date_time}')
   Future<ResponseData<List<IntfTtData>>> getRequestStorageMeasureData({
-    @Path('req_sn') required int requestId,
+    @Path('key_date_time') required String keyDateTime,
   });
 
   @override
   @Headers({'access_token': true})
-  @DELETE('$kRequestStorageDataPath/{req_sn}')
+  @DELETE('$kRequestStorageDataPath/{key_date_time}')
   Future<ResponseData> deleteRequestStorageData({
-    @Path('req_sn') required int requestId,
+    @Path('key_date_time') required String keyDateTime,
   });
 
+  @override
+  @Headers({'access_token': true})
+  @POST('$kRequestStorageDataPath/upload')
+  Future<ResponseData<RequestUploadResultData>> uploadRequestData({
+    @Body() required RequestUploadData requestUploadData,
+  });
+
+  @override
+  @Headers({'access_token': true})
+  @GET(kBaseVersionPath)
+  Future<ResponseData<BaseVersionData>> getBaseVersion();
+
+  @override
+  @Headers({'access_token': true})
+  @GET('$kBaseDataPath/update')
+  Future<ResponseData<BaseVersionData>> updateBaseData();
 }

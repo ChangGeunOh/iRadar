@@ -12,6 +12,7 @@ class MeasureProcessData {
   final String name;
 
   final List<IntfTtData> intfTTList;
+  final String keyDateTime;
 
   MeasureProcessData({
     required this.division,
@@ -20,6 +21,7 @@ class MeasureProcessData {
     required this.isWideArea,
     required this.name,
     required this.intfTTList,
+    this.keyDateTime = '',
   });
 
   MeasureUploadData getUploadData({areaIdx = -1}) {

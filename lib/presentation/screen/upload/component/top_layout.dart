@@ -5,6 +5,7 @@ import 'package:googlemap/data/repository/repository.dart';
 import 'package:googlemap/domain/model/enum/location_type.dart';
 import 'package:googlemap/domain/model/map/area_data.dart';
 import 'package:googlemap/domain/model/upload/measure_process_data.dart';
+import 'package:googlemap/domain/model/upload/request_upload_data.dart';
 import 'package:googlemap/presentation/screen/upload/component/measure_edit_text.dart';
 import 'package:googlemap/presentation/screen/upload/component/request_storage_dialog.dart';
 
@@ -18,7 +19,7 @@ import '../../../component/dropdown_box.dart';
 // import 'area_dialog.dart';
 
 class TopLayout extends StatefulWidget {
-  final ValueChanged<MeasureUploadData> onTapUpload;
+  final ValueChanged<RequestUploadData> onTapUpload;
   final ValueChanged<bool> onChangeLoading;
   final ValueChanged<MeasureProcessData> onProcessData;
 
@@ -34,6 +35,7 @@ class TopLayout extends StatefulWidget {
 }
 
 class _TopLayoutState extends State<TopLayout> {
+  var keyDateTime = '';
   var division = '';
   var fileName = '';
   var area = '';
@@ -41,6 +43,8 @@ class _TopLayoutState extends State<TopLayout> {
   var isLteOnly = false;
   var isAddData = false;
   var isWideArea = false;
+  var requestNumber = -1;
+  String appendKeyDateTime = '';
 
   List<IntfTtData> intfTtDataList = [];
 
@@ -67,19 +71,6 @@ class _TopLayoutState extends State<TopLayout> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SizedBox(
-              width: 200,
-              child: DropdownBox(
-                onChanged: (value) => setState(() {
-                  division = value as String;
-                }),
-                hint: '구분선택',
-                label: '구분',
-                items: divisionList,
-                value: division.isEmpty ? null : division,
-              ),
-            ),
-            const SizedBox(width: 16),
             SizedBox(
               width: 400,
               child: Column(
@@ -110,11 +101,14 @@ class _TopLayoutState extends State<TopLayout> {
                       children: [
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            fileName.isEmpty ? '파일을 선택해 주세요.' : fileName,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
+                          child: GestureDetector(
+                            onTap: _onTapRequestStorage,
+                            child: Text(
+                              fileName.isEmpty ? 'NQI 측정 데이터를 선택하세요' : fileName,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
                         ),
@@ -122,13 +116,13 @@ class _TopLayoutState extends State<TopLayout> {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                onPressed: _onTapFile,
-                                icon: const Icon(
-                                  Icons.attach_file_rounded,
-                                ),
-                              ),
+                              // IconButton(
+                              //   padding: EdgeInsets.zero,
+                              //   onPressed: _onTapFile,
+                              //   icon: const Icon(
+                              //     Icons.attach_file_rounded,
+                              //   ),
+                              // ),
                               IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: _onTapRequestStorage,
@@ -146,9 +140,22 @@ class _TopLayoutState extends State<TopLayout> {
               ),
             ),
             const SizedBox(width: 16),
+            SizedBox(
+              width: 200,
+              child: DropdownBox(
+                onChanged: (value) => setState(() {
+                  division = value as String;
+                }),
+                hint: '구분선택',
+                label: '구분',
+                items: divisionList,
+                value: division.isEmpty ? null : division,
+              ),
+            ),
+            const SizedBox(width: 16),
             Expanded(
               child: MeasureEditText(
-                value: fileName.replaceAll(RegExp(r'\.(xls|xlsx)$'), ''),
+                value: fileName,           // fileName.replaceAll(RegExp(r'\.(xls|xlsx)$'), ''),
                 onChanged: (value) {
                   area = value;
                   setState(() {});
@@ -208,19 +215,26 @@ class _TopLayoutState extends State<TopLayout> {
               child: ElevatedButton(
                 onPressed: isEnableUpload
                     ? () {
-                        final areaIdx = (isAddData && areaData != null)
-                            ? areaData!.idx
-                            : -1;
-                        final measureProcessData = MeasureProcessData(
-                          division: LocationType.getByName(division),
-                          isNoLocation: isNoLocation,
-                          isLteOnly: isLteOnly,
-                          isWideArea: isWideArea,
+                        // final areaIdx = (isAddData && areaData != null)
+                        //     ? areaData!.idx
+                        //     : -1;
+                        // final measureProcessData = MeasureProcessData(
+                        //   division: LocationType.fromJson(division),
+                        //   isNoLocation: isNoLocation,
+                        //   isLteOnly: isLteOnly,
+                        //   isWideArea: isWideArea,
+                        //   name: area,
+                        //   intfTTList: intfTtDataList,
+                        //   // requestNumber: areaData?.requestNumber,
+                        // );
+                        // final uploadData =
+                        //     measureProcessData.getUploadData(areaIdx: areaIdx);
+                        final uploadData = RequestUploadData(
+                          keyDateTime: keyDateTime,
+                          division: LocationType.fromJson(division),
                           name: area,
-                          intfTTList: intfTtDataList,
+                          appendAreIdx: areaData?.idx ?? -1,
                         );
-                        final uploadData =
-                            measureProcessData.getUploadData(areaIdx: areaIdx);
                         widget.onTapUpload(uploadData);
                       }
                     : null,
@@ -261,7 +275,8 @@ class _TopLayoutState extends State<TopLayout> {
       try {
         final file = result.files.single;
         fileName = file.name;
-        await Future.delayed(const Duration(milliseconds: 500)); // Simulate loading delay
+        await Future.delayed(
+            const Duration(milliseconds: 500)); // Simulate loading delay
         final excelFile = await ExcelFile.fromBytes(file.bytes!);
         isLteOnly = excelFile.isLteOnly;
         isNoLocation = excelFile.isNoLocation;
@@ -274,7 +289,7 @@ class _TopLayoutState extends State<TopLayout> {
         // widget.onChangedData(excelFile);
 
         MeasureProcessData measureProcessData = MeasureProcessData(
-          division: LocationType.getByName(division),
+          division: LocationType.fromJson(division),
           isNoLocation: isNoLocation,
           isLteOnly: isLteOnly,
           isWideArea: false,
@@ -288,7 +303,8 @@ class _TopLayoutState extends State<TopLayout> {
         debugPrintStack(stackTrace: stack);
       } finally {
         widget.onChangeLoading(false);
-        print('Finished processing file: ${result.files.single.name} :: isLoading: false');
+        debugPrint(
+            'Finished processing file: ${result.files.single.name} :: isLoading: false');
       }
       setState(() {});
     }
@@ -304,6 +320,7 @@ class _TopLayoutState extends State<TopLayout> {
 
     widget.onChangeLoading(true);
     try {
+      keyDateTime = result.keyDateTime;
       fileName = result.name;
       area = result.name;
       division = result.division.name;
@@ -312,7 +329,8 @@ class _TopLayoutState extends State<TopLayout> {
       setState(() {});
 
       // widget.onChangedData(ExcelFile.fromBytes(result!.bytes));
-      final responseData = await _repository.getRequestStorageMeasureData(30);
+      final responseData =
+          await _repository.getRequestStorageMeasureData(result.keyDateTime);
       if (responseData.meta.code == 200) {
         intfTtDataList = responseData.data;
         final measureProcessData = MeasureProcessData(
@@ -322,6 +340,7 @@ class _TopLayoutState extends State<TopLayout> {
           isWideArea: isWideArea,
           name: area,
           intfTTList: responseData.data,
+          keyDateTime: keyDateTime,
         );
         widget.onProcessData(measureProcessData);
         setState(() {});

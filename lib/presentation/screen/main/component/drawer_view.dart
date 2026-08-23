@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:googlemap/presentation/screen/main/component/base_version_dialog.dart';
 
 import '../../../../common/utils/web_download.dart';
 
@@ -79,39 +80,39 @@ class DrawerView extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             const DrawerListHeader(text: 'UPLOAD BASIC DATA'),
+            // DrawerListItem(
+            //     title: "업로드 샘플 파일 다운로드",
+            //     iconData: Icons.file_copy_outlined,
+            //     onTap: () {
+            //       _downloadExampleFile("iradar_upload_example_file.zip");
+            //     }),
             DrawerListItem(
-                title: "업로드 샘플 파일 다운로드",
-                iconData: Icons.file_copy_outlined,
-                onTap: () {
-                  _downloadExampleFile("iradar_upload_example_file.zip");
-                }),
-            DrawerListItem(
-              title: "기지국/중계기 정보 업로드",
+              title: "기지국/중계기 버전 정보",
               iconData: Icons.cell_tower_rounded,
               onTap: () {
                 _showDialog(
                   context,
                   '기지국 정보 업로드',
                   bloc,
-                  const BaseScreen(),
+                  const BaseVersionDialog(),
                 );
               },
-              description:
-                  'Last Update: ${state.baseLastDate.isEmpty ? '자료 없음' : state.baseLastDate}',
+              // description:
+              //     'Last Update: ${state.baseLastDate.isEmpty ? '자료 없음' : state.baseLastDate}',
             ),
-            DrawerListItem(
-              title: "기지국/중계기 정보 삭제",
-              iconData: Icons.delete_forever_outlined,
-              onTap: () {
-                _showDialog(
-                  context,
-                  '기지국/중계기 정보 삭제',
-                  bloc,
-                  const BaseRemoveScreen(),
-                  hasAppBar: true,
-                );
-              },
-            ),
+            // DrawerListItem(
+            //   title: "기지국/중계기 정보 삭제",
+            //   iconData: Icons.delete_forever_outlined,
+            //   onTap: () {
+            //     _showDialog(
+            //       context,
+            //       '기지국/중계기 정보 삭제',
+            //       bloc,
+            //       const BaseRemoveScreen(),
+            //       hasAppBar: true,
+            //     );
+            //   },
+            // ),
             DrawerListItem(
                 title: "기지국/중계기 정보 다운로드",
                 iconData: Icons.file_download,

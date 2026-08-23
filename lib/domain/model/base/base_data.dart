@@ -13,6 +13,11 @@ class BaseData {
   @JsonKey(name: 'lng')
   final double longitude;
   final DateTime createdAt;
+  @JsonKey(
+    name: 'pci',
+    fromJson: _pciFromJson,
+    toJson: _pciToJson,
+  )
   final int pci;
 
   BaseData({
@@ -56,6 +61,14 @@ class BaseData {
     // Avoid comparing it with the enum `WirelessType`.
     final is5G = type.toLowerCase() == '5g';
     return is5G ? false : ['RS', 'RB', 'RE'].any((e) => code.startsWith(e));
+  }
+
+  static int _pciFromJson(String pci) {
+    return int.tryParse(pci) ?? -1;
+  }
+
+  static String _pciToJson(int pci) {
+    return pci.toString();
   }
 }
 

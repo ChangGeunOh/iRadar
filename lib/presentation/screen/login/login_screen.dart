@@ -7,6 +7,7 @@ import 'package:googlemap/presentation/screen/login/viewmodel/login_bloc.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_event.dart';
 import 'package:googlemap/presentation/screen/login/viewmodel/login_state.dart';
 
+import '../../../common/const/constants.dart';
 import '../../../domain/bloc/bloc_scaffold.dart';
 import 'component/unsplash_copyright.dart';
 
@@ -134,22 +135,7 @@ class LoginScreen extends StatelessWidget with ShowMessageMixin {
                           borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: "강북", child: Text("강북")),
-                        DropdownMenuItem(value: "강원", child: Text("강원")),
-                        DropdownMenuItem(value: "강남", child: Text("강남")),
-                        DropdownMenuItem(value: "서부", child: Text("서부")),
-                        DropdownMenuItem(value: "부산", child: Text("부산")),
-                        DropdownMenuItem(value: "울산", child: Text("울산")),
-                        DropdownMenuItem(value: "경남", child: Text("경남")),
-                        DropdownMenuItem(value: "대구", child: Text("대구")),
-                        DropdownMenuItem(value: "경북", child: Text("경북")),
-                        DropdownMenuItem(value: "전남", child: Text("전남")),
-                        DropdownMenuItem(value: "전북", child: Text("전북")),
-                        DropdownMenuItem(value: "제주", child: Text("제주")),
-                        DropdownMenuItem(value: "충남", child: Text("충남")),
-                        DropdownMenuItem(value: "충북", child: Text("충북")),
-                      ],
+                      items: dropdownItems,
                       hint: const Text("지역을 선택하세요"), // 초기 상태의 힌트 텍스트
                     ),
                     const SizedBox(height: 24),

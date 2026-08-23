@@ -9,21 +9,16 @@ part 'request_storage_data.g.dart';
 
 @JsonSerializable()
 class RequestStorageData {
+
   @JsonKey(
-    name: 'request_number',
+    name: 'fileinfo_m_starttime',
   )
-  final int requestNumber;
+  final String keyDateTime;
+
   final LocationType division;
   final String name;
   final String address;
-  @JsonKey(
-    name: 'start_time',
-  )
-  final DateTime startDate;
-  @JsonKey(
-    name: 'end_time',
-  )
-  final DateTime endDate;
+  final String center;
 
   @JsonKey(
     name: 'has_location',
@@ -32,18 +27,24 @@ class RequestStorageData {
   final bool hasLocation;
 
   @JsonKey(
+    name: 'mobile_number',
+    defaultValue: ''
+  )
+  final String mobileNumber;
+
+  @JsonKey(
     name: 'is_lte_only',
     fromJson: Convert.dynamicToBool,
   )
   final bool isLteOnly;
 
   RequestStorageData({
-    required this.requestNumber,
+    required this.center,
+    required this.keyDateTime,
     required this.division,
     required this.name,
     required this.address,
-    required this.startDate,
-    required this.endDate,
+    required this.mobileNumber,
     this.hasLocation = false,
     this.isLteOnly = false,
   });

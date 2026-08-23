@@ -47,27 +47,23 @@ const List<Country> countryOptions = <Country>[
   Country(name: 'South America', size: 17840000),
 ];
 
+
 List<DropdownMenuItem<String>> get dropdownItems {
   List<DropdownMenuItem<String>> menuItems = [
-    const DropdownMenuItem(value: "부산", child: Text("부산")),
-    const DropdownMenuItem(value: "울산", child: Text("울산")),
-    const DropdownMenuItem(value: "경남", child: Text("경남")),
-    const DropdownMenuItem(value: "강북", child: Text("강북")),
+    const DropdownMenuItem(value: "서울강북", child: Text("서울강북")),
     const DropdownMenuItem(value: "강원", child: Text("강원")),
+    const DropdownMenuItem(value: "경기북부", child: Text("경기북부")),
     const DropdownMenuItem(value: "강남", child: Text("강남")),
-    const DropdownMenuItem(value: "서부", child: Text("서부")),
-    const DropdownMenuItem(value: "대구", child: Text("대구")),
-    const DropdownMenuItem(value: "경북", child: Text("경북")),
-    const DropdownMenuItem(value: "전남", child: Text("전남")),
-    const DropdownMenuItem(value: "전북", child: Text("전북")),
-    const DropdownMenuItem(value: "충남", child: Text("충남")),
-    const DropdownMenuItem(value: "충북", child: Text("충북")),
-    const DropdownMenuItem(value: "제주", child: Text("제주")),
+    const DropdownMenuItem(value: "경기남부", child: Text("경기남부")),
+    const DropdownMenuItem(value: "부산/경남", child: Text("부산/경남")),
+    const DropdownMenuItem(value: "대구/경북", child: Text("대구/경북")),
+    const DropdownMenuItem(value: "전남/전북", child: Text("전남/전북")),
+    const DropdownMenuItem(value: "충남/충북", child: Text("충남/충북")),
   ];
   return menuItems;
 }
 
-const divisionList = ['행정동', '인빌딩', '테마'];
+const divisionList = ['행정동', '인빌딩', '테마', '도로'];
 
 class Country {
   const Country({

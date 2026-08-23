@@ -50,10 +50,7 @@ class Utils {
     return digest.toString();
   }
 
-  static String get baseUrl {
-    const isDebug = bool.fromEnvironment("dart.vm.product") == false;
-    return isDebug ? kNetworkDebugBaseUrl : kNetworkReleaseBaseUrl;
-  }
+
 
   static Future<void> downloadFile(String fileName) async {
     ByteData data = await rootBundle.load('assets/files/$fileName');

@@ -28,21 +28,31 @@ class UploadBloc extends BlocBloc<BlocEvent<UploadEvent>, UploadState> {
         emit(state.copyWith(group: userData?.group1));
         break;
       case UploadEvent.onLoading:
-        print('onLoading>${event.extra}');
         emit(state.copyWith(isLoading: event.extra));
         break;
       case UploadEvent.onTapSave:
         emit(state.copyWith(isLoading: true));
-        final responseData = await repository.uploadMeasureData(event.extra);
-        emit(state.copyWith(isLoading: false));
+        final responseData = await repository.uploadRequestData(
+          requestUploadData: event.extra,
+        );
+        // // final responseData = await repository.uploadMeasureData(requestNumber: requestNumber, measureUploadData: event.extra);
+        // emit(state.copyWith(isLoading: false));
+        // if (responseData.meta.code == 200) {
+        //   emit(state.copyWith(message: '자료를 등록 하였습니다.', isLoading: false));
+        //   if (context.mounted) {
+        //     context.pop(true);
+        //   }
+        // } else {
+        //   emit(state.copyWith(message: responseData.meta.message, isLoading: false));
+        // }
+
         if (responseData.meta.code == 200) {
           emit(state.copyWith(message: '자료를 등록 하였습니다.', isLoading: false));
           if (context.mounted) {
             context.pop(true);
           }
-        } else {
-          emit(state.copyWith(message: responseData.meta.message, isLoading: false));
         }
+        emit(state.copyWith(message: responseData.meta.message, isLoading: false));
         break;
       case UploadEvent.onClearMessage:
         emit(state.copyWith(message: ''));

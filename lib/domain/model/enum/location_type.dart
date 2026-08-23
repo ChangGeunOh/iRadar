@@ -7,16 +7,25 @@ enum LocationType {
   inBuilding('인빌딩'),
   @JsonValue('테마')
   theme('테마'),
+  @JsonValue('모름')
   undefined('undefined');
 
   final String name;
 
   const LocationType(this.name);
 
-  factory LocationType.getByName(String name) {
+  // json_annotation 호환용 fromJson / toJson
+  factory LocationType.fromJson(String name) {
     return LocationType.values.firstWhere(
           (element) => element.name == name,
-      orElse: () => LocationType.undefined,
+      orElse: () {
+        if (name == '도로') {
+          return LocationType.adminBuilding;
+        }
+        return LocationType.undefined;
+      },
     );
   }
+
+  String toJson() => name;
 }

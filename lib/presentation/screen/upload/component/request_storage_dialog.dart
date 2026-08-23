@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
-import 'package:googlemap/common/utils/extension.dart';
 import 'package:googlemap/data/repository/repository.dart';
 import 'package:googlemap/domain/model/upload/request_storage_data.dart';
 
@@ -16,6 +15,7 @@ class RequestStorageDialog extends StatefulWidget {
 }
 
 class _RequestStorageDialogState extends State<RequestStorageDialog> {
+
   final textController = TextEditingController();
   late final Repository _repository;
   List<RequestStorageData> _storageAreaList = [];
@@ -36,7 +36,6 @@ class _RequestStorageDialogState extends State<RequestStorageDialog> {
 
   void _init() async {
     final response = await _repository.getRequestStorageData();
-    print(response.meta.toJson());
     if (response.meta.code == 200) {
       _storageAreaList = response.data!;
       _filteredStorageAreaList = _storageAreaList;
@@ -78,7 +77,6 @@ class _RequestStorageDialogState extends State<RequestStorageDialog> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                 ),
                 onChanged: (value) {
-                  print('value>$value');
                   setState(() {
                     _filteredStorageAreaList = _storageAreaList
                         .where(
@@ -97,7 +95,8 @@ class _RequestStorageDialogState extends State<RequestStorageDialog> {
                         child: RequestStorageItem(
                           data: data,
                           onRemove: () {
-                            _removeRequestStorageData(data.requestNumber);
+                            // TODO: 자료 삭제 기능 구현 필요
+                            // _removeRequestStorageData(data.requestNumber);
                           },
                         ),
                         onTap: () {
@@ -114,13 +113,14 @@ class _RequestStorageDialogState extends State<RequestStorageDialog> {
     );
   }
 
-  void _removeRequestStorageData(int requestNumber) async {
-    final response = await _repository.deleteRequestStorageData(requestNumber);
+  void _removeRequestStorageData(String keyDateTime) async {
+    final response = await _repository.deleteRequestStorageData(keyDateTime);
     if (response.meta.code == 200) {
-      _storageAreaList.removeWhere((data) => data.requestNumber == requestNumber);
+      _storageAreaList.removeWhere((data) => data.keyDateTime == keyDateTime);
       setState(() {
         _filteredStorageAreaList = _storageAreaList
-            .where((data) => data.name.toLowerCase().contains(textController.value.text))
+            .where((data) =>
+                data.name.toLowerCase().contains(textController.value.text))
             .toList();
       });
     }
@@ -140,7 +140,7 @@ class RequestStorageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Slidable(
-      key: Key(data.requestNumber.toString()),
+      key: Key(data.keyDateTime),
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
@@ -172,13 +172,38 @@ class RequestStorageItem extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(data.name,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        subtitle: Row(
+        title: Row(
           children: [
-            Text(data.address),
-            const Spacer(),
-            Text(data.startDate.toDateString()),
+            Text(
+              data.name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Spacer(),
+            Text(data.center)
+          ],
+        ),
+        subtitle: Column(
+          children: [
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Text(data.address),
+                const Spacer(),
+                Text(data.mobileNumber),
+              ],
+            ),
+            Row(
+              children: [
+                Text('위치정보 : ${data.hasLocation ? 'O' : 'X'}'),
+                const SizedBox(width: 32),
+                Text('LTE Only : ${data.isLteOnly ? 'O' : 'X'}'),
+                Spacer(),
+                Text(data.keyDateTime),
+              ],
+            ),
           ],
         ),
       ),

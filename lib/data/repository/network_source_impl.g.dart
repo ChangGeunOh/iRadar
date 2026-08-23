@@ -87,6 +87,37 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
   }
 
   @override
+  Future<ResponseData<dynamic>> uploadRequestNumber(String keyDateTime) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'key_date_time': keyDateTime};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<dynamic>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            'req',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<dynamic> _value;
+    try {
+      _value = ResponseData<dynamic>.fromJson(
+        _result.data!,
+        (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<ResponseData<TokenData?>> postTokenData(String jsonString) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -703,7 +734,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'base/version',
+            'base/latest',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -970,7 +1001,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8000/api/req',
+            'req',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -998,7 +1029,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<ResponseData<List<IntfTtData>>> getRequestStorageMeasureData({
-    required int requestId,
+    required String keyDateTime,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -1009,7 +1040,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8000/api/req/${requestId}',
+            'req/${keyDateTime}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -1037,7 +1068,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
 
   @override
   Future<ResponseData<dynamic>> deleteRequestStorageData({
-    required int requestId,
+    required String keyDateTime,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -1048,7 +1079,7 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8000/api/req/${requestId}',
+            'req/${keyDateTime}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -1060,6 +1091,103 @@ class _NetworkSourceImpl implements NetworkSourceImpl {
       _value = ResponseData<dynamic>.fromJson(
         _result.data!,
         (json) => json as dynamic,
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<RequestUploadResultData>> uploadRequestData({
+    required RequestUploadData requestUploadData,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    _data.addAll(requestUploadData.toJson());
+    final _options = _setStreamType<ResponseData<RequestUploadResultData>>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            'req/upload',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<RequestUploadResultData> _value;
+    try {
+      _value = ResponseData<RequestUploadResultData>.fromJson(
+        _result.data!,
+        (json) =>
+            RequestUploadResultData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<BaseVersionData>> getBaseVersion() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<BaseVersionData>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            'base/version',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<BaseVersionData> _value;
+    try {
+      _value = ResponseData<BaseVersionData>.fromJson(
+        _result.data!,
+        (json) => BaseVersionData.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<ResponseData<BaseVersionData>> updateBaseData() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'access_token': true};
+    _headers.removeWhere((k, v) => v == null);
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ResponseData<BaseVersionData>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            'base//update',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ResponseData<BaseVersionData> _value;
+    try {
+      _value = ResponseData<BaseVersionData>.fromJson(
+        _result.data!,
+        (json) => BaseVersionData.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);

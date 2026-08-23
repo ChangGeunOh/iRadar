@@ -9,7 +9,9 @@ part of 'area_data.dart';
 AreaData _$AreaDataFromJson(Map<String, dynamic> json) => AreaData(
       idx: (json['idx'] as num).toInt(),
       name: json['name'] as String,
-      division: $enumDecodeNullable(_$LocationTypeEnumMap, json['division']),
+      division: json['division'] == null
+          ? null
+          : LocationType.fromJson(json['division'] as String),
       type: Convert.dynamicToWirelessType(json['type']),
       latitude: (json['lat'] as num?)?.toDouble(),
       longitude: (json['lng'] as num?)?.toDouble(),
@@ -23,7 +25,7 @@ Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
       'idx': instance.idx,
       'name': instance.name,
       'type': Convert.wirelessTypeToDynamic(instance.type),
-      'division': _$LocationTypeEnumMap[instance.division],
+      'division': instance.division,
       'lat': instance.latitude,
       'lng': instance.longitude,
       'is_chart_cached': instance.isChartCached,
@@ -31,10 +33,3 @@ Map<String, dynamic> _$AreaDataToJson(AreaData instance) => <String, dynamic>{
       'create_at': Convert.dateTimeToDynamic(instance.createdAt),
       'dt': Convert.dateTimeToDynamic(instance.measuredAt),
     };
-
-const _$LocationTypeEnumMap = {
-  LocationType.adminBuilding: '행정동',
-  LocationType.inBuilding: '인빌딩',
-  LocationType.theme: '테마',
-  LocationType.undefined: 'undefined',
-};

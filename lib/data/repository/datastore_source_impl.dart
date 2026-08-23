@@ -126,4 +126,8 @@ class DataStoreSourceImpl extends DataStoreSource {
     await _dataStore.clearCache(keyMapData);
   }
 
+  @override
+  Future<void> clearTokenData() async {
+    return _dataStore.remove(keyTokenData);
+  }
 }
